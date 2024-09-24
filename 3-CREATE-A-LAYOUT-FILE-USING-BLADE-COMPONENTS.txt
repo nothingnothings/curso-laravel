@@ -1,0 +1,1309 @@
+
+
+
+
+
+
+
+
+--> SEMPRE QUE O PROFESSOR ESTÁ APRENDENDO 
+    ALGO NOVO,
+    
+
+    ELE SEMPRE VOLTA PARA
+
+    O ''I WANT TO CREATE A SIMPLE THREE-PAGE LAYOUT''...
+
+
+
+
+
+
+
+
+
+
+--> PQ, SE VC SABE ISSO, VC SABE MT COISA...
+
+
+
+
+
+
+
+
+
+
+--> VAMOS CRIAR ISSO AÍ,
+
+UM 'THREE-PAGE LAYOUT',
+
+
+USANDO O LARAVEL...
+
+
+
+
+
+
+
+--> NA ÚLTIMA PARTE DO SEGUNDO DIA,
+
+FICAMOS COM ESTE CÓDIGO:
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/about', function () {
+    return ['foo' => 'bar'];
+});
+
+Route::get('/about', function () {
+    return view('about');
+});
+
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+MAS O PROFESSOR QUER RENOMEAR A VIEW INICIAL,
+
+
+
+DE 
+'welcome' para 'home', ou 'index.'...
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+--> ISSO FEITO,
+
+
+
+O PROFESSOR VAI DUPLICAR CÓDIGO...
+
+
+
+
+
+TEREMOS CÓDIGO DUPLICADO INICIALMENTE,
+
+MAS USAREMOS LAYOUTS 
+
+
+
+PARA 
+
+
+
+TER 1 MESMO LAYOUT, PARA ESSAS 3 PAGES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR QUER ADICIONAR UMA NAVBAR,
+
+
+COM ESTE CÓDIGO:
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+ISSO TUDO NA HOME PAGE...
+
+
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE, ASSIM QUE ABRIRMOS A NOVA VIEW,
+
+DE 'CONTACT',
+
+FICAREMOS 
+
+
+
+
+SEM ESSA NAVBAR...
+
+
+
+
+
+
+
+
+
+--> SE VC DUPLICAR ESSA NAVBAR NAS OUTRAS 
+2 PAGES,
+
+VAI FUNCIONAR, MAS É TERRÍVEL...
+
+
+
+
+
+
+
+--> PARA CONSERTAR ISSO, USAREMOS LAYOUTS...
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR RENOMEIA OS ARQUIVOS PARA 
+
+'home.blade.php',
+
+'contact.blade.php'
+
+
+e 
+
+'about.blade.php'...
+
+
+
+
+
+--> É COMO 1 PEQUENO LAYER EM CIMA DOS ARQUIVOS php...
+
+
+
+--> TE DÁ ALGUNS HELPERS, ALGUMAS DIRECTIVES,
+    SHORTCUTS,
+
+    ETC ETC...
+
+
+
+
+
+
+
+--> TAMBÉM TE DÁ 'LAYOUT FILES' OU 'MASTER FILES',
+    COMO SÃO CHAMADAS...
+
+
+
+
+
+
+--> SE RENOMEARMOS ISSO PARA BLADE FILES,
+    NADA VAI MUDAR, INICIALMENTE,
+
+    MAS ACTUALLY GANHAREMOS 1 MONTE DE VANTAGENS...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR CRIA 1 NOVO FOLDER, CHAMADO DE 'Components',
+    dentro de 'views'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO VAI AGIR COMO 1 REUSABLE BLOCK,
+
+QUE PODEREMOS USAR EM DIVERSAS PARTES DE NOSSO APP..
+
+
+
+
+PODERÃO SER:
+
+
+1) UMA TASK
+ 
+ 2) UM MENU 
+
+
+ 3) UM DROPDOWN ITEM 
+
+
+ 4) UMA CARD MESSAGE 
+
+
+ 5) UM AVATAR
+
+
+
+ 6) UM LAYOUT...
+
+
+
+
+
+
+
+ --> NOSSO LAYOUT SERÁ 1 COMPONENT...
+
+
+
+
+
+
+--> POR ISSO CRIAMOS 1 ARQUIVO CHAMADO DE 'layout.blade.php'...
+
+
+
+
+
+
+
+--> AÍ, NO CASO,
+ 
+ O PROFESSOR PEGA TODO O WRAPPING CODE E COLOCA 
+ NESSA LAYOUT FILE,
+
+ TIPO ASSIM:
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+--> ELE BASICAMENTE VAI REPLICAR 
+
+O TRUQUE DE 'props.children' do react,
+
+para que 
+
+esse layout WRAPPE
+
+
+AO REDOR DAS OUTRAS PAGES...
+
+
+
+
+
+
+
+
+
+
+ELE FARÁ O INCLUDE DE ESSE LAYOUT 
+
+NAS OUTRAS PAGES...
+
+
+
+
+
+
+
+
+--> ELE VAI ATÉ 'home.blade.php',
+
+
+E AÍ 
+
+DELETA TODO O CONTEÚDO...
+
+
+
+
+
+
+
+-- ''NOW, I WANNA REFERENCE A LAYOUT FILE''....
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, VAMOS INTERAGIR 
+    COM ESSA LAYOUT FILE COMO SE ELA 
+    FOSSE 1 'CUSTOM HTML TAG'...
+
+
+
+
+
+
+
+--> NO CASO, A TAG SERÁ 'layout'...
+
+
+
+
+
+
+
+
+
+
+EM 'home.blade.php',
+
+
+ESCREVEMOS ASSIM:
+
+
+
+
+
+<x- 
+
+
+
+
+
+
+nós sempre referenciamos components 
+
+com 
+
+'x-',
+
+
+PARA GARANTIR QUE SEJAM UNIQUE,
+
+
+E PARA QUE NÃO INTERFIRAM COM 
+
+HTML TAGS QUE JÁ EXISTEM...
+
+
+
+
+
+
+
+
+
+NO CASO DO COMPONENT 'layout',
+
+
+ESCREVEMOS 
+
+
+'<x-layout></x-layout>'...
+
+
+
+
+
+
+
+
+
+
+-> CERTO.... 
+
+
+
+
+
+
+MAS SE QUEREMOS QUE ESSE COMPONENT 
+
+DE 
+
+'<x-layout>'
+
+REALMENTE WRAPPE NOSSAS VIEWS/PAGES,
+
+
+
+
+PRECISAMOS 
+
+
+
+
+COLOCAR TIPO UM 'props.children' dentro do x-layout...
+
+
+
+
+
+
+
+
+
+
+
+''WE NEED TO DECLARE WHERE THAT 
+    VIEW SHOULD BE SLOTTED IN....''
+
+
+
+
+
+
+--> PARA ISSO, O LARAVEL TEM 
+
+1 VARIABLE NAME QUE SEMPRE FICA DISPONÍVEL A NÓS,
+
+
+QUE É 
+
+A VARIABLE 
+
+
+'slot'..
+
+
+
+
+
+
+O PROFESSOR NOS MOSTRA, INICIALMENTE,
+
+A VERSAO 'LONGA',
+
+
+PARA MAIS TARDE MOSTRAR A VERSAO COM HELPERS, MAIS SIMPLES...
+
+
+
+
+
+
+
+
+A VERSÃO MAIS LONGA É ASSIM:
+
+
+
+
+
+
+<?php echo $slot ?>
+
+
+
+
+
+
+
+
+
+ESSA É A VARIABLE,
+
+
+
+ESSe '$slot'...
+
+
+
+
+
+--> SE FAZEMOS ECHO DE '$slot',
+
+    CONSEGUIMOS O ACTUAL CÓDIGO/HTML
+
+    DA PAGE DE HOME...
+
+
+
+
+
+
+
+
+O CÓDIGO COMPLETO FICA ASSIM:
+
+
+
+
+
+(home.blade.php):
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    Hello from the HOME page.
+</x-layout>
+
+
+
+
+
+
+
+
+(layout.blade.php):
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+    <!--  This is similar to 'props.children', for layouting -->
+    <?php echo $slot ?>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+E REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+NÓS:
+
+
+
+
+1) CREATED A NEW COMPONENT, FOR A LAYOUT FILE 
+
+
+
+
+2) THE LAYOUT FILE IS ALMOST LIKE THE 
+
+'''STRUCTURE''' FOR YOUR APP... IT IS ALL THE 
+SURROUNDING MARKUP, THE <head> tag, ANY SCRIPTS 
+OR STYLESHEETS YOU NEED TO IMPORT... THE NAVIGATION 
+AREA, THE FOOTER, ETC...
+
+
+
+3) THEN, TYPICALLY, YOU HAVE A 'main' SECTION,
+    THAT IS ALWAYS GOING TO BE UNIQUE, FOR EACH PAGE...
+
+
+
+
+
+
+4) SO, WE DEFINE THE STRUCTURE,
+
+
+
+    AND THEN WE ARE GOING TO '$slot' in  
+    ANY PAGE-SPECIFIC MARKUP...
+
+
+
+
+     
+
+
+
+
+
+
+    --> NOSSA PAGE DE HOME FICOU ASSIM:
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    Hello from the HOME page.
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+FICOU BEM MAIS CLEAN...
+
+
+
+
+
+
+
+
+
+PODEMOS FAZER A MESMA COISA COM A PAGE DE CONTACT.BLADE.PHP,
+TIPO ASSIM:
+
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <h1>Hello from the CONTACT Page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+E ABOUT TAMBÉM:
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <h1>Hello from the ABOUT page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, ESTAMOS REMOVENDO TODA AQUELA DUPLICATION,
+O QUE É MT BOM...
+
+
+
+
+
+
+
+
+
+
+
+
+--> ENTRAMOS NAS 3 PAGES,
+
+
+E TUDO FUNCIONA..
+
+
+
+
+
+
+
+
+-> O PROFESSOR ADICIONA 
+    MAIS 1 LINK À NAVBAR,
+
+
+    LÁ EM 'layout.blade.php'
+
+
+
+    tipo assim:
+
+
+
+
+
+    <a href="/meet-the-team">Team</a>
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/meet-the-team">Team</a>
+    </nav>
+    <!--  This is similar to 'props.children', for layouting -->
+    <?php echo $slot ?>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+COM ISSO, PODEMOS EVITAR MT DUPLICAÇÃO DE CÓDIGO,
+
+PQ BASTA ALTERAR A NAVBAR NESSA ÚNICA FILE,
+
+
+
+E OS EFEITOS JÁ SERÃO APLICADOS A TODAS OUTRAS 
+
+VIEWS QUE O UTILIZAM....
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+CONTINUANDO:
+
+
+
+
+'''NOW WE ARE GOING TO SEE OUR FIRST BLADE HELPER''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE PODERÍAMOS ESCREVER 'echo $slot'....
+
+
+
+
+
+
+
+
+
+
+-> MAS O LARAVEL E O BLADE NOS OFERECEM 1 HELPER BEM MELHOR,
+
+QUE É O 
+
+'{{}}'.... 
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+ISSO É TRADUZIDO DIRETAMENTE PARA 'php echo $xxxx'...
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE VAMOS ESCREVER 
+
+
+'{{ slot }}'''
+
+
+
+
+
+
+
+isso pq 
+
+
+'{{ slot}} ''
+
+
+É 
+
+exatamente A MESMA COISA QUE 
+
+
+<?php  echo $slot ?>
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/meet-the-team">Team</a>
+    </nav>
+    <!--  This is similar to 'props.children', for layouting -->
+    <!-- <?php echo $slot ?> -->
+     <!--  This is the same as 'echo $slot', but written in a simpler form, with double curly braces -->
+     {{ slot }}
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+ESSAS 2 ESCRITAS SÃO BASICAMENTE A MESMA COISA...
+
+
+
+
+
+
+
+''BEHIND THE SCENES, THIS SYNTAX 
+IS CONVERTED INTO php echo $xxxxx''
+
+
+
+
+
+--> OK....
+
+
+
+
+
+ CERTO...
+
+
+
+
+
+
+
+
+
+
+
+--> APRENDEMOS A CRIAR ESSE THREE-PAGE LAYOUT...
+
+
+
+
+
+
+--> É SUPER BÁSICO, MAS É ESSENCIAL...
+
+
+
+
+
+--> AGORA SABEMOS SOBRE COMPONENTS E LAYOUT FILES...
+
+
+
+
+
+
+
+--> O QUE DEVEMOS FAZER, AGORA?
+
+
+
+
+
+--> ''YOU SHOULD 
+    CREATE A <nav-link> Laravel Component''...
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+-> A PARTE DA LABEL E DO LINK DEVERÁ SER DINÂMICA...
+
+
+
+--> QUER DIZER QUE VAMOS PRECISAR USAR SLOTS...
+
+
+
+
+VAI FICAR TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <x-navlink href="/">Home</x-navlink>
+        <x-navlink href="/about">About</x-navlink>
+        <x-navlink href="/contact">Contact</x-navlink>
+        <a href="/meet-the-team">Team</a>
+    </nav>
+    <!--  This is similar to 'props.children', for layouting -->
+    <!-- <?php echo $slot ?> -->
+    <!--  This is the same as 'echo $slot', but written in a simpler form, with double curly braces -->
+    {{ slot }}
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+CERTO... DEVO VER SE ISSO FUNCIONA...
+
+
+
+
+
+
+
+GANHEI ESTE ERROR:
+
+
+
+
+Undefined constant "slot"
+
+
+
+
+
+era pq o correto é '$slot'...
+
+
+
+
+
+
+
+
+
+
+a versao correta do código era esta:
+
+
+
+
+
+(navlink.blade.php):
+
+
+<a href="{{ $href }}">{{ $slot }}</a>
+
+
+
+
+
+
+(layout.blade.php):
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <x-navlink href="/">Home</x-navlink>
+        <x-navlink href="/about">About</x-navlink>
+        <x-navlink href="/contact">Contact</x-navlink>
+        <x-navlink href="/meet-the-team">Team</x-navlink>
+    </nav>
+    {{ $slot }}
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+é claro que isso poderia ser simplificado ainda mais,
+
+com 1 for loop em 1 array, nessa navbar...
