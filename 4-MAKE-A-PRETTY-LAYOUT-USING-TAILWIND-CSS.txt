@@ -4,3 +4,585 @@
 
 AGORA USAREMOS 1 POUCO DE TAILWIND COM PHP...
 
+
+
+
+
+--> VAMOS COMEÇAR COM O HOMEWORK DO DIA 3...
+
+
+
+
+
+
+
+
+-> MEU CÓDIGO DO NAVBAR FICOU TIPO ASSIM:
+
+
+
+
+<a href="{{ $href }}">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+--> o professor usou 'Components',
+
+
+mas pode ser 'components'...
+
+
+
+
+
+
+-> certo..., aí, lá no 'layout.blade.php',
+
+
+ficou tipo assim:
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <x-navlink href="/">Home</x-navlink>
+        <x-navlink href="/about">About</x-navlink>
+        <x-navlink href="/contact">Contact</x-navlink>
+        <x-navlink href="/meet-the-team">Team</x-navlink>
+    </nav>
+    {{ $slot }}
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+usei a variable '$href' 
+
+
+do larave/blade,
+
+
+para conseguir o acesso ao attribute de 'href'...
+
+
+
+
+
+
+
+EXPLICAÇÃO DO PROFESSOR:
+
+
+
+
+
+
+''ALL LARAVEL BLADE COMPONENTS 
+HAVE ACCESS TO AN 'ATTRIBUTE' OBJECT... '''
+
+
+
+
+'''AND THAT ATTRIBUTE OBJECT 
+
+WILL CONTAIN _ ALL THE DETAILS ___ FOR ANY 
+ATTRIBUTE YOU PASS''...
+
+
+
+
+
+
+
+
+
+
+''ANY ATTRIBUTE'' --> COISAS COMO:
+
+
+1) ID 
+
+2) HREF 
+
+3) CLASS
+
+4) DATA-XX....
+
+
+
+
+
+
+
+-> É POR ISSO QUE O PROFESSOR ESCREVEU ASSIM:
+
+
+
+
+
+<a href="{{ $attributes }}">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... MAS É CLARO QUE 
+
+'attributes' NÃO É 'href'...
+
+
+
+
+
+
+--> MAS O PROFESSOR ESCREVEU DE FORMA DIFERENTE,
+
+TIPO ASSIM:
+
+
+<a {{ $attributes }}>{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+
+ELE FEZ DUMP DE __ TODOS OS ATTRIBUTES,
+
+PARA DENTRO DE ESSA TAG <a>...
+
+
+
+
+
+
+
+-> ISSO VAI FAZER COM QUE TODOS NOSSOS ATTRIBUTES 
+    SEJAM STRINGIFADOS E OUTPUTTADOS...
+
+
+
+
+
+
+
+
+
+
+
+
+''$attributes'' é um OBJECT... o que quer dizer que 
+
+há mais bells and whistles aqui, do que parece....
+
+
+
+
+
+
+
+
+--> POR EXEMPLO, SE VC QUER FAZER 
+
+
+'''MERGE IN SOME CLASS NAMES'',
+
+
+VC pode escrever assim:
+
+
+
+
+$attributes->merge('class');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS, VOLTANDO AO BROWSER,
+
+REALMENTE DEIXAMOS ASSIM:
+
+
+
+
+
+<a {{ $attributes }}>{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+E ISSO FARÁ COM QUE OS LINKS REALMENTE APONTEM PARA AS 'href'
+
+corretas...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS DIGAMOS QUE QUEREMOS ESCREVER 
+
+1 STYLE INLINE,
+
+
+
+
+
+COMO 
+
+'style="color: green"' ,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+</head>
+
+<body>
+    <nav>
+        <x-navlink href="/">Home</x-navlink>
+        <x-navlink href="/about" style="color: green">About</x-navlink>
+        <x-navlink href="/contact">Contact</x-navlink>
+        <x-navlink href="/meet-the-team">Team</x-navlink>
+    </nav>
+    {{ $slot }}
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+SE ESCREVEMOS ESSE INLINE-STYLE,
+
+ELE TAMBÉM É INCLUÍDO 
+
+
+NO STYLE DESSE NAVBAR ESPECÍFICO...
+
+
+
+
+
+
+
+
+--> OK, MAS VC PODE ESTAR SE PERGUNTANDO:
+
+
+'''PQ VC FARIA ISSO??''
+
+
+
+
+
+
+--> PARA COISAS SIMPLES, VC N USARIA ISSO...
+
+
+
+
+
+
+
+
+
+
+-> MAS A RESPOSTA:
+
+
+'''NA VIDA REAL, NAVLINKS
+    SÃO 1 POUCO MAIS COMPLEXOS DO QUE 
+
+    1 SIMPLES ANCHOR TAG''...
+
+
+
+
+
+
+-_> VC VAI PRECISAR DE CLASSES E STYLES ESPECÍFICOS, 
+    A DEPENDER SE ESSA É A ACTIVE PAGE OU NÃO...
+
+
+
+
+
+
+
+
+
+--> VC TAMBÉM PODE TER DIFERENTES CASES,
+
+
+    A DEPENDER ''ON WHERE YOU ARE ON THE WEBSITE, 
+                OR DEPEND ON WHAT YOUR SCREEN SIZE IS'''...
+
+
+
+
+
+
+
+
+-> O PONTO É:
+
+
+
+AS COISAS FICAM MAIS COMPLEXAS DO QUE 1 ANCHOR TAG  BÁSICO...
+
+
+
+
+
+
+
+
+
+
+---> MAS O QUE INTERESSA, AQUI, É QUE PODEMOS ISOLAR TODA A COMPLEXIDADE 
+    DE NAVLINKS EM 1 ÚNICO COMPONENT,
+    O QUE É BEM LEGAL...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AGORA O PROFESSOR QUER MELHORAR A APARENCIA DO APP...
+
+
+
+
+
+
+
+
+
+
+--> ELE BAIXA O TAILWIND,
+
+COM O CDN...
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+-> UMA COISA QUE O PROFESSOR GOSTA MT DO TAILWIND É 
+
+O 'TAILWIND-COMPONENTS'...
+
+
+
+
+
+
+
+
+
+
+
+-> é o 'TAILWIND UI.com'....
+
+
+
+
+
+-> esse site oferece alguns exemplos free, que é os que utilizaremos...
+
+
+
+
+
+
+
+
+
+
+-> certo...
+
+
+
+
+
+
+
+
+
+-> 'browse components'...
+
+
+
+
+
+
+
+-> vamos até 'application UIs'...
+
+
+
+
+
+
+
+
+--> O PROFESSOR pega um em 'stacked layouts'...
+
+
+
+
+
+
+--> O PRIMEIRO É FREE....
+
+
+
+
+
+
+--> os custom são pagos...
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR PEGA O LAYOUT DO PRIMEIRO EXEMPLO,
+
+E AÍ COLA 
+
+EM 'layout.blade.php'...
+
+
+
+O professor cola isso no BODY...
+
+
+
+
+
+FICA TIPO ASSIM:
+
+
+
+

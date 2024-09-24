@@ -10,7 +10,7 @@
 <body>
     <nav>
         <x-navlink href="/">Home</x-navlink>
-        <x-navlink href="/about">About</x-navlink>
+        <x-navlink href="/about" style="color: green">About</x-navlink>
         <x-navlink href="/contact">Contact</x-navlink>
         <x-navlink href="/meet-the-team">Team</x-navlink>
     </nav>
