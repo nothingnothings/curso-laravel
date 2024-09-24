@@ -1,0 +1,834 @@
+
+
+
+
+
+
+
+LARACON --> CONFERENCIA ESPECÍFICA DO LARAVEL...
+
+
+
+
+
+
+
+
+
+
+--> ANTIGAMENTE, NINGUÉM SABIA O QUE ERA O LARAVEL...
+
+
+
+
+
+
+
+
+
+
+
+--> LARABEL -> É A PRONÚNCIA CORRETA...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> DIA 1:
+
+
+
+
+
+
+
+
+
+
+--> 
+
+
+
+
+
+
+ANTIGAMENTE, QUANDO VC  
+
+
+QUERIA SETTAR 1 ENVIRONMENT PARA O PHP,
+
+
+EXISTIAM 
+
+
+
+200 OPCOES DIFERENTES... E ISSO AINDA É VERDADE...
+
+
+
+
+
+
+-> MAS HOJE EM DIA EXISTEM ONE-CLICK SOLUTIONS 
+INCRÍVEIS...
+
+
+
+
+
+
+
+
+-> TRADICIONALMENTE,
+    TOOLS COMO 
+
+    XAMPP, WAMPP,
+    LAMPP....
+
+
+
+
+
+--> WINDOWS --> LARAGON...
+
+
+
+
+
+
+
+
+
+--> TODOS ESSES SÃO DESENVOLVIDOS ATÉ HOJE...
+
+
+
+
+
+
+
+
+
+--> VC PODERIA INSTALAR TUDO MANUALMENTE,
+    NO MAC,
+
+
+    COM 
+
+    'brew install php'
+
+
+    'brew install mysql'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+---> TODOS ESSES AINDA EXISTEM, E HÁ OPTIONS PARA ISSO....
+
+
+
+
+
+
+
+
+
+
+
+-> MAS SE VC ESTÁ COMEÇANDO COM O 
+    LARAVEL,
+    O PROFESSOR RECOMENDA 
+
+    O 
+
+    'LARAVEL HERD'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> LARAVEL HERD ---> É 
+
+
+UMA ONE-CLICK UTILITY,
+
+
+QUE PODE TE AJUDAR A BUILD PHP 
+
+
+E LARAVEL APPS...
+
+
+
+
+
+
+
+
+-> mas, para linux, não há essa opção...
+
+
+
+
+
+
+''IF YOU ARE ON LINUX, YOU PROBABLY 
+ALREADY KNOW WHAT TO DO....''
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI USAR O HERD...
+
+
+
+
+
+
+
+
+
+
+
+-> EU POSSO USAR O DOCKER...
+
+
+
+
+
+-> A VERSAO FREE DO HERD JÁ É BOA O BASTANTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SE VC INSTALA O HERD,
+
+VC FICA COM ACESSO A:
+
+
+
+1) herd 
+
+
+2) php 
+
+
+3) composer 
+
+
+4) laravel, tudo no seu terminal...
+
+
+
+
+
+
+
+
+
+
+
+--> AS VANTAGENS DO HERD:
+
+
+
+
+
+
+''All PHP projects placed in ~/Herd 
+will be AUTOMATICALLY AVAILABLE IN YOUR BROWSER''...
+
+
+
+
+
+
+
+
+
+--> ESSA É UMA DAS MELHORES FEATURES...
+
+
+
+
+
+
+-> NA MENU BAR,
+    ENCONTRAMOS 
+
+
+    O ÍCONE DO HERD...
+
+
+
+
+
+
+
+
+--> PODEMOS ESCOLHER AS VERSIONS DE PHP QUE QUEREMOS UTILIZAR...
+
+
+
+
+
+
+
+--> PODEMOS VER OS PROCESSES QUE ESTAMOS RUNNING...
+
+
+
+
+
+
+
+--> SE VC TEM MÚLTIPLOS PROJECTS,
+    ALGUNS QUE DEPENDEM DE VERSIONS MAIS ANTIGAS DO PHP,
+    VC PODE EXECUTÁ-LOS SIMULTANEAMENTE, EM SUA LOCAL MACHINE...
+
+
+
+
+
+
+
+
+
+
+--> TUDO FICA DISPONÍVEL EM APENAS 1 CLICK,
+    AS VERSIONS OPCIONAIS E ETC...
+
+
+
+
+
+
+
+
+
+--> OK.. NA ABA 'GENERAL', 
+
+    TEMOS 1 LISTA DE 
+
+
+
+'''PATHS IN WHICH HERD WILL LOOK FOR ANY PHP PROJECTS'''....
+
+
+
+
+
+
+POR DEFAULT, VC FICA COM APENAS O 
+
+'/Herd',
+
+
+MAS VC PODE CRIAR QUANTOS VC QUISER 
+
+(
+    como o professor, que criou um outro folder,
+    chamado de 
+
+    'code'....
+)
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ENTÃO ENTRA NO directory 
+
+'herd'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> AÍ, ENTÃO,
+
+
+VAMOS USAR 
+
+
+
+A BINARY 'laravel',
+
+
+que é incluída junto do 'herd'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA CRIAR 1 NOVO PROJECT LARAVEL,
+
+O PROFESSOR 
+
+ESCREVE 
+
+
+
+laravel new <project_name>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO CASO,
+
+ELE ESCREVE 
+
+
+
+
+laravel new example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> AÍ ELE FAZ ALGUMAS PERGUNTAS:
+
+
+
+
+
+
+
+''WOULD YOU LIKE TO INSTALL A STARTER KIT?''
+
+
+
+> No starter kit 
+
+> Laravel Breeze 
+
+> Laravel Jetstream
+
+
+
+
+
+
+
+
+
+
+
+
+-> É UMA MANEIRA DE JUMPSTART 1 PROJECT 
+    COM LAYOUTS, TEMPLATES, AUTHENTICATION...
+
+
+
+
+
+
+
+--> MAS O PROFESSOR DECIDE NÃO USAR STARTER KITS....
+
+
+
+
+
+
+
+
+-> TESTING FRAMEWORK: PEST... (também há o PHPUNIT)
+
+
+
+
+
+
+
+
+
+
+
+'''WOULD YOU LIKE TO 
+    INITIALIZE A GIT REPOSITORY? ''
+
+
+
+
+
+o professor decide não fazê-lo...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---> DEPOIS DISSO,
+     O HERD/LARAVEL 
+
+     FAZ PULL-IN DE TODAS AS DEPENDENCIES NECESSÁRIAS...
+
+
+
+
+
+
+
+    
+
+
+
+
+-> tudo isso depende do composer,
+
+que foi instalado behind the scenes...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO,
+    HÁ A PERGUNTA 
+
+
+
+''Which database will your application use?''
+
+
+
+> MySQL 
+> MariaDB
+> PostgreSQL 
+> SQLite 
+> SQL Servers 
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ESCOLHE 'SQLite'...
+
+
+
+
+
+
+
+
+
+
+
+SQLite --> é uma 
+
+
+
+'FILE-BASED DATABASE''...
+
+
+
+
+
+
+(eu nunca usei, mas não parece uma boa ideia)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ENTAO ENTRA NA PASTA DE 'example',
+
+
+e aí 
+
+
+
+roda ls 
+
+para ver uma lista das files/folders..
+
+
+
+
+
+
+
+
+
+
+FICA TIPO ASSIM:
+
+
+
+
+
+README.md
+app
+bootstrap 
+config 
+database 
+phpunit.xml 
+routes 
+storage
+vendor 
+public 
+resources 
+package.json 
+composer.json 
+composer.lock 
+artisan 
+vite.config.js
+tests
+
+
+
+
+
+
+
+
+
+
+--> esse é o laravel framework...
+
+
+
+
+
+
+
+
+
+
+
+-> MELHOR DO QUE ISSO, PODEMOS 
+
+INSTANTANEAMENTE 
+
+VER ESSE APP 
+
+NO BROWSER,
+
+
+
+BASTA VISITAR 
+
+
+
+
+<nome_do_folder>.test
+
+
+
+
+
+
+
+
+
+
+
+--> POR EXEMPLO,
+
+
+
+
+
+'example.test'...
+
+
+
+
+
+
+
+
+
+
+--> E ISSO JÁ MOSTRA O NOSSO SITE...
+
+
+
+
+
+
+-> já ficamos com a landing page do laravel 11...
+
+
+
+
+
+
+
+
+--> JÁ ESTAMOS PREPARADOS...
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+
+
+
+''IF YOU CHOSE NOT TO USE HERD,
+YOU MIGHT USE A SLIGHTLY DIFFERENT APPROACH,
+LIKE LARAVEL, XAMPP, LARAGON, DOCKER, ETC''...
+
+
+
+
+
+
+
+
+
+
+-> TODOS ESSES SÃO BONS,
+
+MAS SUA INSTALAÇÃO É DIFERENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO PRÓXIMO VIDEO, CRIAREMOS NOSSA PRIMEIRA ROUTE E VIEW...
+
+
+
