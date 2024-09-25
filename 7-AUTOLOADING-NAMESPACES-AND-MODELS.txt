@@ -1,0 +1,2192 @@
+ESTAMOS NO DIA 7...
+
+
+
+
+
+-> TEMOS QUE FAZER UM MONTE DE COISAS...
+
+
+
+
+
+
+
+
+
+
+
+--> TÍNHAMOS DUPLICADO TEMPORARIAMENTE A LISTA DE JOBS 
+
+DO NOSSO APP,
+
+
+TIPO ASSIM:
+
+
+
+
+<?php
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ]
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => [
+            [
+                'id' => 1,
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'id' => 2,
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ]
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+
+    $jobs = [
+        [
+            'id' => 1,
+            'title' => 'Director',
+            'salary' => '$50,000'
+        ],
+
+        [
+            'id' => 2,
+            'title' => 'Programmer',
+            'salary' => '$10,000'
+        ],
+        [
+            'id' => 3,
+            'title' => 'Teacher',
+            'salary' => '$40,000'
+        ],
+    ];
+
+    // * Native PHP solution:
+    // $selectedJob = array_filter($jobs, function ($job) use ($id) {
+    //     return $job['id'] == $id;
+    // });
+
+    // * Laravel solution (with 'Arr' class and helper functions):
+    $selectedJob = Arr::first($jobs, fn($job) => $job['id'] == $id);
+
+    //  dd($selectedJob); /// 'dd' --> dump and die, kill the execution.
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+    // return ['foo' => 'bar'];
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+E PRECISAMOS RESOLVER ESSA DUPLICAÇÃO,
+FAZER COM QUE 
+
+
+ESSA DATA SEJA IMPORTADA DE APENAS 1 ÚNICO LUGAR DO APP...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI RESOLVER ESSE PROBLEMA DE UMA MANEIRA 
+
+BEM INCREMENTAL...
+
+
+
+
+isso vai nos ajudar a entender alguns dos conceitos 
+
+do próximo episódio....
+
+
+
+
+
+
+
+
+
+--> SE ESTAMOS PENSANDO INCREMENTALMENTE,
+
+
+
+PODEMOS PENSAR EM 
+
+
+
+
+'DEFINE THE ARRAY ONE LEVEL ABOVE',
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+$jobs = [
+    [
+        'title' => 'Director',
+        'salary' => '$50,000'
+    ],
+
+    [
+        'title' => 'Programmer',
+        'salary' => '$10,000'
+    ],
+    [
+        'title' => 'Teacher',
+        'salary' => '$40,000'
+    ],
+];
+
+Route::get('/', function () use ($jobs) {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs', function () use ($jobs) {
+    return view('jobs', [
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) use ($jobs) {
+    $selectedJob = Arr::first($jobs, fn($job) => $job['id'] == $id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+certo... tudo funciona como antes,
+
+
+
+mas agora, com menos duplication...
+
+
+
+
+
+
+
+
+AGORA DEVEMOS FAZER OUTRA COISA...
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR QUER FAZER O WRAP 
+
+
+
+DESSE ARRAY EM ALGUM TIPO DE 'DATA CONTAINER'...
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, ELE CRIA UMA NOVA CLASS,
+
+DE NOME 'JOBS'...
+
+
+
+EX:
+
+
+
+
+
+class Job {
+
+    
+}
+
+$jobs = [
+    [
+        'title' => 'Director',
+        'salary' => '$50,000'
+    ],
+
+    [
+        'title' => 'Programmer',
+        'salary' => '$10,000'
+    ],
+    [
+        'title' => 'Teacher',
+        'salary' => '$40,000'
+    ],
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TEREMOS ESSA CLASS AÍ,
+
+
+E ENTÃO UM METHOD, QUE FARÁ O FETCH DE TODOS OS JOBS...
+
+
+
+
+
+- O NOME DE ESSE METHOD SERÁ 'fetchAll()'....
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, PODEMOS ESCREVER TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+isso vai retornar esse array...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS, ENTÃO, CHAMAR 
+
+
+'Job::fetchAll()',
+
+
+PARA PEGAR TOODS ESSES JOBS....
+
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+}
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => Job::fetchAll()
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => Job::fetchAll()
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = Arr::first(Job::fetchAll(), fn($job) => $job['id'] == $id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... O PRÓXIMO PASSO, NO CASO, 
+
+É SE PERGUNTAR:
+
+
+''FAZ SENTIDO TER 1 CLASS DE NOME 'Job',
+
+dentro de web.php?''
+
+
+
+
+
+
+
+--> NÃO FAZ...
+
+
+
+
+
+
+---> É POR ISSO QUE É UMA BOA IDEIA CRIAR 1 NOVO ARQUIVO PARA ISSO,
+
+    DENTRO DO FOLDER DE 'app',
+
+
+    DENTRO DA PASTA DE 'Models'...
+
+
+
+
+
+
+
+
+
+O PROFESSOR FALA DO MVC...
+
+
+
+
+
+
+
+
+<?php
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+É UMA MANEIRA DE CONSTRUIR APPS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+MODEL UPDATES THE VIEW... USER SEES THE VIEW...
+
+
+
+USER USES THE CONTROLLER 
+
+
+
+CONTROLLER MANIPULATES THE MODEL 
+
+
+THE MODEL UPDATES THE VIEW... AND REPEAT...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VIEWS --> É O PRESENTATION LAYER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EM 'web.php',
+
+
+aquela segunda parte do router,
+
+
+
+
+é basicamente o controller, a function que handla a route....
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MODEL...
+
+
+
+
+
+
+
+
+
+
+
+--> MODEL --> PODE REPRESENTAR SUA DATA PERSISTENCE,
+            MAS TAMBÉM A PARTE DE 'BUSINESS LOGIC' 
+
+            DO SEU APP...
+
+
+
+
+
+
+
+
+--> SE VC VAI CONSTRUIR UM 'JOBS BOARD APP',
+        O CONCEITO DE 'JOB' É MT IMPORTANTE...
+
+
+
+
+
+
+
+--> GRANDE PARTE DA LÓGICA VAI GIRAR AO REDOR DOS JOBS...
+
+
+
+
+
+
+
+
+
+
+
+---> QUAIS SÃO AS REGRAS QUE GIRAM EM VOLTA DO JOB?
+
+
+
+
+
+
+
+''SHOULD JOBS BE MARKED AS AVAILABLE, AS FILLED, ETC..'''
+
+
+
+
+''HOW DO YOU STORE THOSE JOBBS? FILES, DATABASES?''
+
+
+
+
+
+''HOW DO WE ARCHIVE THESE JOBS, ETC ETC''...
+
+
+
+
+
+
+
+
+
+
+--> SE TEMOS 1 PASTA DE 'MODELS',
+    A CLASS DE 'JOB'
+
+
+
+    DEVE IR DENTRO DELA...
+
+
+
+
+
+
+--> JÁ TEMOS UMA CLASS DE 'User.php',
+
+
+COM ESTE FORMATO:
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR CRIA A CLASS DE 'Job',
+
+
+    E AÍ 
+
+
+
+    COLOCA NOSSA LÓGICA LÁ DENTRO...
+
+
+
+
+
+
+
+
+
+--> JÁ FICAMOS COM 1 NAMESPACE DE 'App\Models'
+
+
+
+
+
+
+
+ISSO CORRESPONDE AO FILEPATH...
+
+
+
+
+
+
+
+
+
+
+
+--> NAMESPACE...
+
+
+
+
+
+
+
+
+-> NAMESPACE --> É UMA MANEIRA DE ORGANIZAR SEU 
+                CÓDIGO....
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> NAMESPACES EXISTEM JUSTAMENTE PQ 
+
+
+    ARQUIVOS PODEM TER OS MESMOS NOMES...
+
+
+
+
+
+
+
+
+
+
+EX: 'Job'...
+
+
+
+
+
+
+--> Job pode ser:
+
+
+1) Queue Job 
+
+
+2) Job Interface 
+
+
+3) o nosso model, 'Job'...
+
+
+
+
+
+
+
+
+
+
+
+--> SE NÃO TEMOS NENHUMA ORGANIZAÇÃO ESTRUTURAL,
+
+FICAMOS COM COLLISIONS... E É POR ISSO QUE 
+EXISTE 
+
+
+A FEATURE DOS NAMESPACES...
+
+
+
+
+
+
+
+
+
+--> É EXATAMENTE COMO EM 20 ANOS ATRÁS,
+    EM QUE ORGANIZÁVAMOS MP3 
+
+
+
+    EM DIFERENTES PASTAS...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+PinkFloy/TheWall..
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+--> TUDO QUE VC PRECISA SABER:
+
+
+
+
+'''LARAVEL CONFORMS TO AN AUTO-LOADING 
+    STANDARD, 
+
+    CALLED PSR4'''''
+
+
+
+
+
+
+
+-> E ISSO É DEFINIDO DENTRO DE 'composer.json',
+
+
+
+COM ISTO:
+
+
+
+
+
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+--> certo... eu já sabia disso... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ''PS4 IS A CONVENTION, AND A STANDARD FOR 
+    AUTOLOADING FILES''...
+
+
+
+
+
+
+
+
+
+--> E PODEMOS DEFINIR NOSSOS MAPPINGS ALI MESMO....
+
+
+
+
+
+
+
+--> MAS O LARAVEL JÁ FAZ ISSO PARA NÓS,
+
+
+COMO ENXERGAMOS COM ISTO:
+
+
+
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+
+E É POR ISSO QUE FICA TIPO ASSIM:
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ, SEMPRE QUANDO VC CRIAR UMA NOVA FILE,
+
+VC VAI SEGUIR ESSA NOMENCLATURA,
+
+
+
+
+
+VAI SEGUIR 
+
+
+
+ESSA ESTRUTURA DE FOLDERS...
+
+
+
+
+
+
+
+
+
+
+
+por exemplo,
+
+os controllers:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+abstract class Controller
+{
+    //
+}
+
+
+
+
+
+
+
+Como vc pode ver,
+
+
+ele está dentro de 
+
+
+app>Http>Controllers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM SOFISTICAÇÃO SUFICIENTE 
+
+PARA 'AUTO-IMPORT THESE FILES, WITHOUT 
+        NEEDING TO require() them''...
+
+
+
+
+
+
+
+
+
+--> PQ ANTIGAMENTE, COM O PHP ANTIGO,
+    REALMENTE PRECISAMOS/PRECISÁVAMOS 
+    FAZER O IMPORT, COM 'require()'....
+
+
+
+
+--> MAS, COM A ESTRUTURA DE AUTOLOADING 
+DO COMPOSER/LARAVEL,
+
+ISSO É COISA DO PASSADO, BASTA POSICIONAR OS ARQUIVOS 
+
+
+E ESCREVER OS NAMESPACES CORRETAMENTE...
+
+
+
+
+
+
+
+
+
+PARA USARMOS ISSO NO ARQUIVO 'web.php',
+
+
+
+basta usar o autocomplete do IDE,
+
+
+
+que aí os statements de 'use' já vão aparecer, na parte superior...
+
+
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Job;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => Job::fetchAll()
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => Job::fetchAll()
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = Arr::first(Job::fetchAll(), fn($job) => $job['id'] == $id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+COM ISSO, TUOD FUNCIONA COMO ANTES,
+
+
+
+MAS AGORA COM MAIOR OUTSOURCING E ORGANIZAÇÃO...
+
+
+
+
+
+
+
+
+
+
+
+-> AGORA ESTAMOS EXTRAINDO DATA PARA 1 CLASS PRÓPRIA,
+
+A QUE PODEREMOS DEFINIR BEHAVIOR E LÓGICA PRÓPRIAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... agora devemos recapitular esta route aqui:
+
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = Arr::first(Job::fetchAll(), fn($job) => $job['id'] == $id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+ela faz listen to a uma URI específica,
+
+para fazer view de 1 job específico...
+
+
+
+
+
+
+
+
+
+
+
+-> por meio daquela lógica de 
+
+'Arr::first()',
+
+encontramos 
+O PRIMEIRO ELEMENTO DENTRO DAQUELE ARRAY, QUE TENHA 
+
+UM ID EQUIVALENTE A '{id}',
+
+e então o retornamos...
+
+
+
+
+
+
+
+--> MAS É CLARO QUE ESSE BEHAVIOR PODERIA 
+
+SER COLOCADO DENTRO DA CLASS DE 'Job'...
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS ESCREVER 1 METHOD de 'getJob',
+
+ou algo assim... ele faria expect do ID do job...
+
+
+
+
+
+
+
+
+--> os jobs, por sua vez, poderiam ser definidos 
+
+DENTRO DA PRÓPRIA CLASS DE 'job',
+
+
+como 1 property....
+
+
+
+
+
+MAS ANTES DISSO, ESCREVEMOS O METHOD QUE O PROFESSOR 
+
+
+QUER ESCREVER,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): array
+    {
+        $selectedJob = Arr::first(Job::fetchAll(), fn($job) => $job['id'] == $id);
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+ESSE METHOD VAI RETORNAR UM ARRAY COM APENAS 1 ÚNICO ELEMENTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> BEM... JÁ ESTAMOS DENTRO DESSA CLASS,
+
+
+POR ISSO FAZ SENTIDO TROCAR 'Job::all()'
+
+
+por 'static::all()'...
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, PEGAMOS 1 CÓDIGO RELATIVAMENTE CONFUSO,
+
+E O ISOLAMOS PARA DENTRO DE 1 METHOD SIMPLES,
+
+
+QUE DEIXA TRANSPARENTE O QUE ELE FAZ...
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+--> AÍ, LÁ EM 'web.php',
+
+PODEMOS SUBSTITUIR AQUELE CÓDIGO ANTIGO POR ISTO:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... AÍ TESTAMOS,
+
+
+
+
+
+E FUNCIONA COMO ANTES,
+
+
+
+
+
+
+MAS AGORA COM 1 CÓDIGO MAIS LIMPO...
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK.... MAS IMAGINE SE AS COISAS 
+
+    NÃO DERAM CERTO....
+
+
+
+
+
+
+
+    --> IMAGINE QUE O USER TENTA ACESSAR 1 PAGE QUE NÃO EXISTE, 
+
+
+    DE 1 JOB QUE NÃO EXISTE...
+
+
+    POR EXEMPLO,
+
+    UM JOB COM ID DE 5...
+
+
+
+
+
+
+
+
+
+-> COM ISSO, FICAREMOS COM UM __ ERROR__..
+
+
+
+
+
+
+O error será causado pelo return de 'null',
+
+
+pela function de 'Arr::first()'...
+
+
+
+
+
+--> PARA SOLUCIONAR ESSE PROBLEMA,
+
+DEVEMOS DEIXAR O RETURN TYPE DO METHOD 'find()'
+
+
+
+como sendo NULLABLE, com '?',
+
+
+E DEVEMOS ESCREVER UM IF-ELSE CASE,
+
+
+PROVAVELMENTE COM ALGUM THROW,
+
+
+
+PARA QUE SEJA MOSTRADA 1 TELA DE ERROR,
+
+CASO um job com ESSE ID NÃO EXISTA...
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'id' => 1,
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'id' => 2,
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            throw new NotFoundHttpException('Route not Found');
+        }
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+podemos começar com algo assim, sim...
+
+
+
+
+
+E ISTO REALMENTE FUNCIONOU:
+
+
+
+
+
+
+
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            throw new NotFoundHttpException('Route not Found');
+        }
+
+        return $selectedJob;
+    }
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DIZ QUE REALMENTE DEVEMOS FAZER ISSO,
+
+    FAZER O SHOW DE 1 PAGE 404...
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, O PROFESSOR DIZ QUE TEMOS 1 HELPER FUNCTION,
+
+CHAMADA DE 'abort()'...
+
+
+
+
+
+
+
+--> ESSA FUNCTION FAZ ACCEPT DE 1 PARAMETER,
+
+QUE É O STATUS CODE..
+
+
+
+
+
+
+
+--> PODEMOS COLOCAR O STATUS CODE DE 404,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            abort(404);
+        }
+
+        return $selectedJob;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ESSA É UMA GRANDE FEATURE DO LARAVEL:
+
+
+
+
+
+
+
+''WE JUST NEED TO CALL THIS abort() function,
+    AND THEN IT WILL __ BUBBLE-UP IN OUR SYSTEM,
+    TO THE POINT LARAVEL WILL CAPTURE IT AND THEN 
+    TRANSLATE IT TO THE APPROPRIATE RESPONSE''...
+
+
+
+
+
+
+
+
+
+
+E ISSO É TUDO AUTOMÁTICO, NÃO PRECISAMOS FAZER COISA ALGUMA 
+
+PARA FAZER FUNCIONAR...
+
+
+
+
+
+
+
+
+
+
+OK... AGORA FICAMOS COM 1 PAGE DE STATUS 404...
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+--> COM ISSO, CONSEGUIMOS:
+
+
+
+
+
+1) CLEAN UP THE ROUTE FILES 
+
+
+
+
+2) LEARNED ABOUT MODELS 
+
+
+3) CREATED OUR FIRST MODELS 
+
+
+
+4) LEARNED ABOUT DATA ENCAPSULATION AND BEHAVIOR 
+
+
+5) HOW TO HANDLE UNEXPECTED 
+    VALUES...
+
+
+
+6) CUSTOM STATUS CODES,
+    AND HOW THEY ARE CONVERTED 
+    TO RESPONSES,
+    AUTOMATICALLY,
+
+    BY LARAVEL...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
