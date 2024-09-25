@@ -1833,3 +1833,77 @@ IF THE TYPE IS B, DO B'
 --> PARA ISSO, PRECISAREMOS 
 
 DE DIRECTIVES COMO '@if' e '@else'...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+@props(['active' => false, 'type' => 'link'])
+<!-- This is how we declare props, in laravel. This 'active' prop's default value will be 'false', in this case.  -->
+
+
+@if($type === 'link')
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+@else
+
+
+<button {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</button>
+
+
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <x-navlink href="/" :active="request()->is('/')"
+                                    id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" :active="request()->is('about')">About</x-navlink>
+                                <x-navlink href="/contact" :active="request()->is('contact')">Contact</x-navlink>
+                                <!-- ':' prefix, in your prop name, makes it so that the value is interpreted as an EXPRESSION, and not a pure string (we will get bool(false/true), instead of the strings "false"/"true", in this case, the case of the 'active' prop) -->
+                                <x-navlink href="/contact" type="button" :active="request()->is('contact')">Button</x-navlink>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO REALMENTE FUNCIONOU.
