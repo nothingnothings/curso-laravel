@@ -1,0 +1,2750 @@
+
+
+
+
+
+
+
+CERTO, AGORA VAMOS REVISITAR O TÓPICO DE 'MIGRATIONS'...
+
+
+
+
+
+
+
+
+
+
+
+
+NA CLASS DE JOB,
+
+ATÉ AGORA,
+
+
+
+
+FIZEMOS HARDCODE DE NOSSA DATA:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'id' => 1,
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'id' => 2,
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            abort(404);
+        }
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SE SUA COMPANY É PEQUENA
+
+
+E NÃO SE IMPORTA COM O UPDATE 
+
+
+
+DE ESSA FILE,
+
+
+VC DEVE 'KEEP IT SIMPLE',
+
+NÃO HÁ NECESSIDADE DE AUMENTAR O TAMANHO DISSO AÍ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS SE VC ESTÁ BUILDANDO UMA ACTUAL 
+
+
+JOBS BOARD PLATFORM,
+
+
+EM QUE PESSOAS PODERÃO SIGN-UP E CRIAR NOVOS JOBS,
+
+
+
+
+
+
+VC VAI PRECISAR DE UMA DEDICATED DATABASE,
+
+
+PARA ABRIGAR TODOS OS JOB LISTINGS...
+
+
+
+
+
+
+
+
+
+
+
+
+--> QUANDO INICIALIZAMOS NOSSO APP,
+    O LARAVEL 
+
+
+    PERGUNTOU 
+
+    ''WHICH DATABASE DO YOU WANT TO USE''?
+
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+--> NO CASO, ESCOLHEMOS 'SQLite'...
+
+
+
+
+
+
+
+
+
+
+
+SQLite --> é uma FILE-BASED DATABASE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+SQLITE --> TEM UMA MÁ REPUTAÇÃO...
+
+
+
+
+
+
+
+MAS PODE SER USADO NA MAIOR PARTE DAS SITUAÇÕES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VC SÓ NÃO PODE USÁ-LO SE FOR 1 EMPRESA GRANDE,
+
+
+TIPO AMAZON, GOOGLE, MICROSOFT, ETC...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SE VC É UM NEGÓCIO MÉDIO-GRANDE,
+    SEM MILLIONS OF ROWS,
+
+    AÍ É OK...
+
+
+
+
+
+
+
+
+
+
+--> MAS SE VC PREFERE MYSQL OU POSTGRESQL,
+
+VC PODE ESCOLHER ESSAS OPTIONS...
+
+
+
+
+
+
+
+
+
+--> OK... MAS O QUE INTERESSA AQUI,
+
+    É O ARQUIVO '.env'...
+
+
+
+
+
+
+
+
+ELE ESTÁ ASSIM:
+
+
+
+
+
+
+
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:S4dzdnf6Jt7KwBqXcC1OF4LbzH0661VIhdwim0OG2i4=
+APP_DEBUG=true
+APP_TIMEZONE=UTC
+APP_URL=http://localhost
+
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+
+APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=sqlite
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=laravel
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+
+CACHE_STORE=database
+CACHE_PREFIX=
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=log
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+VITE_APP_NAME="${APP_NAME}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TEMOS VÁRIAS COISAS IMPORTANTES, AQUI...
+
+
+
+
+
+
+
+
+
+
+--> E A ESCOLHA DE DATABASE, DENTRO DO LARAVEL,
+
+É FEITA NESTE TRECHO AQUI:
+
+
+
+
+
+
+DB_CONNECTION=sqlite
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=laravel
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+
+
+
+
+
+
+
+
+
+
+
+
+SUA ESCOLHA DE DATABASE É FEITA ALI...
+
+
+
+
+
+
+
+
+
+
+-> VC PODE CONFIGURAR SUAS DIFERENTES PREFERENCES, PASSWORDS E 
+STRINGS PARA SEU PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS ESCOLHER QUAL DATABASE...
+
+
+
+
+
+
+--> PODEMOS DEFINIR SE NOSSO APP ESTÁ 
+
+EM 1 MODO DE DEBUG OU NÃO... (agora está como 'true')...
+
+
+
+
+
+
+
+
+--> A ESCOLHA DO SESSION_DRIVER,
+
+
+
+
+CACHE_STORE,
+
+
+
+
+
+
+SE VAMOS QUERER TER 1 API KEY,
+
+COMO PARTE DE NOSSO PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS ADICIONAR NOSSAS PRÓPRIAS API KEYS,
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+APP_API_KEY=1adjasijdasihdiahdsai
+
+
+
+
+
+
+
+
+
+--> ok... isso tudo é importante...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS AGORA O PROFESSOR QUER FALAR SOBRE 
+
+
+''THE CHOICE OF YOUR DATABASE'''..
+
+
+
+
+
+
+
+
+
+
+--> E ISSO É REALMENTE DECIDIDO POR MEIO DE 
+
+'DB_CONNECTION',
+
+QUE É O QUE TE MOSTRA 
+
+
+QUAL 
+
+DATABASE SERÁ USADA POR SEU APP...
+
+
+
+
+VC PODE DESCOBRIR ISSO LENDO ESSE ARQUIVO '.env',
+
+
+OU POR MEIO 
+
+
+
+
+
+
+de um comando do artisan,
+
+
+
+que é 
+
+
+
+
+
+''''
+
+php artisan xxx
+
+
+''''
+
+
+
+
+
+
+
+
+
+
+-> O LARAVEL VEM COM UMA TOOL CHAMADA DE 'artisan'...
+
+
+
+
+
+
+
+
+
+
+--> QUANDO EXECUTAMOS O ARTISAN,
+
+    ENXERGAMOS UMA VARIEDADE 
+
+
+    DE COMANDOS QUE PODEMOS 
+
+    EXECUTAR...
+
+
+
+
+
+
+
+-> MAS, NA MAIOR PARTE DOS CASES, VAMOS USAR APENAS 
+
+    ALGUNS DELES...
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+
+--> SÃO ELES:
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-8> php artisan
+Laravel Framework 11.24.0
+
+Usage:
+  command [options] [arguments]
+
+Options:
+  -h, --help            Display help for the given command. When no command is given display help for the list command  -q, --quiet           Do not output any message
+  -V, --version         Display this application version   
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question      --env[=ENV]       The environment the command should 
+run under
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Available commands:
+  about                     Display basic information about your application
+  clear-compiled            Remove the compiled class file 
+  completion                Dump the shell completion script
+  db                        Start a new database CLI session
+  docs                      Access the Laravel documentation
+  down                      Put the application into maintenance / demo mode
+  env                       Display the current framework environment
+  help                      Display help for a command     
+  inspire                   Display an inspiring quote     
+  list                      List commands
+  migrate                   Run the database migrations    
+  optimize                  Cache framework bootstrap, configuration, and metadata to increase performance
+  serve                     Serve the application on the PHP development server
+  test                      Run the application tests      
+  tinker                    Interact with your application 
+  up                        Bring the application out of maintenance mode
+ auth
+  auth:clear-resets         Flush expired password reset tokens
+ cache
+  cache:clear               Flush the application cache    
+  cache:forget              Remove an item from the cache  
+  cache:prune-stale-tags    Prune stale cache tags from the cache (Redis only)
+ channel
+  channel:list              List all registered private broadcast channels
+ config
+  config:cache              Create a cache file for faster 
+configuration loading
+  config:clear              Remove the configuration cache 
+file
+  config:publish            Publish configuration files to 
+your application
+  config:show               Display all of the values for a given configuration file or key
+ db
+  db:monitor                Monitor the number of connections on the specified database
+  db:seed                   Seed the database with records 
+  db:show                   Display information about the given database
+  db:table                  Display information about the given database table
+  db:wipe                   Drop all tables, views, and types
+ env
+  env:decrypt               Decrypt an environment file    
+  env:encrypt               Encrypt an environment file    
+ event
+  event:cache               Discover and cache the application's events and listeners
+  event:clear               Clear all cached events and listeners
+  event:list                List the application's events and listeners
+ install
+  install:api               Create an API routes file and install Laravel Sanctum or Laravel Passport
+  install:broadcasting      Create a broadcasting channel routes file
+ key
+  key:generate              Set the application key        
+ lang
+  lang:publish              Publish all language files that are available for customization
+ make
+  make:cache-table          [cache:table] Create a migration for the cache database table
+  make:cast                 Create a new custom Eloquent cast class
+  make:channel              Create a new channel class     
+  make:class                Create a new class
+  make:command              Create a new Artisan command   
+  make:component            Create a new view component class
+  make:controller           Create a new controller class  
+  make:enum                 Create a new enum
+  make:event                Create a new event class       
+  make:exception            Create a new custom exception class
+  make:factory              Create a new model factory     
+  make:interface            Create a new interface
+  make:job                  Create a new job class
+  make:listener             Create a new event listener class
+  make:mail                 Create a new email class       
+  make:middleware           Create a new middleware class  
+  make:migration            Create a new migration file    
+  make:model                Create a new Eloquent model class
+  make:notification         Create a new notification class  make:notifications-table  [notifications:table] Create a 
+migration for the notifications table
+  make:observer             Create a new observer class    
+  make:policy               Create a new policy class      
+  make:provider             Create a new service provider class
+  make:queue-batches-table  [queue:batches-table] Create a 
+migration for the batches database table
+  make:queue-failed-table   [queue:failed-table] Create a migration for the failed queue jobs database table
+  make:queue-table          [queue:table] Create a migration for the queue jobs database table
+  make:request              Create a new form request class  make:resource             Create a new resource
+  make:rule                 Create a new validation rule   
+  make:scope                Create a new scope class       
+  make:seeder               Create a new seeder class      
+  make:session-table        [session:table] Create a migration for the session database table
+  make:test                 Create a new test class        
+  make:trait                Create a new trait
+  make:view                 Create a new view
+ migrate
+  migrate:fresh             Drop all tables and re-run all 
+migrations
+  migrate:install           Create the migration repository  migrate:refresh           Reset and re-run all migrations  migrate:reset             Rollback all database migrations
+  migrate:rollback          Rollback the last database migration
+  migrate:status            Show the status of each migration
+ model
+  model:prune               Prune models that are no longer needed
+  model:show                Show information about an Eloquent model
+ optimize
+  optimize:clear            Remove the cached bootstrap files
+ package
+  package:discover          Rebuild the cached package manifest
+ pest
+  pest:dataset              Create a new dataset file      
+  pest:test                 Create a new test file
+ queue
+  queue:clear               Delete all of the jobs from the specified queue
+  queue:failed              List all of the failed queue jobs
+  queue:flush               Flush all of the failed queue jobs
+  queue:forget              Delete a failed queue job      
+  queue:listen              Listen to a given queue        
+  queue:monitor             Monitor the size of the specified queues
+  queue:prune-batches       Prune stale entries from the batches database
+  queue:prune-failed        Prune stale entries from the failed jobs table
+  queue:restart             Restart queue worker daemons after their current job
+  queue:retry               Retry a failed queue job       
+  queue:retry-batch         Retry the failed jobs for a batch
+  queue:work                Start processing jobs on the queue as a daemon
+ route
+  route:cache               Create a route cache file for faster route registration
+  route:clear               Remove the route cache file    
+  route:list                List all registered routes     
+ sail
+  sail:add                  Add a service to an existing Sail installation
+  sail:install              Install Laravel Sail's default 
+Docker Compose file
+  sail:publish              Publish the Laravel Sail Docker files
+ schedule
+  schedule:clear-cache      Delete the cached mutex files created by scheduler
+  schedule:interrupt        Interrupt the current schedule 
+run
+  schedule:list             List all scheduled tasks       
+  schedule:run              Run the scheduled commands     
+  schedule:test             Run a scheduled command        
+  schedule:work             Start the schedule worker      
+ schema
+  schema:dump               Dump the given database schema 
+ storage
+  storage:link              Create the symbolic links configured for the application
+  storage:unlink            Delete existing symbolic links 
+configured for the application
+ stub
+  stub:publish              Publish all stubs that are available for customization
+ vendor
+  vendor:publish            Publish any publishable assets from vendor packages
+ view
+  view:cache                Compile all of the application's Blade templates
+  view:clear                Clear all compiled view files
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+MAS BASTA PERCEBER QUE 
+
+
+ELES ESTÃO ORGANIZADOS DE ACORDO COM NAMESPACES...
+
+
+
+
+
+
+
+
+
+
+
+POR EXEMPLO,
+
+TEMOS O NAMESPACE DE 'make',
+
+
+que é usado para 
+
+
+
+
+'''QUICKLY GENERATE FILES''',
+
+
+dentro do seu project...
+
+
+
+
+
+
+
+
+
+
+
+-> ele pode ser usado para tudo, desde interfaces até models,
+
+controllers, commands, components, migrations, exceptions...
+
+
+
+
+
+
+
+
+
+
+
+
+tudo que aprendemos, no php normal,
+
+pode ser criado por meio disso...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> TAMBÉM TEMOS COMANDOS 
+    NO NAMESPACE DE 'db'...
+
+
+
+
+
+
+SÃO ELES:
+
+
+
+
+db:monitor 
+db:seed ------> esse é bom/interessante 
+db:table --> MOSTRA INFORMATION SOBRE A TABLE ESPECÍFICADA 
+db:show --> MOSTRA INFORMATION SOBRE A GIVEN DATABASE 
+db:wipe --> DROPPA TODAS AS TABLES, VIEWS E TYPES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PARA VISUALIZARMOS INFO SOBRE NOSSA DATABASE ATUAL,
+
+
+BASTA EXECUTAR 
+
+
+
+
+php artisan db:show...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-8> php artisan db:show
+
+  SQLite .................................................................................................................................... 3.40.0  
+  Connection ................................................................................................................................ sqlite
+  Database .................................................................. D:\curso laravel\curso-laravel\code\example-8\database\database.sqlite
+  Host .............................................................................................................................................
+  Port .............................................................................................................................................
+  Username .........................................................................................................................................
+  URL ..............................................................................................................................................  
+  Open Connections .................................................................................................................................
+  Tables ......................................................................................................................................... 9
+
+  Table ....................................................................................................................................... Size
+  cache .......................................................................................................................................... —
+  cache_locks .................................................................................................................................... —
+  failed_jobs .................................................................................................................................... —
+  job_batches .................................................................................................................................... —  
+  jobs ........................................................................................................................................... —
+  migrations ..................................................................................................................................... —
+  password_reset_tokens .......................................................................................................................... —
+  sessions ....................................................................................................................................... —
+  users .......................................................................................................................................... — 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ENCONTRAMOS QUE ESTAMOS USANDO 'SQLite',
+
+
+
+  O PATH ATÉ O ARQUIVO DO SQLITE, com 
+
+
+
+    Database  D:\curso laravel\curso-laravel\code\example-8\database\database.sqlite
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    --> E AÍ TEMOS AS VÁRIAS TABLES QUE 
+        JÁ VEM INCLUSAS, NO MOMENTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> AQUI O PROFESSOR NOS EXPLICA:
+
+
+
+
+
+''when we ran that laravel new xxxxx command,
+    one of the STEPS IN THAT CHAIN WAS 
+
+    __TO RUN __ MIGRATIONS AND BUILD THE DATABASE,
+    IN THOSE CORRESPONDING TABLES'''...
+
+
+
+
+
+
+
+
+
+--> QUER DIZER QUE TODAS ESSAS TABLES SÃO CRIADAS 
+    __ POR DEFAULT, POR MEIO DAS MIGRATIONS DO LARAVEL...
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR EXPLICA TUDO ISSO PQ,
+
+SE VC CRIOU 1 LARAVEL APP SEM USAR O COMANDO 
+
+
+
+'laravel new xxxxx',
+
+
+
+
+
+VC VAI PRECISAR RODAR ESSAS MIGRATIONS 
+
+
+__MANUALMENTE_...
+
+
+
+
+
+
+
+
+
+
+
+PARA RODAR ESSAS MIGRATIONS MANUALMENTE,
+
+
+VC DEVERÁ RODAR 
+
+
+'php artisan migrate'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR NOS MOSTRA 1 EXEMPLO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ELE ABRE O ARQUIVO DE DATABASE,
+
+
+QUE É 
+
+
+
+'database.sqlite'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> AÍ ELE VAI EM FRENTE E __ DELETA ESSE ARQUIVO...
+
+
+
+
+
+
+
+
+
+
+-> DEPOIS DE __ DELETAR ESSE ARQUIVO,
+
+
+ELE RODA 
+
+
+'php artisan migrate'...
+
+
+
+
+
+
+
+
+
+
+
+FICAMOS COM ESTA MENSAGEM:
+
+
+
+
+
+
+   WARN  The SQLite database configured for this application does not exist: D:\curso laravel\curso-laravel\code\example-8\database\database.sqlite.
+
+  Would you like to create it? (yes/no) [yes]
+
+
+
+
+
+
+
+
+
+
+
+
+  -> ''VC QUER CRIAR A DATABASE''?
+
+
+
+
+
+  --_> SIM...
+
+
+
+
+
+
+
+  EX:
+
+
+
+
+
+    Would you like to create it? (yes/no) [yes]
+❯ yes
+
+   INFO  Preparing database.  
+
+  Creating migration table .................. 23.24ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table ...... 81.35ms DONE
+  0001_01_01_000001_create_cache_table ...... 33.72ms DONE
+  0001_01_01_000002_create_jobs_table ....... 67.27ms DONE
+
+
+
+
+
+
+
+
+
+
+
+
+  ISSO FEITO,
+
+
+  ELE CRIA A DATABASE 
+
+
+
+  E RODA TODAS AS MIGRATIONS NECESSÁRIAS 
+
+  PARA CRIAR AS TABLES 
+
+
+  QUE O LARAVEL JULGA NECESSÁRIAS...
+
+
+
+
+
+
+--> O LARAVEL TAMBÉM CRIA AS TABLES 
+
+QUE SÃO NECESSÁRIAS A ELE, AO LARAVEL FRAMEWORK...
+
+
+
+
+
+
+
+
+
+
+
+--> OK.. ISSO FEITO,
+
+
+
+O ARQUIVO 'database.sqlite' é criado 
+
+MANUALMENTE...
+
+
+
+
+
+
+
+
+
+-> CERTO, MAS COMO PODEMOS NOS CONECTAR A ESSA DATABASE,
+
+PARA VISUALIZAR AS DIVERSAS ROWS E TABLES?
+
+
+
+
+
+
+
+
+
+
+
+--> A RESPOSTA É:
+
+
+''VC PRECISA SE CONECTAR A ESSA DATABASE, DE ALGUMA FORMA''...
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS NOS CONECTAR 
+
+    à DATABASE USANDO A CLI,
+
+
+
+    OU ENTÃO USANDO 
+
+    UM 
+
+    'GUI'...
+
+
+
+
+
+--> OU SEJA,
+
+
+O ANTARES...
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR RECOMENDA O 'TablePlus'...
+
+
+
+
+
+--> ELE ACHA MELHOR DO QUE O 'Antares'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO....
+
+
+
+
+
+
+
+
+--> BAIXAMOS ISSO...
+
+
+
+
+
+BASTA CRIAR UMA NOVA CONNECTION... 
+
+
+AÍ ESCOLHEMOS SQLITE...
+
+
+
+
+
+
+
+
+
+
+
+
+--> A VANTAGEM DO 'TablePlus'
+
+é que ele SUPORTA TODAS AS DATABASES EXISTENTES...
+
+
+
+
+
+
+
+--> DEPOIS DE ESCOLHER 'SQLITE',
+
+
+
+
+
+DEVEMOS ESCOLHER O PATH ATÉ 
+
+
+NOSSA DATABASE...
+
+
+
+
+
+
+
+--> ESCOLHEMOS A FILE....
+
+
+
+
+
+
+
+
+
+
+-> a file database.sqlite'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... FICAMOS COM ACESSO A ESSA DATABASE...
+
+
+
+
+
+
+
+
+
+
+--> TEMOS TODAS AS TABLES...
+
+
+
+
+
+
+
+SÃO ELAS:
+
+
+
+
+
+
+1) cache 
+
+
+2) cache_locks 
+
+
+3) failed_jobs 
+
+
+4) job_batches 
+
+
+5) jobs 
+
+6) migrations 
+
+
+
+7) password_reset_tokens 
+
+
+8) sessions 
+
+
+9) sqlite_sequence 
+
+
+
+10) users...
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR APONTA QUE 
+
+
+
+
+''YOU CAN ALMOST FORGET THAT 
+THEY EXIST''...
+
+
+
+
+
+
+NENHUMA DELAS IMPORTA A NÓS,
+
+
+
+COM EXCEÇÃO DE 'USERS',
+
+
+NO MOMENTO...
+
+
+
+
+
+
+
+
+
+
+
+-> nessa table,
+
+temos estes fields:
+
+
+
+
+
+
+
+
+
+id 
+name 
+email
+email_verified_at
+password
+remember_token
+created_at
+updated_at 
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS FAZER APPEND A ESSES FIELDS, SE QUISERMOS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR VOLTA AOS ARQUIVOS,
+
+E MOSTRA 
+
+
+O FOLDER DE 'migrations'
+
+
+dentro do folder de 'database'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> ELE EXPLICA QUE _ QUANDO NÓS RODAMOS 
+
+O ARQUIVO DE 'php artisan migrate',
+
+anteriormente,
+
+
+
+NÓS ACABAMOS EXECUTANDO TODAS AS FILES 
+
+DENTRO DE ESSA PASTA DE 'database>migrations'...
+
+
+
+
+
+
+
+
+
+
+A LÓGICA DE ESSAS FILES É ESTA:
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+
+
+
+E ESTA:
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->integer('expiration');
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->integer('expiration');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+
+
+
+
+
+
+e esta:
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+QUER DIZER QUE 
+
+
+A LÓGICA DE CREATE DE TODAS ESSAS TABLES 
+
+
+ESTÁ CONTIDA 
+
+
+
+NESSAS MIGRATIONS, EM FORMATO PHP...
+
+
+
+
+
+
+
+
+
+
+
+TEMOS OS BLUEPRINTS PARA AS TABLES...
+
+
+
+
+
+
+
+
+
+
+
+
+-> TUDO POR MEIO DO TYPE/Object de 'Blueprint',
+
+
+
+
+QUE AJUDA A CRIAR ESSAS TABLES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+AÍ, DENTRO DA CLOSURE,
+
+TEMOS 
+
+
+A PARTE QUE ACTUALLY CONSTRÓI AS TABLES,
+
+
+COMO VISTO AQUI:
+
+
+
+
+
+
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+VAMOS ADICIONANDO OS FIELDS ASSIM MESMO...
+
+
+
+
+
+
+
+
+
+
+
+--> '$table->id()',
+
+
+ADICIONA 1 FIELD que servirá como 'id'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS DIGAMOS QUE QUEREMOS ADICIONAR 
+
+'SOMETHING ELSE'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DIGAMOS QUE QUEREMOS 2 FIELDS 
+
+PARA O NAME,
+
+
+
+COMO 
+
+'first_name' 
+
+
+e 
+
+'last_name'...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+OK... MAS PARA CONSEGUIRMOS TER ESSAS CHANGES,
+
+PRECISAMOS _ RE-RODAR A MIGRATION...
+
+
+
+
+
+
+
+
+
+
+
+--> NO CASO,
+
+
+
+TEREMOS DE FAZER 'DOWN' DE ESSA MIGRATION,
+
+PARA DEPOIS FAZER O 'UP'...
+
+
+
+
+
+OK... MAS MESMO LIMPANDO TUDO,
+
+
+AINDA NÃO CONSEGUI 
+
+
+
+FAZER COM QUE 
+
+
+
+A CHANGE FOSSE APLICADA...
+
+
+
+
+
+
+
+
+--> OS COMANDOS DE MIGRATION, TODOS ELES, SÃO:
+
+
+
+
+
+
+
+migrate:fresh ------> ''DROP ALL TABLES AND RE-RUN ALL MIGRATIONS''...
+
+
+
+''migrate:install'' --> CREATE THE MIGRATION REPOSITORY 
+
+
+
+''migrate:refresh' ---> RESET AND RE-RUN ALL MIGRATIONS 
+
+
+''migrate:reset'' --> ROLLBACK ALL DATABASE MIGRATIONS 
+
+
+
+''migrate:status'' --> show the status of each migration...
+
+
+
+
+
+
+
+certo...
+
+
+
+
+esses são bem úteis, realmente...
+
+
+
+
+
+
+
+
+rodei o 'migrate:fresh'....
+
+
+
+
+
+
+
+--> VC NUNCA RODARIA O 'migrate:fresh'
+
+em production,
+
+pq isso limparia todas suas databases...
+
+
+
+
+
+
+
+
+'migrate:rollback' 
+
+
+
+--> O ROLLBACK VOLTA 1 CASA ATRÁS,
+
+    NÃO VAI VOLTAR TUDO,
+
+
+    E SIM APENAS 1 ÚNICA CASA...
+
+
+
+
+    vai fazer rollback da ÚLTIMA MIGRATION... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rodamos o php artisan migrate:fresh,
+
+
+
+
+para  DROPPAR TODAS AS TABLES E RE-RODAR TODAS AS MIGRATIONS...
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... MAS O PROFESSOR FICOU COM 1 PROBLEMA SIMILAR 
+
+AO MEU:
+
+
+''WHEN YOU RE-RUN THE MIGRATIONS, WITH SQLITE,
+
+YOU'LL NOTICE THAT YOU WON'T HAVE THE EXTRA COLUMNS,
+
+EVEN AFTER REFRESHING THE GUI''..
+
+
+
+
+
+
+--> PARA VISUALIZAR AS MUDANÇAS,
+    DEVEMOS FECHAR A CONNECTION E ABRIR 
+    DE NOVO... ESSE É UM DEFEITO DO SQLITE...
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... O PROFESSOR QUER ACABAR POR MEIO DO 
+
+'MAKE OUR FIRST MIGRATION'...
+
+
+
+
+
+
+
+
+
+
+
+--> DEVEMOS CRIAR NOSSA PRIMEIRA MIGRATION,
+
+COM 
+
+
+
+
+php artisan make:migration 
+
+
+
+
+
+
+
+
+
+AÍ TEMOS QUE ESCOLHER 1 NOME...
+
+
+
+
+
+
+
+
+
+
+--> NÃO PODEMOS ESCOLHER 'jobs',
+
+
+pq 
+
+
+O LARAVEL JÁ TEM UMA TABLE DE NOME 'jobs'...
+
+
+
+
+
+
+
+--> É POR ISSO QUE VAMOS CRIAR 1 MIGRATION 
+
+DE NOME 'create_job_listings_table',
+
+
+
+PARA ENTÃO CRIARMOS 1 TABLE DE NOME 'job_listings'...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-8> php artisan make:migration
+
+  What should the migration be named?
+❯ create_job_listings
+
+   INFO  Migration [D:\curso laravel\curso-laravel\code\example-8\database\migrations/2024_09_25_234852_create_job_listings.php] created successfully.      
+
+PS D:\curso laravel\curso-laravel\code\example-8>
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, O ARQUIVO FICA COM UM NOME DE 
+
+
+
+
+2024_09_25_234852_create_job_listings.php
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DENTRO DE ESSE ARQUIVO,
+
+
+TEMOS ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listings');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+-> TEMOS O METHOD 'up',
+
+QUE APLICA AS MUDANÇAS 
+NA DATABASE...
+
+
+
+
+E TEMOS O METHOD 'down()',
+
+que REVERTE AS OPERATIONS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO NOSSO CASO,
+
+A PRIMEIRA COISA QUE ACONTECE É O 'CREATE THE JOB LISTINGS TABLE'...
+
+
+
+
+
+
+
+
+
+
+--> SE TIVÉSSEMOS 1 MIGRATION QUE ADICIONA 1 COLUMN,
+
+ESCREVERÍAMOS O ADD NO UP,
+E O REMOVE COM MODIFY, NO DOWN....
+
+
+
+
+
+
+
+
+
+
+
+
+O LARAVEL JÁ NOS DEU UMAS SUGESTÕEs:
+
+
+
+
+
+     */
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+
+
+ELE JÁ QUER QUE ESSA TABLE TENHA 1 UNIQUE ID,
+
+
+E ALGUNS TIMESTAMPS (created_at e updated_at)...
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+SÓ PRECISAMOS DOS FIELDS 'title' 
+
+e 
+
+'salary'...
+
+
+
+
+
+--> COMO SALARY, PODEMOS DEIXAR ISSO 
+
+DE DIVERSAS MANEIRAS...
+
+
+
+
+
+
+
+O PROFESSOR DIZ QUE UMA BOA IDEIA É PENSAR EM 
+
+MONEY 
+
+
+''AS CENTS''...
+
+
+
+
+
+
+
+
+
+--> NO NOSSO CASO, VAMOS PENSAR EM SALARY COMO 
+
+'WHATEVER THE EMPLOYEE WANTS TO PUT',
+
+
+
+POR ISSO VAMOS DEIXAR COMO 1 COLUMN SIMPLES,
+
+TIPO ASSIM:
+
+
+
+
+
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('salary');
+            $table->timestamps();
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA QUEREMOS RODAR ESSA MIGRATION...
+
+
+
+
+
+
+
+
+
+-. QUEREMOS APLICAR APENAS ESSA LATEST MIGRATION..
+
+
+
+
+
+
+
+
+-> PARA ISSO, BASTA RODAR 
+
+'php artisan migrate'...
+
+
+
+
+
+
+
+
+-> COM ISSO, JÁ É POSSÍVEL VISUALIZAR NOSSA 
+
+NOVA TABLE...
+
+
+
+
+
+
+
+
+
+
+POR FIM, O PROFESSOR QUER ACABAR
+
+A AULA 
+
+
+
+COM 1 'POPULATE'
+
+
+DE ROWS 
+
+DENTRO DE JOB LISTINGS..
+
+
+
+
+
+
+
+
+
+-> ELE COLOCA OS MESMOS ROWS QUE TEMOS HARDCODADOS 
+
+
+LÁ EM 'Job.php',
+
+
+
+MAS TIPO ASSIM:
+
+
+
+
+
+
+1	Director	$40.000	NULL	NULL
+2	Programmer	$10.000	NULL	NULL
+3	Teacher	$20.000	NULL	NULL
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM CONTROL + S,
+
+
+CONSEGUIMOS SALVAR ESSES ROWS QUE 
+
+
+ADICIONAMOS...
+
+
+
+
+
+
+
+
+--> COM ISSO,
+
+
+
+
+CRIAMOS UMA MIGRATION,
+
+RODAMOS A MIGRATION,
+
+
+E TIVEMOS AS CHANGES NA NOSSA DATABASE...
+
+
+
+
+
+
+
+
+
+
+-> O PRÓXIMO PASSO É 
+
+'HOW TO FETCH THAT DATA FROM THE DATABASE,
+
+AND THEN RENDER IT IN THE VIEW''...
+
+
+
+
+
+-> VEREMOS ISSO NA PRÓXIMA AULA...
