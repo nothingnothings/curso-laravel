@@ -1,0 +1,1835 @@
+
+
+
+
+
+HOJE VEREMOS NAVIGATION LINKS...
+
+
+
+
+
+
+''HOW TO APPLY CUSTOM STYLING BASED ON 
+THE CURRENT ROUTE/URL IS''...
+
+
+
+
+
+
+
+
+
+
+--> PERCEBEMOS QUE O HIGHLIGHT DA NAVBAR 
+
+
+ESTÁ TRAVADO 
+
+NA PAGE DE 'HOME',
+
+QUANDO DEVERIA TROCAR PARA O HIGHLIGHT DAS 
+
+OUTRAS PAGES...
+
+
+
+
+
+
+
+
+
+--> certo... e, dentro do 'layout.blade.php',
+
+
+
+TEMOS ESTE COMMENT, 
+
+TIRADO DO TAILWIND:
+
+
+
+
+
+ <!--
+  This example requires updating your template:
+
+  ```
+  <html class="h-full bg-gray-100">
+  <body class="h-full">
+  ```
+-->
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+
+
+ELE NOS DÁ ALGUM FEEDBACK,
+
+APONTANDO QUE 
+
+
+''WE SHOULD SET THE HEIGHT TO FULL ON 
+BOTH THE BODY AND BODY CLASS''...
+
+
+
+
+
+É POR ISSO QUE DEVEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, A HEIGHT DO CONTAINER É O 'FULL HEIGHT',
+
+
+
+AS YOU WOULD EXPECT...
+
+
+
+
+
+
+
+
+--> OK... ENTÃO O PROFESSOR FOCA 
+
+
+NA PARTE 
+
+
+DAS 3 ANCHOR TAGS 
+
+
+DO NAVBAR,
+
+
+ESTE TRECHO AQUI:
+
+
+
+
+
+
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+              <a href="/" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+              <a href="/about" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</a>
+              <a href="/contact" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Contact</a>
+            </div>
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+PERCEBA QUE A PRIMEIRA PAGE ESTÁ COM O ACTIVE STYLE DE 'bg-gray-900'...
+
+
+
+
+
+
+
+
+--> O TEXT TAMBÉM FICOU WHITE...
+
+
+
+
+
+--> ESSE É O STYLE ACTIVE...
+
+
+
+
+
+
+--> CASO CONTRÁRIO,
+
+TEMOS UM STYLE DE TEXT-GRAY, COM BG-GRAY-700...
+
+
+
+
+
+tipo o que está escrito aqui:
+
+
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+O QUE PODEMOS FAZER, AQUI,
+
+
+É RODAR 1 CONDITION PARA DETERMINAR 
+
+
+SE A CURRENT PAGE É A 'HOME PAGE'
+
+OU NÃO...
+
+
+
+
+
+
+
+
+
+PARA ISSO,
+
+
+VAMOS COLOCAR '{{}}' 
+
+dentro do class attribute..
+
+
+
+
+
+
+
+
+PARA ISSO, VAMOS USAR UMA TERNARY EXPRESSION, PROVAVELMENTE...
+
+
+
+
+
+
+
+--> MAS PRECISAMOS DE UMA VARIABLE QUE REPRESENTE A 
+'CURRENT ROUTE'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ''LARAVEL, OUT OF THE BOX,
+    PROVIDES A 'request()' HELPER FUNCTION...''
+
+
+
+
+
+--> YOU CAN USE 'request()' TO GRAB 
+    INFORMATION ABOUT THE CURRENT REQUEST...
+
+
+
+
+
+--> NO CASO,
+
+    podemos escrever tipo 
+
+
+    request()->is
+
+
+
+
+
+
+--> 'is()' é um METHOD 
+    dentro do object de 'request'...
+
+
+
+
+--> e 'is()' NOS DEIXA 
+    PASSAR UMA REGEX 
+
+    PARA DETERMINAR 
+     
+
+     SE A CURRENT PAGE 
+
+     MATCHEIA ESSE PATTERN...
+
+
+
+
+--> no caso, o professor vai escrever 
+
+'request()->is('/')' ? 'active-style' : 'inactive-style',
+
+
+
+
+basicamente...
+
+
+
+
+
+--> ESCREVEMOS TIPO ASSIM:
+
+
+
+
+
+                <a href="/"
+                                    class="{{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium"
+                                    aria-current="page">Home</a>
+
+
+
+
+        CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+E DEVEMOS FAZER A MESMA COISA NOS OUTROS NAVLINKS, TIPO ASSIM:
+
+
+
+
+
+              <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <a href="/"
+                                    class="{{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium"
+                                    aria-current="page">Home</a>
+                                <a href="/about"
+                                    class="{{ request()->is('about') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">About</a>
+                                <a href="/contact"
+                                    class="{{ request()->is('contact') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">Contact</a>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+AGORA LEMBRE-SE DA AULA ANTERIOR, EM QUE O PROFESSOR FALOU
+
+
+
+''REAL LIFE NAVLINKS START TO GET MESSY WHEN 
+YOU START TO HAVE CONDITIONALS TO DETERMINE THINGS BASED 
+ON ROUTE, ETC ET''..
+
+
+
+
+
+
+
+--> PARA SIMPLIFICAR ISSO, DEVEMOS REINTRODUZIR 
+
+O COMPONENT DE 'navlink.blade.php',
+
+
+
+
+
+E USAR NESSE TRECHO AÍ,
+ 
+ PARA SIMPLIFICAR A COISA TODA...
+
+
+
+
+
+
+
+
+--> PARA ISSO, O CÓDIGO PROVAVELMENTE FICARÁ ASSIM:
+
+
+
+
+
+  <x-navlink href="/"
+                                    class="{{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium"
+                                    aria-current="page">Home</x-navlink>
+                                <x-navlink href="/about"
+                                    class="{{ request()->is('about') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">About</x-navlink>
+                                <x-navlink href="/contact"
+                                    class="{{ request()->is('contact') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+
+                                    SIMPLIFICAMOS MAIS UM POUCO:
+
+
+
+
+
+
+  <x-navlink href="/"
+                                    class="{{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">Home</x-navlink>
+                                <x-navlink href="/about"
+                                    class="{{ request()->is('about') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">About</x-navlink>
+                                <x-navlink href="/contact"
+                                    class="{{ request()->is('contact') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA VAMOS SIMPLIFICAR ESSE CONDITIONAL STYLING,
+
+TIPO ASSIM:
+
+
+
+
+
+<a {{ $attributes }}
+    class="{{ request()->is($href) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... mas isso não está funcionando...
+
+
+
+
+
+
+
+
+
+
+
+
+-> o professor então fala de 'aria-current=page'...
+
+
+
+
+
+
+
+esse attribute serve para screenwriters... 
+
+
+
+É UMA MANEIRA DE INDICAR SE O CURRENT LINK INDICA A CURRENT 
+PAGE OU NÃO...
+
+
+
+
+
+o professor deixa o código assim:
+
+
+
+aria-current="{{ request()->is('/') ? 'page' : 'false'}}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+MAS O PROBLEMA, AGORA,
+
+
+
+É ESTE TRECHO:
+
+
+class="{{ request()->is('/') ? 'active-style' : 'inactive-style' }}" 
+
+
+
+
+
+
+
+
+
+-> PQ NÃO QUEREMOS QUE ISSO SEJA HARDCODADO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS HANDLAR ISSO DE DIFERENTES MANEIRAS...
+
+
+
+
+
+
+
+
+
+
+
+UMA MANEIRA SERIA 'INSPECTING THE $href variable'...
+
+
+
+
+
+
+
+
+A OUTRA MANEIRA, QUE O PROFESSOR UTILIZARÁ,
+
+
+SERÁ 
+
+O USO DE UM 'PROP', QUE VAI INDICAR 
+
+
+SE ESSE NAVLINK AÍ DEVERÁ SER MARCADO COMO ACTIVE OU NÃO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BLADE COMPONENTS --> POSSUEM ATTRIBUTES E PROPS...
+
+
+
+
+ATTRIBUTES --> SÃO OS ATTRIBUTES CLÁSSICOS DO HTML...
+
+
+
+
+
+
+
+
+
+PROP --> QUALQUER COISA 
+        QUE __ NÃOO É UM ATTRIBUTE....
+
+
+
+
+
+
+
+
+--> NÓS DIFERENCIAMOS ENTRE OS 2
+
+    PQ 
+
+
+
+    OS PROPS SÃO OPCIONAIS...
+
+
+
+
+
+
+
+
+
+
+
+-> VOCE SEMPRE VAI QUERER DIFERENCIAR ENTRE 
+
+
+PROPS E ATTRIBUTES...
+
+
+
+
+
+
+
+''SHOULD THAT PROP BE __INCLUDED__ 
+AS ONE OF THE ATTRIBUTES THAT WE ECHO, AS PART 
+OF THE ANCHOR TAG... WELL, NO...''
+
+
+
+
+
+
+
+
+
+-> SE VC TEM 1 PROP CHAMADO DE 'active'
+
+e vc faz ECHO dele,
+
+
+
+
+vc vai ficar com um attribute de nome 'active',
+
+o que não vai fazer sentido....
+
+
+
+
+
+
+
+ex (de coisa que vc n deve fazer):
+
+
+
+
+
+  <x-navlink uselessPropAttribute="oh-no"/>
+
+
+
+
+
+VIRA ISTO:
+
+
+<a uselessPropAttribute="oh-no" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK, MAS COMO PODEMOS DIFERENCIAR ENTRE OS 2?
+
+
+
+
+
+
+
+
+
+
+--> ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO TOPO DO BLADE COMPONENT,
+
+
+
+O PROFESSOR ADICIONA UMA 
+
+'BLADE DIRECTIVE'...
+
+
+
+
+
+
+
+
+
+
+
+--> BLADE DIRECTIVES SÃO ADICIONADAS COM 
+
+'@' no início...
+
+
+
+
+
+
+
+
+
+
+
+
+-> tipo assim:
+
+
+
+
+
+
+
+
+
+@for
+<a {{ $attributes }} aria-current="{{ request()->is('/') ? 'page' : 'false'}}"
+    class="{{ request()->is(str_replace($href, '/', '')) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+EXISTEM MTAS DIRECTIVES...
+
+
+
+
+
+
+UTILIZAREMOS VÁRIAS DELAS...
+
+
+
+
+
+
+
+
+
+
+-> HÁ DIRECTIVES COMO:
+
+1) if 
+
+2) for 
+
+
+3) unless 
+
+
+
+4) @foreach 
+
+
+
+5) @dump (usado para dumpar algo rapidamente à tela)...
+
+
+
+
+
+
+
+SÃO BASICAMENTE 
+
+SHORTHANDS, SUGAR,
+
+
+
+
+QUE FINALMENTE SÃO COMPARADOS 
+
+
+EM VANILLA PHP, ECHO STATEMENTS E FUNCTION CALLS...
+
+
+
+
+
+
+
+--> NO NOSSO CASO,
+
+
+    QUEREMOS UM NOVO 'props()'..
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE ESCREVEMOS 
+
+
+'@props()'...
+
+
+
+
+
+
+
+
+
+--> DENTRO DE PROPS, QUEREMOS TER 1 ARRAY...
+    
+
+    DENTRO DE ESSE ARRAY,
+
+
+
+    DECLARAMOS QUE QUEREMOS 1 PROP CHAMADO DE 'active'...
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+@props(['active'])
+<!-- This is how we declare props, in laravel  -->
+
+<a {{ $attributes }} aria-current="{{ request()->is('/') ? 'page' : 'false'}}"
+    class="{{ request()->is(str_replace($href, '/', '')) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+certo... isso feito, o professor faz 
+
+
+
+'''SPIT OUT ALL OF THE ATTRIBUTES THAT MAY BE POTENTIALLY 
+    PASSED IN, AS NAV LINKS'''...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+<x-navlink href="/" id="asdasdsadsaidhsaidai">Home</x-navlink>
+<x-navlink href="/about">About</x-navlink>
+<x-navlink href="/contact">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+e isso é realmente passado, como 
+
+
+value do attribute de 'id'....
+
+
+
+
+
+
+
+
+
+ISSO ESTÁ ACONTECENDO, NO CASO,
+
+JUSTAMENTE PQ FIZEMOS ECHO/SPIT OUT DE TODOS OS ATTRIBUTES,
+
+
+
+POR MEIO 
+
+DA ESCRITA DE '{{ $attributes }}',
+
+
+
+DENTRO DO anchor tag no component 'x-navlink':
+
+
+
+
+
+
+<a {{ $attributes }} aria-current="{{ request()->is('/') ? 'page' : 'false'}}"
+    class="">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+ISSO FAZ SENTIDO...
+
+
+
+
+
+
+
+
+
+
+--> MAS E QUANTO AO PROP DE 'active'?
+
+
+
+
+
+
+
+
+
+-> SE O PROFESSOR DEFINE UM VALUE COMO 'active=dasdasdas',
+
+
+lá no x-navlink,
+
+
+
+
+
+ESSE VALUE __ NÃO VAI APARECER COMO ATTRIBUTE... 
+
+
+
+ELE VAI SER CONSIDERADO COMO O VALUE DO __PROP__,
+
+E NÃO COMO O VALUE DO ATTRIBUTE...
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+                                <x-navlink href="/" active="super-example" id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about">About</x-navlink>
+                                <x-navlink href="/contact">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+NÃO ENCONTRAMOS NENHUMA REFERENCE A ESSE PROP DE 
+
+
+
+'active="super-example"',
+
+
+
+lá no html final...
+
+
+
+
+
+
+
+
+
+E ISSO __ REALMENTE _ aCONTECEU 
+
+
+DEVIDO AO DECLARE DE 'active' como property/props...
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ -> É ESSA ESCRITA,
+
+
+ DE '@props()',
+
+ QUE FAZ COM QUE O LARAVEL 
+
+ ACEITE ESSE IDENTIFIER DE 'active'
+
+
+ como um PROP do seu component...
+
+
+
+
+ SE VC NÃO DECLARA ESSE IDENTIFIER COMO UM 'prop',
+
+ ELE __ É AUTOMATICAMENTE CONSIDERADO,
+
+ PELO LARAVEL,
+
+ COMO UM ___ ATTRIBUTE__ do html final...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ BASICAMENTE, '''WE ALWAYS NEED TO EXPLICITLY 
+                DECLARE OUR PROPS, SO THAT THEY CAN 
+                BE DISTINGUISHED''
+
+
+
+
+
+
+
+-> CERTO....
+
+
+
+
+
+
+
+POR FIM, VAMOS SUBSTITUIR 
+
+
+
+'request()->is()'
+
+
+
+POR 1 SIMPLES CHECK __ POR NOSSO PROP DE 'active'...
+
+
+
+
+
+
+
+---> NO CASO, VAMOS CHECAR SE 
+
+
+
+
+'$active'... se active for true,
+
+
+
+vamos usar o active styling...
+
+
+
+
+
+
+
+--> vai ficando tipo assim:
+
+
+
+
+
+
+@props(['active'])
+<!-- This is how we declare props, in laravel  -->
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS O PROFESSOR QUER DEIXAR UM 
+
+'DEFAULT VALUE' 
+
+PARA ESSE PROP DE 'active'...
+
+
+
+
+
+
+
+--> O VALUE QUE ELE ESCOLHE, NO CASO,
+
+SERÁ 'false'...
+
+
+
+
+
+
+
+
+PARA DEFINIR ESSE VALUE DEFAULT COMO SENDO 'false',
+
+
+
+ELE ESCREVE ASSIM:
+
+
+
+
+@props(['active' => false])
+<!-- This is how we declare props, in laravel. This 'active' prop's default value will be 'false', in this case.  -->
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> QUER DIZER QUE O DEFAULT VALUE ASSOCIADO 
+
+A ESSE PROP SERÁ DE 'false'...
+
+
+
+
+
+
+
+
+
+
+OK... DEPOIS DISSO,
+
+O PROFESSOR 
+
+
+VAI ATÉ 'layout.blade.php',
+
+
+E AÍ 
+
+
+
+COLOCA VALUES PARA o prop 'active',
+
+TIPO ASSIM:
+
+
+
+
+
+ <x-navlink href="/" active="super-example" id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" active="super-example-2">About</x-navlink>
+                                <x-navlink href="/contact" active="super-example-3">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, 
+
+OS 3 LINKS FICARÃO 
+
+COMO ACTIVE... ISSO PQ 
+
+
+OS __ 3 LINKS ESTÃO COM UM VALUE SENDO PASSADO PARA 
+
+
+
+O PROP DE 'active'...
+
+
+
+
+
+
+--> lembre-se:
+
+
+no PHP,
+QUALQUER STRING É CONSIDERADA 
+
+
+COMO 'TRUTHY VALUE'...
+
+
+
+
+-> o professor aponta outra coisa:
+
+
+
+'''IF YOU TRY TO PASS 'false' as the value 
+    of the 'active' prop, in this case,
+
+    IT WILL STILL BE EVALUATED AS TRUE...
+    THIS IS BECAUSE false won't be bool(false),
+
+    but THE STRING 'false'...'''
+
+
+
+
+
+--> A ÚNICA MANEIRA DE FAZER O FALSE _ SER REALMENTE __ PASSADO 
+    COMO FALSE, A SEU PROP,
+
+    É POR MEIO DA ESCRITA DE 
+
+
+    ':active="false"',
+
+
+    EM VEZ DE 
+
+
+    'active="false"'...
+
+
+
+
+
+
+A ESCRITA DE ':' FAZ TODA A DIFERENÇA, NESSE CASO...
+
+
+
+
+
+
+É POR ISSO QUE ESCREVEMOS ASSIM:
+
+
+
+
+
+                               <x-navlink href="/" active="super-example" id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" active="super-example-2">About</x-navlink>
+                                <x-navlink href="/contact" :active="false">Contact</x-navlink>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            COM ISSO, OS 2 PRIMEIROS VALUES 
+                            SERÃO CONSIDERADOS 
+
+                            'true',
+
+
+                            e o último value será considerado como 
+
+                            FALSE...
+
+
+
+
+
+
+
+
+
+
+                        A DEPENDER DO SEU IDE,
+
+
+                        A COR DO VALUE DO SEU PROP 
+
+                        VAI MUDAR,
+                        SE VC prefixar o nome do prop com ':'...
+                    
+
+
+
+
+
+''IN LARAVEL AND BLADE,
+    WHEN YOU __ PREFIX A PROP NAME WITH A ':',
+
+    THIS INDICATES THAT THE VALUE YOU PROVIDE 
+    MUST BE EVALUATED AS AN _ EXPRESSION,
+
+    AND NOT A PURE STRING''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> POR FIM,
+
+
+PARA FAZER FUNCIONAR OS NAVLINKS,
+
+A EXPRESSAO QUE O PROFESSOR UTILIZA É 
+
+
+
+
+:active="request()->is('contact')" 
+
+
+
+
+
+CERTO...
+
+
+
+
+ISSO FAZ TOTAL SENTIDO,
+
+
+PQ AÍ ESSA EXPRESSION VAI SER EVALUATED COMO TRUE/FALSE,
+
+E ESSE VALUE VAI SER PASSADO, COMO PROP,
+
+
+AO SEU COMPONENT...
+
+
+
+
+
+
+
+É POR ISSO QUE FICOU ASSIM:
+
+
+
+
+
+
+                 <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <x-navlink href="/" :active="request()->is('/')" id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" :active="request()->is('about')">About</x-navlink>
+                                <x-navlink href="/contact" :active="request()->is('contact')">Contact</x-navlink> <!-- ':' prefix, in your prop name, makes it so that the value is interpreted as an EXPRESSION, and not a pure string (we will get bool(false/true), instead of the strings "false"/"true", in this case, the case of the 'active' prop) -->
+                            </div>
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+@props(['active' => false])
+<!-- This is how we declare props, in laravel. This 'active' prop's default value will be 'false', in this case.  -->
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FINALMENTE NOSSOS NAVLINKS FUNCIONARAM...
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, APRENDEMOS BASTANTE SOBRE BLADE COMPONENTS,
+
+ANTES MESMO DE APRENDERMOS SOBRE ELOQUENT...
+
+
+
+
+
+OK... COM ISSO, APRENDEMOS:
+
+
+
+
+
+1) SOBRE ATTRIBUTES 
+
+2) SOBRE PROPS 
+
+
+
+
+
+
+--> VC TAMBÉM PODE FAZER COISAS 
+
+
+
+
+COM A DIRECTIVE DE '@php e @endphp'...
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+@php 
+
+
+
+
+@endphp 
+
+
+
+
+
+
+
+
+
+-> DENTRO DE ESSA DIRECTIVE, VC PODE 
+RODAR LÓGICA PHP, diretamente no seu template...
+
+
+
+
+
+
+
+
+
+
+
+
+@php 
+
+$name = 'Arthur' 
+
+if ($active) {
+    echo 'something';
+}
+
+
+@endphp 
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+QUAL É O HOMEWORK...
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS CONTINUAR COM A IDEIA 
+
+DOS PROPS...
+
+
+
+
+
+
+-> DEVEMOS INTRODUZIR 1 NOVO PROP...
+
+
+
+
+
+
+
+--> O PROP SERÁ CHAMADO DE 'type'...
+
+
+
+
+--> ESSE PROP SERÁ USADO PARA 
+
+'DETERMINE IF A LINK SHOULD BE USED AS AN ANCHOR TAG 
+OR AS A BUTTON''...
+
+
+
+
+
+
+
+
+
+-> VAMOS PRECISAR RODAR 1 CONDITION DENTRO DE NOSSO COMPONENT,
+
+PARA 
+
+
+
+'IF THE TYPE IS A, DO A,
+
+IF THE TYPE IS B, DO B'
+
+
+
+(render different components, based on that)...
+
+
+
+
+
+
+
+
+--> PARA ISSO, PRECISAREMOS 
+
+DE DIRECTIVES COMO '@if' e '@else'...
