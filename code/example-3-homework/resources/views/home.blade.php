@@ -1,4 +1,6 @@
 <!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
 <x-layout>
-    Hello from the HOME page.
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
 </x-layout>

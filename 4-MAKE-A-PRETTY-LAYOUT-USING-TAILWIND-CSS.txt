@@ -1361,6 +1361,7 @@ O 'HEADING' de cada 1 das pages....
 
 
 
+(ou seja, o title que diz "Dashboard", "About", "Contact", etc)
 
 
 
@@ -1372,10 +1373,11 @@ O 'HEADING' de cada 1 das pages....
 
 
 
-''BUT, NOW, WE'VE LEARNED THAT THERE IS A 
-PART OUTSIDE OF THAT, OUTSIDE OF '$slot',
+''BUT, NOW, WE'VE LEARNED THAT THERE IS A
+SECTION OUTSIDE OF THAT, OUTSIDE OF '$slot',
 
-THAT ALSO NEEDS TO BE __DYNAMIC__...''
+THAT ALSO NEEDS TO BE __DYNAMIC,
+based on the current page...''
 
 
 
@@ -1396,7 +1398,38 @@ THAT ALSO NEEDS TO BE __DYNAMIC__...''
 
 
 
-O PROFESSOR NOS MOSTRA UMA DAS MANEIRSA....
+O PROFESSOR NOS MOSTRA UMA DAS MANEIRAS...
+
+
+
+
+--> a maneira dele é 
+
+'simply assume 
+    that heading 
+    is a VARIABLE...''
+
+
+
+
+
+no caso, ele escreve ''{{ $heading }}''
+
+
+
+
+FICA TIPO ASSIM:
+
+
+
+
+
+
+  <header class="bg-white shadow">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $heading }}</h1>
+    </div>
+  </header>
 
 
 
@@ -1405,15 +1438,412 @@ O PROFESSOR NOS MOSTRA UMA DAS MANEIRSA....
 
 
 
--> para definir essa variable, na home page,
-
-há 2 opções possíveis:
 
 
 
+  CERTO...
 
 
 
 
-1) 
+
+
+PRECISAMOS PASSAR ESSE VALUE, DE ALGUMA MANEIRA,
+
+NAS NOSSAS ROUTES...
+
+
+
+
+
+--> ESSA VARIABLE AINDA NÃO FOI DEFINIDA...
+
+
+
+
+
+
+
+
+-> PARA DEFINIR ESSA VARIABLE, HÁ 2 OPTIONS:
+
+
+
+
+
+1) PASS THIS VARIABLE IN, AS A __ PROP___ 
+TO OUR LARAVEL COMPONENTS...
+
+
+
+
+
+
+
+
+
+--> para passar o value de essa variable como 1 prop,
+
+
+    temos uma sintaxe similar a do react,
+
+    tipo assim:
+
+
+
+
+
+<x-layout heading="your value">
+    <h1>Hello from the HOME page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) OU, ALTERNATIVAMENTE,
+    PODEMOS 
+
+
+    ''DECLARE A __ NAMED SLOT__'''...
+
+
+
+
+
+
+
+
+''NAMED SLOT'' ... 
+
+
+
+
+
+
+
+--> VC DEVE PENSAR EM SEUS SLOTS COMO 
+
+
+''DIFERENTES ÁREAS EM QUE VC COLA CONTEÚDO...''
+
+
+
+
+
+
+
+--> VC PODE TER 1 SLOT EM CIMA, NO MEIO, EM BAIXO, ETC...
+
+
+
+
+
+
+
+
+--> MAS VC PRECISA DE UMA MANEIRA DE DIFERENCIAR ESSES SLOTS...
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE VC ASSIGNA DIFERENTES NOMES PARA SEUS SLOTS...
+
+
+
+
+
+
+
+--> NO CASO,
+
+A TAG DE 
+
+
+'' 
+
+
+    <h1>Hello from the HOME page.</h1>
+
+
+
+
+''
+
+
+
+
+
+ESTÁ SENDO INSERIDA DENTRO DO DEFAULT SLOT,
+
+QUE É '$slot'....
+
+
+
+
+
+
+
+
+
+
+
+agora o professor vai CRIAR UM NOVO SLOT,
+
+QUE SERÁ USADO PARA O 'HEADING'...
+
+
+
+
+
+
+--> será o HEADING SLOT, basicamente....
+
+
+
+
+
+
+
+
+
+--> PARA CRIAR 1 DE ESSES SLOTS,
+
+    O PROFESSOR ESCREVE ASSIM:
+
+
+
+
+
+
+<x-layout heading="your value">
+    <x-slot:xxxxxx/>
+    <h1>Hello from the HOME page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO CASO,
+
+ESCREVEMOS 'x-slot:',
+
+e então o NOME DO SLOT OU VARIABLE...
+
+
+
+
+
+
+
+-> É POR ISSO QUE ELE ESCREVE 
+
+'x-slot:heading',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+
+    </x-slot:heading>
+    <h1>Hello from the HOME page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DENTRO DE ESSE SLOT,
+
+PODEMOS ESCREVER 'Home Page'...
+
+
+
+EX:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>Hello from the HOME page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+E PODEMOS FAZER ISSO NAS OUTRAS PAGES,
+
+TIPO ASSIM:
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        About Page
+    </x-slot:heading>
+    <h1>Hello from the ABOUT page.</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+E ESSA É UMA DAS MANEIRAS DE RESOLVER 
+
+
+ESSE PROBLEMA...
+
+
+
+
+
+
+
+
+-> É A MANEIRA MAIS SIMPLES, APONTA O PROFESSOR...
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR FALARÁ MAIS SOBRE PROPS MAIS TARDE...
+
+
+
+
+
+
+
+
+
+O PROFESSOR TROCA O LOGO DO TAILWIND 
+
+PELO 
+
+
+LARACAST...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NA PRÓXIMA AULA,
+
+VEREMOS COMO CONSERTAR O HIGHLIGHT CONDICIONAL 
+
+DOS NAVLINKS DA NAVBAR...
+
+
+
+
+
+''APPLY STYLING CONDITIONALLY,
+BASED ON WHAT THE CURRENT ROUTE IS''...
+
+
 
