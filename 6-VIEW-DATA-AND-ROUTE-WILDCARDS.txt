@@ -1,0 +1,1950 @@
+
+
+
+
+
+
+
+
+
+
+
+HOJE VEREMOS COMO PASSAR DATA 
+
+DE NOSSAS ROUTES, DA FILE DE 'web.php' (routes file),
+
+
+PARA DENTRO DE NOSSAS VIEWS...
+
+
+
+
+
+
+
+
+--> QUANTO AO HOMEWORK,
+
+
+O PROFESSOR QUERIA QUE COLOCÁSSEMOS 
+
+1 PROP DE 'type'...
+
+
+
+--> aí esse type pode ser ou 'button' ou 'link'...
+
+
+
+
+
+
+
+
+-> EU USEI as directives de '@if',
+
+'@else'
+
+e '@endif'...
+
+
+
+
+
+
+--> FICOU TIPO ASSIM:
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+@props(['active' => false, 'type' => 'link'])
+<!-- This is how we declare props, in laravel. This 'active' prop's default value will be 'false', in this case.  -->
+
+
+@if($type === 'link')
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+@else
+
+
+<button {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</button>
+
+
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <x-navlink href="/" :active="request()->is('/')"
+                                    id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" :active="request()->is('about')">About</x-navlink>
+                                <x-navlink href="/contact" :active="request()->is('contact')">Contact</x-navlink>
+                                <!-- ':' prefix, in your prop name, makes it so that the value is interpreted as an EXPRESSION, and not a pure string (we will get bool(false/true), instead of the strings "false"/"true", in this case, the case of the 'active' prop) -->
+                                <x-navlink href="/contact" type="button" :active="request()->is('contact')">Button</x-navlink>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> o professor escreveu de forma bem parecida...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+<x-navlink href="/contact" type="button" :active="request()->is('contact')">Button</x-navlink>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS O PROFESSOR FEZ DE UM JEITO MAIS GAMBIARRA,
+
+
+QUE É POR MEIO DO ALTER DO PRÓPRIO TAG NAME,
+
+TIPO ASSIM:
+
+
+
+
+
+
+@props(['active' => false, 'type' => 'a'])
+
+
+<{{ $type }} {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</>
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+<{{ $type }} {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</>
+
+
+
+
+
+
+
+
+
+
+
+
+
+FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+
+--> MAS O PROFESSOR FALA QUE NÃO É O MELHOR APPROACH...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE O PROFESSOR DECIDIU USAR
+ 
+
+
+UMA VERSÃO MAIS TRADICIONAL...
+
+
+
+
+
+
+-> ELE USOU A ESCRITA PHP TRADICIONAL, TIPO ASSIM:
+
+
+
+
+<?php if ($type === 'a') : ?>
+    <anchor-tag>
+
+<?php else : ?> 
+
+<button ... />
+
+
+<?php endif ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO FUNCIONA, É CLARO...
+
+
+
+
+
+
+
+MAS ESSE APPROACH NÃO USOU AS DIRECTIVES 
+
+DO BLADE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''BLADE INTRODUCES HELPERS THAT 
+    LET YOU SIMPLIFY THINGS''...
+
+
+
+
+
+
+
+
+
+
+--> AS DIRECTIVES DO BLADE...
+
+
+
+
+
+
+--> PODERÍAMOS TROCAR ESSE BLOCK INTEIRO 
+
+
+
+POR 
+
+"@if (type === 'link') "
+
+
+
+
+
+@else 
+
+
+xxxx
+
+
+
+@endif ...
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+FOI ISSO QUE FIZ, E FUNCIONOU..
+
+
+
+
+É A EXATA MESMA COISA,
+
+
+MAS MAIS SIMPLIFICADA... 
+
+
+
+
+
+
+
+
+
+
+AGORA VEREMOS O TÓPICO DESTE EPISODE,
+
+QUE É 
+
+'PASS DATA INTO VIEWS'...
+
+
+
+
+
+
+
+
+--> O PROFESSOR VAI ATÉ O ARQUIVO DE ROUTES,
+
+'web.php'...
+
+
+
+
+
+
+--> AÍ TEMOS ISTO:
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('home');
+});
+
+// * Useful for APIs
+Route::get('/about', function () {
+    // return ['foo' => 'bar'];
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS PASSAR UM SEGUNDO ARGUMENT 
+À FUNCTION DE 'view()'...
+
+
+
+
+
+
+-> ESSE SEGUNDO ARGUMENT 
+
+
+    SERÁ GERALMENTE UM ASSOC ARRAY,
+
+
+    EM QUE CADA 1 DAS KEYS 
+
+    SERÁ CONVERTIDA EM VARIABLES,
+
+
+
+    QUE SERÃO INSERIDAS NAS SUAS VIEWS...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello'
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, TEREMOS ACESSO À VARIABLE DE 
+
+{{ $greeting }},
+
+
+
+
+
+
+
+LÁ na nossa view..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>{{ $greeting }} from the HOME page</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COLOCAMOS MAIS ALGUMAS KEYS,
+
+TIPO ASSIM:
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>{{ $greeting }} from the HOME page. My name is {{ $name }}, {{ $age }}, I'm a {{ $job }} </h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR VAI ESCREVENDO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer'
+    ]);
+});
+
+// * Useful for APIs
+Route::get('/about', function () {
+    // return ['foo' => 'bar'];
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS AÍ ELE CRIA UMA LISTA DE JOBS,
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'jobs' => [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ]
+        ]
+    ]);
+});
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+TEREMOS 3 ITEMS NESSE ARRAY...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'jobs' => [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ]
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+AGORA, QUANDO CARREGAMOS ESSA VIEW,
+
+
+TEMOS 1 VARIABLE DE 'jobs',
+
+
+que é igual a essa list de jobs...
+
+
+
+
+
+
+
+--> PODEMOS USAR 1 DAS BLADE DIRECTIVES,
+
+
+
+O 'foreach'...
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>{{ $greeting }} from the HOME page. My name is {{ $name }}, {{ $age }}, I'm a {{ $job }} </h1>
+
+    @foreach($jobs as $job)
+
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+
+VC PRECISA TER '@endforeach',
+
+
+no final...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>{{ $greeting }} from the HOME page. My name is {{ $name }}, {{ $age }}, I'm a {{ $job }} </h1>
+
+    @foreach($jobs as $job)
+
+
+
+    @endforeach
+
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS ESCREVER ESSES ELEMENTS ASSIM:
+
+
+
+
+
+
+
+<!-- THIS IS HOW WE REFERENCE COMPONENTS, IN LARAVEL: -->
+<x-layout>
+    <x-slot:heading>
+        Home Page
+    </x-slot:heading>
+    <h1>{{ $greeting }} from the HOME page. My name is {{ $name }}, {{ $age }}, I'm a {{ $job }} </h1>
+
+    @foreach($jobs as $job)
+        <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+    @endforeach
+
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS O PROFESSOR TWEAKA TUDO 1 POUCO...
+
+
+--> O PROFESSOR CRIA 1 PAGE DE JOBS,
+
+
+COM ESTE CÓDIGO:
+
+
+
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => [
+            [
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ]
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+E ESTE CÓDIGO:
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    @foreach($jobs as $job)
+        <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+    @endforeach
+
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E ESSA DATA É PASSADA... ESSA DATA HARDCODADA...
+
+
+
+
+
+
+
+
+
+
+NA VIDA REAL,
+
+ESSA DATA VAI SER PROVAVELMENTE FETCHEADA DE 1 DATABASE...
+
+
+
+
+
+
+
+
+
+
+ADICIONAMOS 1 NOVO LINK NA NAVBAR,
+
+
+PARA ESSE LINK DE 'JOBS',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <x-navlink href="/" type="link" :active="request()->is('/')"
+                                    id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" type="link" :active="request()->is('about')">About</x-navlink>
+                                <x-navlink href="/jobs" type="link" :active="request()->is('jobs')">Jobs</x-navlink>
+                                <x-navlink href="/contact" type="link" :active="request()->is('contact')">Contact</x-navlink>
+                                <!-- ':' prefix, in your prop name, makes it so that the value is interpreted as an EXPRESSION, and not a pure string (we will get bool(false/true), instead of the strings "false"/"true", in this case, the case of the 'active' prop) -->
+                                <x-navlink type="button">Button</x-navlink>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo... agora temos 1 home page,
+
+
+e a page de jobs,
+
+
+com todos esses jobs...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR QUER DEIXAR CADA 1 DE ESSES JOBS
+    CLICKABLE...
+
+
+
+
+
+-> E, QUANDO CLICARMOS EM 1 DE ESSES JOBS,
+
+    QUEREMOS SER LEVADOS ATÉ 1 PAGE 
+
+
+    SOBRE ESSE JOB...
+
+
+
+
+
+
+
+
+--> PARA ISSO, 
+
+
+    PRECISAMOS DE IDs,
+
+
+    de route parameters...
+
+
+
+
+
+-> query parameters...
+
+
+
+
+
+
+-> devemos colocar ul em volta do li, também...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul>
+    @foreach($jobs as $job)
+        <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+    @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+SABEMOS QUE TODOS ESSES ELEMENTS SERÃO ANCHOR TAGS...
+
+
+
+
+
+POR ISSO VAMOS WRAPPAR TODOS OS <li> 
+
+com '<a>'...
+
+
+
+
+
+
+
+
+
+
+--> ISSO FEITO,
+
+
+TEREMOS DE FAZER COM QUE ESSES LINKS DIRECIONEM A NOVAS ROUTES,
+
+
+
+COMO 
+
+
+
+'jobs/programmer',
+
+
+'jobs/director',
+
+'jobs/teacher'....
+
+
+
+
+
+
+
+
+
+--> PODEMOS FAZER ISSO TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul>
+        @foreach($jobs as $job)
+            <a href="/jobs/{{ $job['title'] }}">
+                <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+            </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+NA VIDA REAL,
+
+TERÍAMOS ALGUM TIPO DE ID...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ADICIONA UM ID,
+
+
+
+
+
+UMA INT...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => [
+            [
+                'id' => 1,
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'id' => 2,
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ]
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AGORA PRECISAMOS DA ROUTE PARA  ESSAS PAGES...
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, PODEMOS ESCREVER AS ROUTES ASSIM:
+
+
+
+
+
+
+
+Route::get('/jobs/{id}', function () {
+    return view('job', [
+        
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+TIPO ALGO ASSIM...
+
+
+
+
+A COISA LEGAL DO LARAVEL É QUE 
+
+
+
+'''LARAVEL WILL AUTOMATICALLY DETECT 
+    THAT THIS IS WRAPPED IN BRACES,
+
+    AND THAT THIS IS A WILD CARD''...
+
+
+
+
+
+
+
+
+
+
+
+--> PARA PEGAR O VALUE DE ESSE WILDCARD,
+
+'id',
+
+
+
+basta passá-lo como ARGUMENT DA FUNCTION 
+
+do callback,
+
+tipo assim:
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+    return view('job', [
+
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+AÍ O PROFESSOR FAZ O DUMP DE ESSE ID,
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+
+    dump($id);
+    return view('job', [
+
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> mas em vez de usar 'dump()',
+
+
+o professor usa a function 'dd()',
+
+
+que significa 'dump and die'...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+
+    dd($id); /// 'dd' --> dump and die, kill the execution.
+    return view('job', [
+
+    ]);
+});
+
+
+
+
+
+
+
+
+O PROFESSOR RODA ESSA FUNCTION JUSTAMENTE PQ ELE APENAS 
+SE IMPORTA COM A ANÁLISE DO VALUE DE '$id'...
+
+
+
+
+tudo para checar se o '$id' 
+
+realmente está chegando 
+
+
+como aquela int...
+
+
+
+
+
+
+
+
+
+
+
+
+--> ESSAS FUNCTIONS,
+
+'dump()'
+
+e 
+
+'dd()',
+
+
+nem conhecia...
+
+
+
+
+
+
+
+
+
+
+
+ok... aí vamos até /jobs/1...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO...
+
+
+
+
+
+FICAMOS COM ESTE OUTPUT:
+
+
+
+
+
+
+"1" // routes\web.php:56
+
+
+
+
+
+
+
+
+
+-> FICAMOS COM '1'...
+
+
+
+
+
+
+
+
+--> BASICAMENTE, o que fica ao redor do '{}' 
+
+é um WILDCARD,
+
+
+e o laravel TAKES CARE OF 
+ALL THE WORK,
+
+THE GRABBING, ISOLATING 
+
+AND PASS OF THE VALUE, TO THE CALLBACK FUNCTION...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ENTAO DUPLICA A LISTA DE JOBS,
+
+    E AÍ COLA DENTRO DE 'jobs/{id}'...
+
+
+
+
+
+
+
+
+
+--> COM ISSO, PODEMOS RODAR 1 FILTER,
+
+PARA RETORNAR APENAS O JOB EM QUE 
+
+O ID É IGUAL A 'id'...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+
+    $jobs = [
+        [
+            'id' => 1,
+            'title' => 'Director',
+            'salary' => '$50,000'
+        ],
+
+        [
+            'id' => 2,
+            'title' => 'Programmer',
+            'salary' => '$10,000'
+        ],
+        [
+            'id' => 3,
+            'title' => 'Teacher',
+            'salary' => '$40,000'
+        ],
+    ];
+
+    $selectedJob = array_filter($jobs, function ($job) use ($id) {
+        return $job['id'] == $id;
+    });
+
+    // dd($id); /// 'dd' --> dump and die, kill the execution.
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+CERTO.... 
+
+
+
+
+
+
+
+
+
+
+
+o professor diz que há várias maneiras de fazer isso...
+
+
+
+
+
+
+
+'foreach'...
+
+
+
+
+
+
+
+'array_filter'...
+
+
+
+
+
+
+
+
+--> MAS ESTAMOS USANDO UM FRAMEWORK, POR ISSO É BOM USAR 
+O FRAMEWORK...
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR EXPLICA QUE O LARAVEL OFERECE A CLASS DE 
+
+'Arr',
+
+basicamente uma class de ARRAYS,
+
+
+
+
+
+
+QUE É UMA CLASS QUE TE DÁ MTOS METHODS PARA INTERAGIR 
+COM ARRAYS...
+
+
+
+
+
+
+
+
+
+
+----> ''IF I WANT TO FIND THE __ FIRST 
+        ITEM IN AN ARRAY THAT MATCHES MY CRITERIA'',
+
+
+        eu posso usar o method de 
+
+
+        'Arr::first()'...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+    // * Laravel solution (with 'Arr' class and helper functions):
+    $selectedJob = Arr::first($jobs, function ($job) use ($id) {
+        return $job['id'] == $id;
+    });
+
+
+
+
+
+
+
+
+OUTRA MANEIRA DE ESCREVER ISSO É ASSIM, COM 'ARROW FUNCTIONS':
+
+
+
+
+
+
+    // * Laravel solution (with 'Arr' class and helper functions):
+    $selectedJob = Arr::first($jobs, function ($job) use ($id) {
+        return $job['id'] == $id;
+    });
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+    // * Laravel solution (with 'Arr' class and helper functions):
+    $selectedJob = Arr::first($jobs, fn(array<int|string> $job) => $job['id'] == $id);
+
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO, PODEMOS USAR 'dd()',
+
+
+PARA VER SE ISSO FUNCIONOU...
+
+
+
+E FUNCIONOU....
+
+
+
+
+
+
+
+FICOU TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+                <h1><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+COM O DD(),
+
+ficamos com isto:
+
+
+
+
+
+
+array:3 [▼ // routes\web.php:83
+  "id" => 2
+  "title" => "Programmer"
+  "salary" => "$10,000"
+]
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AGORA, SE TENTARMOS COLOCAR O ID DE 1 JOB QUE N EXISTE,
+
+
+TIPO 
+
+'jobs/5',
+
+ficamos com 'NULL'...
+
+
+
+
+
+
+
+
+e, se ficamos com null,
+
+
+isso vai resultar em um ERRO....
+
+
+
+
+
+
+
+MAS O PASS DO JOB FICOU ASSIM:
+
+
+
+
+
+Route::get('/jobs/{id}', function ($id) {
+
+    $jobs = [
+        [
+            'id' => 1,
+            'title' => 'Director',
+            'salary' => '$50,000'
+        ],
+
+        [
+            'id' => 2,
+            'title' => 'Programmer',
+            'salary' => '$10,000'
+        ],
+        [
+            'id' => 3,
+            'title' => 'Teacher',
+            'salary' => '$40,000'
+        ],
+    ];
+
+    // * Native PHP solution:
+    // $selectedJob = array_filter($jobs, function ($job) use ($id) {
+    //     return $job['id'] == $id;
+    // });
+
+    // * Laravel solution (with 'Arr' class and helper functions):
+    $selectedJob = Arr::first($jobs, fn($job) => $job['id'] == $id);
+
+     dd($selectedJob); /// 'dd' --> dump and die, kill the execution.
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+O PROFESSOR COLOCA ALGUMAS TAILWIND CLASSES...
+
+
+
+
+
+
+
+
+
+
+
+OK... E NOSSOS <li> ficaram clickable,
+
+e levam aos links corretos,
+
+de essas pages...
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul>
+        @foreach($jobs as $job)
+            <a class="text-gray-500 hover:underline hover:text-blue-500" href="/jobs/{{ $job['id'] }}">
+                <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+            </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+NÃO VAMOS CRIAR JOBS DE VERDADE ATÉ O FINAL DOS VIDEOS,
+
+ATÉ FICARMOS MAIS CONFORTÁVEIS...
+
+
+
+
+
+MAS VEREMOS ALGUNS DOS CONCEITOS QUE USAREMOS 
+
+NO FUTURO...
