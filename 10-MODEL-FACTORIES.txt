@@ -22,3 +22,1408 @@ MAS HOJE ESTUDARMOS 'FACTORIES'...
 
 
 
+
+
+
+
+--> FACTORIES...
+
+
+
+
+
+
+
+
+
+--> DEVEMOS VER A USERFACTORY,
+
+
+    QUE É A FACTORY QUE VEM COM O LARAVEL, OUT 
+    OF THE BOX...
+
+
+
+
+
+--> BASTA EXAMINAR ESTE CÓDIGO:
+
+
+
+
+
+
+database>factories>USERFACTORY
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+ACHO QUE ENTENDI...
+
+
+
+
+
+
+
+-> ISSO TUDO É FAKE DATA....
+
+
+
+
+
+
+
+
+-> ESSA FACTORY CRIA 
+
+    RECORDS FAKE...
+
+
+
+
+
+
+
+--> É PRATICAMENTE O 'FAKER.JS'...
+
+
+
+
+
+
+
+--> SE QUEREMOS 1 USER QUE ESTÁ EM UM 'UNVERIFIED STATE',
+
+
+
+
+PODEMOS USAR ESSE METHOD DE 'unverified()',
+
+
+
+que vai nos ajudar a TWEAKAR 
+
+OS ATTRIBUTES 
+
+DE MODO QUE 
+
+
+
+ELE SEJA INSERIDO NA DATABASE EM 
+
+
+1 'UN-VERIFIED STATE'...
+
+
+
+
+
+
+EX:
+
+
+
+
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK, MAS QUAL É A UTILIDADE DE UMA 'FACTORY'?
+
+
+
+
+
+
+
+
+
+
+--> NA VERDADE, HÁ VÁRIAS UTILIDADES...
+
+
+
+
+
+
+
+
+
+--> WE CAN USE IT FOR:
+
+
+
+
+
+1) ANY SITUATION WHERE WE NEED 
+    TO SCAFFOLD/GENERATE A USER, OR SOME EXAMPLE DATA...
+
+
+
+
+
+
+
+
+
+
+
+--> IMAGINE QUE VC ESTÁ ESCREVENDO 1 TEST...
+
+
+
+
+
+
+
+'''GIVEN THAT I HAVE 10 USERS...
+
+    WHEN I DA-DA-DA,
+
+    I SHOULD PA-PA-PA....''
+
+
+
+
+
+
+NO CASO, A FACTORY NOS AJUDA COM O 'GIVEN',
+ 
+
+ PQ ELA VAI RAPIDAMENTE PRODUZIR ESSES 10 USERS...
+
+
+
+
+
+
+
+
+
+
+ 2) OUTRO USO É 'QUICKLY SPIN-UP YOUR 
+                DEVELOPMENT ENVIRONMENT'....
+
+
+
+
+
+            
+
+        
+
+
+
+
+-> QUANDO ESTAMOS TRABALHANDO NO NOSSO LOCAL ENVIRONMENT,
+    É BOM TER ALGO COMO 100 USERS...
+
+
+
+
+--> E AÍ PODEMOS USAR A FACTORY, PARA ISSO....
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... AQUI TEMOS ESSA FACTORY,
+
+SIM, 
+
+MAS COMO PODEMOS UTILIZÁ-LA?
+
+
+
+
+
+
+
+
+-> ACTUALLY, PODEMOS USÁ-LA EM QUALQUER LUGAR 
+EM QUE PODEMOS EXECUTAR CÓDIGO LARAVEL...
+
+
+
+
+
+
+
+
+
+
+ENTRETANTO, AQUI, O PROFESSOR VAI UTILIZÁ-LA 
+
+DENTRO 
+
+
+
+DO REPL DO LARAVEL,
+
+
+DENTRO DO 
+
+'php artisan tinker'...
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+ELE ENTRA NO TINKER...
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ, SE ELE QUER CRIAR 1 FAKE USER,
+
+ELE PRECISA REFERENCIAR ESSA CLASS...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+App\Models\User 
+
+
+
+
+
+
+
+
+
+
+
+-> MAS ANTES DE ELE EXECUTAR QUALQUER COISA 
+
+
+NESSA CLASS,
+
+
+
+
+O PROFESSOR ABRE O CÓDIGO DESSE MODEL,
+
+
+
+
+
+QUE TEM ISTO:
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+
+
+
+
+
+
+
+
+
+
+
+
+aí ele fala:
+
+
+
+
+
+
+
+'''REMEMBER WHEN WE USED 
+    php artisan make:model xxxxx',
+
+
+
+
+
+
+WHICH WE USED TO GENERATE A NEW MODEL...?
+
+
+
+
+
+--> ''ON THAT OCCASION, I SAID THAT 
+    THE CLASS/MODEL HAD A 'HasFactory' 
+    TRAIT... NOW WE ARE GOING TO EXPLAIN WHAT THAT DOES, IN DETAIL''....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O TRAIT DE 'HasFactory':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use HasFactory...
+
+
+
+
+
+
+
+
+--> esse trait 
+
+ADICIONA UM BOCADO DE METHODS 
+
+
+A SUA CLASS,
+
+TUDO PARA 
+
+
+
+QUE SEJA POSSÍVEL FAZER O GENERATE DE FACTORIES 
+
+PARA SUA CLASS/MODEL ESPECÍFICO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> THESE METHODS CAN BE USED 
+    TO GENERATE FACTORIES...
+
+
+
+
+
+
+
+
+
+
+--> ONE OF THESE METHODS, INSIDE OF 'HasFactory.php',
+
+the trait,
+
+
+
+IS 
+
+
+
+'factory()'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... PARA CONSEGUIRMOS 
+
+
+USAR A FACTORY DE USERS,
+
+
+
+QUE EXISTE DENTRO DO MODEL DE 'User',
+
+por conta de esse trait 'HasFactory',
+
+
+
+
+DEVEMOS 
+
+
+CHAMAR ASSIM:
+
+
+
+App\Models\User::factory() 
+
+
+
+
+
+
+
+
+
+
+
+
+--> AÍ, ISSO FEITO,
+
+DEVEMOS CHAMAR 1 DOS METHODS QUE EXISTIRÁ DENTRO DA FACTORY,
+
+
+O METHOD 
+
+'create()'...
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+App\Models\User::factory()->create();
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO, NO CASO,
+
+
+VAI 
+
+
+'''CREATE A NEW FACTORY, FOR THE USER CLASS''....
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS, COM ISSO, FICAMOS COM OUTRO ERROR:
+
+
+
+
+O ERROR É ESTE:
+
+
+
+
+
+   Illuminate\Database\QueryException  SQLSTATE[HY000]: General error: 
+1 table users has no column named name (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "updated_at", "created_at") values (Miss Joyce Romaguera II, dbradtke@example.net, 2024-09-26 05:33:05, $2y$12$dJucSX3Kn.yImpfEWfhms.4tDoDx0jy8lOgIxS1Kykhh47Dzqh3bO, BQyqh8ROVw, 2024-09-26 05:33:05, 2024-09-26 05:33:05)).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO CASO,
+
+
+
+'table users has NO COLUMN NAMED 'name'''....
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO É ESTRANHO...
+
+
+
+
+MAS FAZ TOTAL SENTIDO... ISSO ACONTECEU 
+
+
+JUSTAMENTE 
+
+
+
+PQ 
+
+
+NÓS TÍNHAMOS TROCADO OS FIELDS DO MODEL DE 'User'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> anteriormente, por default,
+    o 'User'
+
+    estava com um field de 'name'...
+
+
+
+
+
+
+    esse field de 'name' é algo default do LARAVEL em si....
+
+
+
+
+
+
+    NÓS TROCAMOS ESSE FIELD POR OUTROS 2 FIELDS,
+
+    'first_name' e 'last_name'...
+
+
+
+
+
+
+
+-> É POR ISSO QUE A FACTORY NÃO FUNCIONOU,
+
+
+É PQ ELA ESTÁ QUERENDO EXECUTAR LÓGICA COM 1 FIELD DE 'name',
+
+
+field que simplesmente NÃO EXISTE NA TABLE DE 'users'....
+
+
+
+
+
+
+
+
+
+
+
+--> PARA CONSERTAR ISSO, BASTA TROCAR ESSE CÓDIGO,
+
+
+E ESCREVER ALGO ASSIM:
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ESSE 'fake()'
+
+
+SE APROVEITA DE UMA API,
+
+
+CHAMADA DE 'FAKER'...
+
+
+
+
+
+
+
+EXISTE O FAKER PARA 'php' e 'js'...
+
+
+
+
+
+
+
+
+
+
+
+--> O FAKER EXISTE METHODS PARA QUALQUER TIPO DE DATA 
+    EXISTENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+TENTAMOS NOVAMENTE...
+
+
+
+
+
+
+
+
+--> ELE AINDA FALHA...
+
+
+
+
+
+
+
+MAS PQ FALHOU?
+
+
+
+
+
+
+
+
+EXPLICAÇÃO:
+
+
+
+''WHEN YOU RUN PHP ARTISAN TINKER,
+ALL THE CODE IS LOADED INTO MEMORY...
+
+IF WE MAKE ANY CHANGES TO THE CODE,
+WE NEED TO EXIT OUT OF THE TINKER/REPL,
+
+TO THEN TEST THE CODE/CHANGES INSIDE OF IT, AFTERWARDS'''...
+
+
+
+
+
+
+
+-> É POR ISSO QUE RODAMOS CTRL + C,
+
+e aí 
+
+re-rodamos o php artisan tinker,
+
+
+para testar se a change consertou o problema...
+
+
+
+
+
+
+
+
+
+
+COM ISSO, COM ESSE COMANDO,
+
+
+1 NOVO RECORD FOI CRIADO,
+
+
+NA TABLE DE 'Users':
+
+
+
+> App\Models\User::factory()->create();
+= App\Models\User {#5262
+    first_name: "Jeanne",
+    last_name: "Zulauf",
+    email: "haley.tierra@example.com",
+    email_verified_at: "2024-09-26 05:38:50",
+    #password: "$2y$12$imMjsZ7o5dhk77gENqWgdOD07/LUNz4qH0QM4PZHk7gEx/BcL37lS",
+    #remember_token: "Qg2CgMw0on",
+    updated_at: "2024-09-26 05:38:51",
+    created_at: "2024-09-26 05:38:51",
+    id: 1,
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... ELE REALMENTE CRIOU ESSE RECORD,
+
+E RETORNOU 1 NOVA INSTANCE, DE ESSE USER...
+
+
+
+
+
+
+
+
+
+
+
+
+---> OK...
+
+
+ 
+ MAS DIGAMOS QUE TEMOS 
+
+
+ 1 SITUATION EM QUE 
+
+
+
+
+ QUEREMOS 
+
+
+ ''CREATE MANY RECORDS'',
+
+ EM VEZ DE 1 ÚNICO RECORD?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ --> para isso,
+
+ DEVEMOS
+
+
+ escrever algo assim:
+
+
+ > App\Models\User::factory(100)->create();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ --> COM ISSO, SE PASSAMOS 1 VALUE A '->factory()',
+
+ como parameter,
+
+
+
+
+ PODEMOS FICAR COM X NUMBER DE ROWS, DE ESSE MODEL/CLASS AÍ,
+
+
+ INSERIDAS NA DATABASE...
+
+
+
+
+
+
+
+
+
+ --> E É EXATAMENTE POR ISSO QUE FACTORIES SÃO TÃO PODEROSAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> QUANDO VC ESTÁ TRABALHANDO NO SEU LOCAL ENVIRONMENT,
+
+VC PODE USAR FACTORIES PARA CRIAR NOVOS ROWS RAPIDAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+
+
+mas digamos que 
+
+O PROFESSOR QUER CRIAR 1 NOVA FACTORY,
+
+DESSA VEZ PARA 'JobListings'...
+
+
+
+
+
+
+
+
+-> SE ELE QUER ISSO,
+
+BASTA RODAR 
+
+
+
+
+
+php artisan make:factory JobListing
+
+
+
+
+
+
+
+
+MAS ESCREVI ERRADO... O CORRETO SERIA:
+
+
+
+
+php artisan make:factory JobListingFactory...
+
+
+
+
+
+
+
+
+
+
+
+--> mas, pelo visto, não faz diferença,
+
+a file ainda foi criada corretamente,
+
+como 'JobListingFactory'...
+
+
+
+
+
+
+
+
+
+-> DENTRO DELA, TEMOS ESTE CÓDIGO:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobListing>
+ */
+class JobListingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            //
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+DENTRO DE 'definition',
+
+
+DEVEMOS COLOCAR OS FIELDS DE NOSSA TABLE/MODEL..
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobListing>
+ */
+class JobListingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'title' => fake()->jobTitle(),
+            'salary' => fake()->numberBetween(1000, 10000),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... ISSO FUNCIONA...
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, TESTAMOS ESSA FACTORY,
+
+COM 
+
+
+
+App\Models\JobListing::factory(100)->create();
+
+
+
+
+
+
+
+
+
+
+
+MAS AO RODARMOS ISSO,
+
+
+FICAMOS COM ESTE ERROR:
+
+
+
+
+
+
+
+''' called undefined method 'Job::factory()''.''.
+
+
+
+
+
+
+
+
+-> A RAZÃO DE ESSE ERROR
+
+
+ESTÁ AQUI:
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+}
