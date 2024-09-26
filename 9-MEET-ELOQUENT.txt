@@ -1,0 +1,1160 @@
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI MOSTRAR O 'ELOQUENT'...
+
+
+
+
+
+
+
+
+
+ELOQUENT -> É UM DOS PILARES 
+                DO LARAVEL...
+
+
+
+
+
+
+
+
+
+
+ELOQUENT ---> É UM ORM...
+
+
+
+
+
+
+
+
+
+
+
+
+OBJECT RELATIONAL MAPPER...
+
+
+
+
+
+
+
+
+
+
+
+
+ORM --> MAPPEIA UM OBJECT,
+    EM SUA DATABASE,
+
+    COMO 1 TABLE ROW,
+
+
+    A 1 OBJECT NO SEU CÓDIGO PHP...
+
+
+
+
+
+
+
+
+
+
+--> NÓS PODEMOS ENTRAR NO TABLEPLUS 
+
+E VER 
+
+OS DETAILS PARA 1 SINGLE ROW...
+
+
+
+
+
+
+
+
+-> ESSE ROW FICA COM ALGUM TIPO DE REPRESENTATION 
+    NO SEU CÓDIGO PHP...
+
+
+
+
+
+
+
+--> É ISSO QUE VC PENSA,
+
+QUANDO FALAMOS EM 'ORM'...
+
+
+
+
+
+
+
+
+
+
+
+--> 'ACTIVE RECORD' --> ELOQUENT É 
+
+                    A IMPLEMENTATION 
+
+                    DE 'ACTIVE RECORD'
+
+                    DO LARAVEL...
+
+
+
+
+
+
+
+
+--> voltamos ao editor,
+
+
+e aí 
+
+
+
+
+TEMOS A CLASS DE 'Job'...
+
+
+
+
+
+
+
+ATUALMENTE, ELA ESTÁ COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+
+        return [
+            [
+                'id' => 1,
+                'title' => 'Director',
+                'salary' => '$50,000'
+            ],
+
+            [
+                'id' => 2,
+                'title' => 'Programmer',
+                'salary' => '$10,000'
+            ],
+            [
+                'id' => 3,
+                'title' => 'Teacher',
+                'salary' => '$40,000'
+            ],
+        ];
+    }
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            abort(404);
+        }
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O QUE QUEREMOS FAZER, AGORA,
+
+
+É CONVERTER ESSA CLASS EM 
+UM 
+
+
+__MODEL__ DO ELOQUENT...
+
+
+
+
+
+
+
+
+
+
+
+
+
+PORÉM, ANTES DISSO, DEVEMOS REMOVER O CÓDIGO 
+
+DO ARRAY,
+
+
+
+PQ AGORA ESSA DATA VAI SER EXTRAÍDA 
+
+DA NOSSA DATABASE...
+
+
+
+
+
+
+
+
+ESCREVEMOS TIPO ASSIm:
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Arr;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class Job
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+    }
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            abort(404);
+        }
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+PRECISAMOS FAZER EXTEND DA CLASS DE 'Model'
+
+
+
+do 
+
+LARAVEL,
+
+TIPO ASSIM:
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+
+class Job extends Model
+{
+
+
+    public function __construct() {}
+
+
+    public static function fetchAll(): array
+    {
+    }
+
+
+    public static function find(int $id): ?array
+    {
+        $selectedJob = Arr::first(static::fetchAll(), fn($job) => $job['id'] == $id);
+
+        if(!$selectedJob) {
+            abort(404);
+        }
+
+        return $selectedJob;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+MAS AO FAZERMOS ISSO,
+
+
+
+FICAMOS COM ERRORS DE TYPE..
+
+
+
+
+
+
+
+
+
+''YOU NEED METHOD 
+
+
+Model::all''...
+
+
+
+
+
+
+
+
+
+
+
+--> COMO VC PODE IMAGINAR,
+
+O ELOQUENT TEM SUA PRÓPRIA API,
+
+QUE BASICAMNETE 
+
+
+
+MOLDA A MANEIRA PELA QUAL FAZEMOS QUERY DA DATABASE...
+
+
+
+
+
+
+
+
+
+
+-> DOIS DOS METHODS DE ESSA CLASS,
+
+'MODEL',
+
+SÃO:
+
+
+
+
+1) all() 
+
+
+
+2) find()....
+
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE 
+
+
+    VAMOS REMOVER TODO CÓDIGO 
+
+    QUE TEMOS DENTRO DE NOSSA CLASS...
+
+
+
+
+
+
+
+DEIXAMOS ASSIM, A CLASS:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+
+class Job extends Model
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+DEIXAMOS ELA COMPLETAMENTE 'PELADA',
+
+
+PQ ESSES METHODS JÁ VÃO EXISTIR,
+
+DENTRO 
+
+
+
+DO PARENT CLASS DE 'Model'...
+
+
+
+
+
+
+
+
+
+
+OK.. ISSO FEITO,
+
+
+DEVEMOS PLAY AROUND 1 POUCO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO ARQUIVO DE 'WEB.PHP',
+
+
+
+O PROFESSOR REESCREVE O CALL DOS METHODS...
+
+
+
+
+
+
+
+
+
+Job:: 
+
+
+
+
+
+
+
+
+--> AÍ TEMOS TODOS OS METHODS QUE PODEMOS CHAMAR,
+
+TUDO POR CONTA 
+
+
+DO EXTEND QUE FIZEMOS, DAQUELA CLASS DE 'Model'...
+
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE DEIXAMOS O CÓDIGO DE 'web.php'
+
+ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Job;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::get('/', function () {
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => Job::all()
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => Job::all()
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = Job::find($id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+TENTAMOS EXECUTAR ISSO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SERÁ QUE ISSO VAI FUNCIONAR INSTANTANEAMENTE?
+
+
+
+
+--> FICAMOS COM 1 COLLECTION,
+
+SIM,
+
+MAS FICAMOS COM 
+
+
+1 COLLECTION _ VAZIA_...
+
+
+
+
+
+FICOU TIPO ASSIM (usando dd(), dump and die, para ver o resultado):
+
+
+
+
+
+
+
+
+Route::get('/', function () {
+
+    $jobs = Job::all();
+
+
+    dd($jobs);
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+Illuminate\Database\Eloquent\Collection {#1082 ▼ // routes\web.php:14
+  #items: []
+  #escapeWhenCastingToString: false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... O PROFESSOR ENTÃO APONTA ALGO QUE DEVEMOS guardar na memória:
+
+
+
+
+
+
+
+
+
+
+''LARAVEL ALWAYS TRIES TO RELY ON 
+    __CONVENTION, OVER CONFIGURATION''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> POR EXEMPLO,
+    SE TEMOS 
+
+    UM MODEL CHAMADO DE 'Job',
+
+
+    O _ ELOQUENT DO LARAVEL _ VAI _ ASSUME 
+
+    _ QUE VC TEM 1 TABLE CHAMADA DE 
+
+    'jobs'...
+
+
+
+
+
+
+
+-> COMO O NOME DE NOSSA TABLE É 'job_listings',
+
+
+O NOME DE NOSSA CLASS/MODEL DOS JOBS,
+
+DE NOSSO APP,
+
+
+
+NÃO DEVERÁ SE CHAMAR DE 'Job',
+
+
+E SIM DE 
+
+'JobListing'...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+
+    dd($jobs);
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => JobListing::all()
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+e assim:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+
+}
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+E ISSO REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+
+NA VERDADE, TEMOS 2 CHOICES PARA RESOLVER ESSE PROBLEMA:
+
+
+
+
+
+
+
+
+
+
+1) RENOMEAR A CLASS/MODEL PARA 'JobListings'...
+
+
+
+
+
+
+
+
+
+2) A ALTERNATIVA,
+
+    QUE DEVE SER USADA EM CASES EM QUE 
+
+    VC QUER TER ''A UNIQUE TABLE NAME'',
+
+
+
+    É ADICIONAR 1 PROPERTY CHAMADA DE 
+
+    'protected $table',
+
+
+
+    e aí 
+
+
+
+    DEFINIR, COMO VALUE,
+
+    O NOME DA SUA TABLE...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+    protected $table = 'job_listings';
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, REALMENTE FICAREMOS COM UM ARRAY 
+
+    CHEIO DE 'JOB_LISTINGS',
+
+    TIPO ASSIM:
+
+
+
+
+    Illuminate\Database\Eloquent\Collection {#963 ▼ // routes\web.php:14
+  #items: array:3 [▼
+    0 => 
+App\Models
+\
+JobListing {#1228 ▶}
+    1 => 
+App\Models
+\
+JobListing {#1229 ▶}
+    2 => 
+App\Models
+\
+JobListing {#1230 ▶}
+  ]
+  #escapeWhenCastingToString: false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+E CADA 1 DE ESSES OBJECTS SERÁ UMA __ INSTANCE_ 
+
+
+DAQUELA CLASS/MODEL DE 'Job'...
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM 1 PLACE TO TUCK ANY BEHAVIOR 
+
+THAT IS RELATED TO THAT JOB....
+
+
+
+
+
+
+
+
+--> SE EXPANDIMOS UM DESSES OBJECTS,
+
+FICAMOS COM ISTO:
+
+
+
+
+
+
+
+  #items: array:3 [▼
+    0 => 
+App\Models
+\
+JobListing {#1228 ▼
+      #connection: "sqlite"
+      #table: "job_listings"
+      #primaryKey: "id"
+      #keyType: "int"
+      +incrementing: true
+      #with: []
+      #withCount: []
+      +preventsLazyLoading: false
+      #perPage: 15
+      +exists: true
+      +wasRecentlyCreated: false
+      #escapeWhenCastingToString: false
+      #attributes: array:5 [▶]
+      #original: array:5 [▶]
+      #changes: []
+      #casts: []
+      #classCastCache: []
+      #attributeCastCache: []
+      #dateFormat: null
+      #appends: []
+      #dispatchesEvents: []
+      #observables: []
+      #relations: []
+      #touches: []
+      +timestamps: true
+      +usesUniqueIds: false
+      #hidden: []
+      #visible: []
+      #fillable: []
+      #guarded: array:1 [▶]
+
+
+
+
+
+
+
+
+
+    DENTRO DE 'attributes',
+
+
+    TEMOS INFO SOBRE A ROW QUE FOI RETRIEVADA...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+ #attributes: array:5 [▼
+        "id" => 1
+        "title" => "Director"
+        "salary" => "$40.000"
+        "created_at" => null
+        "updated_at" => null
+      ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      certo....
+
+
+
+
+      
