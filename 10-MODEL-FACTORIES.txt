@@ -1,0 +1,24 @@
+
+
+
+
+
+HOJE FOCAREMOS NO FOLDER DE 'database'...
+
+
+
+
+
+
+
+
+
+-> JÁ CONHECEMOS MIGRATIONS,
+
+
+MAS HOJE ESTUDARMOS 'FACTORIES'...
+
+
+
+
+
