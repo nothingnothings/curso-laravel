@@ -1427,3 +1427,2333 @@ class JobListing extends Model
         'salary',
     ];
 }
+
+
+
+
+
+
+
+
+
+
+em todos os cases em que vc quer criar 
+
+1 nova coisa,
+
+é melhor usar um GENERATOR,
+
+
+COMO 'php artisan make:factory'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+php artisan make:factory JobListingFactory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DENTRO DISSO, O PROFESSOR ESCREVE ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobListing>
+ */
+class JobListingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'title' => fake()->jobTitle(),
+            'salary' => fake()->numberBetween(1000, 10000),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VC TAMBÉM PODE HARDCODE 1 VALUE,
+    EM VEZ DE USAR os methods do fake, a depender do case...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+aí o professor tenta rodar isso, e fica com este error:
+
+
+
+
+
+''' call to undefined method 'Job::factory()''.''.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> A RAZÃO DE ESTE ERROR ESTÁ 
+
+
+
+NO MODEL/CLASS DE 'JobListing',
+que atualmente tem este código:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+NO CASO,
+
+
+
+AINDA NÃO ESCREVEMOS O TRAIT DE 
+
+
+'' 
+
+
+    use HasFactory;
+
+
+
+'''....
+
+
+
+
+
+
+
+
+-> OU SEJA,
+
+AINDA NÃO FOI APLICADO ESSE TRAIT, em 
+
+
+''JobListing'',
+
+
+
+
+nesse model...
+
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... O PROFESSOR APONTA QUE 
+
+
+'''IF WE MAKE ANY NEW MODEL, WITH 
+    php artisan make:model xxxxxx'',
+
+
+
+any of these new models will already include 
+
+the 'HasFactory' trait,
+
+
+LIKE THIS:
+
+
+
+
+
+
+
+
+class Post extends Model 
+{
+    use HasFactory;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COMO NÓS CRIAMOS A CLASS/MODEL DE 'JobListing'
+    MANUALMENTE,
+
+    ELA NÃO FICOU COM ESSE TRAIT DE 'HasFactory' incluso...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ COM ISSO, PROVAVELMENTE PODEMOS UTILIZAR ESSA FACTORY AÍ,
+
+
+ PARA CRIAR NOVOS 'JobListing'...
+
+
+
+
+ RODEI ASSIM:
+
+
+
+
+
+
+
+
+
+php artisan tinker 
+
+
+App\Models\JobListing::factory(1000)->create();
+
+
+
+
+
+
+e realmente funcionou.
+
+
+
+
+fiz a mesma coisa com 'User'...
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+
+
+
+E VC PRECISA DO TRAIT, PQ É O TRAIT QUE NOS DEIXA USAR AQUELE 
+METHOD CALL DE 
+
+'::factory()'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+COM ISSO, CRIAMOS UM MONTE DE RANDOM JOBS...
+
+
+
+
+
+
+
+
+
+
+--> TAMBÉM FICAMOS COM UM MONTE DE RANDOM USERS...
+
+
+
+
+
+
+
+
+
+
+
+--> OK... MAS LEMBRE-SE DA FACTORY 
+'UserFactory':
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+TEMOS AQUELE METHOD DE 'unverified()',
+
+
+
+QUE PODE SER USADO PARA 
+
+
+CRIAR USERS QUE NÃO FORAM 'VERIFIED' AINDA...
+
+
+
+
+
+
+
+
+
+--> MAS COMO PODEMOS ATIVAR ESSE 'STATE' PARTICULAR?
+
+
+
+
+
+
+
+
+
+
+--> BEM, FAZEMOS ISSO DESTA FORMA:
+
+
+
+
+
+
+App\Models\User::factory()->unverified()->create();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, SERÁ CRIADO 1 NOVO USER, COM O 'verified_at' 
+
+settado como NULL...
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+
+
+
+= App\Models\User {#8322
+    first_name: "Estel",
+    last_name: "Volkman",
+    email: "tess.zieme@example.com",
+    email_verified_at: null,
+    #password: "$2y$12$3FHE.E7kU5nfIBnZ/0zpqe86beZcqNXiE5.DT1MfhPdX6uU2yzpMG",
+    #remember_token: "m6RRhzvQps",
+    updated_at: "2024-09-26 17:22:43",
+    created_at: "2024-09-26 17:22:43",
+    id: 1001,
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QUANDO VC COMEÇAR A ESCREVER PROJECTS MAIS ROBUSTOS,
+
+
+
+'''YOU WILL NEED TO CREATE MODELS/RECORDS IN VERY PARTICULAR STATES''',
+
+
+geralmente para fazer esse tipo de coisa,
+
+
+
+testar coisas específicas...
+
+
+
+
+
+
+
+
+--> A FUNCTION DO LARAVEL QUE ACTUALLY FEZ ESSA MUDANÇA FOI 'state()'
+
+
+
+como visto aqui:
+
+
+
+
+
+
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> podemos usar essa function para deixar outros fields como null, ou algo assim...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> em projetos simples,
+
+    geralmente sua table de 'users' pode 
+
+    ter 
+
+
+    1 column como 'admin', de tipo boolean...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            'admin' => false
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+se vc tiver esse field,
+
+vc pode escrever tests como 
+
+
+
+
+''' Given that I have a user 
+    that is an admin, 
+
+    when I pa-pa-pa,
+
+    da-da-da'''',
+
+
+
+
+
+
+
+
+vc poderá criar vários users 
+
+
+com states específicos,
+
+
+
+como 'admin'....
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+    public function definition(): array
+    {
+        return [
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            'admin' => false
+        ];
+    }
+
+
+
+
+
+
+    // * Call it like this: User::factory()->admin()->create();
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'admin' => true
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+NO PRÓXIMO EPISÓDIO, TEREMOS 1 AULA INTEIRA SOBRE 
+
+
+'ELOQUENT RELATIONSHIPS'...
+
+
+ 
+
+
+
+
+
+MAS VEREMOS O BÁSICO, NESTE VÍDEO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO....
+
+
+
+
+
+
+
+
+
+
+
+
+E FAZ SENTIDO QUE 
+
+
+''ANY GIVEN JOB ON OUR SITE 
+WOULD HAVE A RELATIONSHIP TO A GIVEN EMPLOYEE'''.....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> POR EXEMPLO,
+
+    SE TEMOS A MICROSOFT NO PROJETO,
+
+
+    TEREMOS 100 DIFFERENT JOB LISTINGS,
+
+    E QUEREMOS QUE EXISTA 1 RELATIONSHIP 
+
+    ENTRE JOB LISTINGS E OS USERS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, VAMOS ATÉ O ARQUIVO DE MIGRATIONS
+
+
+    DE 'job_listings',
+
+    E AÍ TEMOS ISTO:
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('salary');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listings');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> NESSA TABLE DE 'job_listings',
+
+    QUEREMOS FAZER COM QUE 
+
+
+    '' A JOB_LISTING BELONGS TO AN EMPLOYER'''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE VAMOS QUERER UMA FOREIGN KEY 
+
+DENTRO DE 'job_listings',
+
+
+
+que vai ser 'employer_id'...
+
+
+
+
+
+TIPO ALGO ASSIM:
+
+
+
+
+
+
+
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('title');
+            $table->string('salary');
+            $table->timestamps();
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, NÓS APONTAMOS ATÉ OS USERS...
+
+
+
+
+
+
+
+
+
+
+
+MAS O PROFESSOR QUER TER UMA TABLE DE EMPLOYERS,
+EM VEZ DE USERS..
+
+
+
+
+
+-> PARA CRIAR UMA TABLE DE EMPLOYERS,
+
+PODEMOS USAR OS GENERATORS 
+DO PHP,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+php artisan make:model employers --migration --factory
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-10> php artisan make:model employers --migration --factory
+
+   INFO  Model [D:\AULAS-LARAVEL\curso-laravel\code\example-10\app\Models\employers.php] created successfully.  
+
+   INFO  Factory [D:\AULAS-LARAVEL\curso-laravel\code\example-10\database\factories\EmployersFactory.php] created successfully.  
+
+   INFO  Migration [D:\AULAS-LARAVEL\curso-laravel\code\example-10\database\migrations/2024_09_26_173055_create_employers_table.php] created successfully.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+AÍ ABRIMOS A MIGRAITON DE 'employers':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+E EMPLOYERS TERÃO:
+
+
+
+
+
+
+1) UM NAME 
+
+
+
+
+
+
+e apenas isso...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, LÁ NA MIGRATION DE 'create_job_listings',
+
+
+
+O PROFESSOR ESCREVE 
+
+
+''$table->unsignedBigInteger('employer_id');''
+
+
+
+
+
+
+
+
+
+COLOCAMOS UNSIGNED JUSTAMENTE PQ 
+
+OS IDS SERÃO SEMPRE POSITIVOS...
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('employer_id');
+            $table->string('title');
+            $table->string('salary');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listings');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> NÓS USAMOS 'unsignedBigInteger'
+
+
+JUSTAMENTE PQ 
+
+O TYPE 
+
+
+
+DE SUA FOREIGN KEY TEM QUE SER IDÊNTICO 
+
+
+
+AO TYPE DA KEY DA TABLE A QUE VC ESTÁ REFERENCING...
+
+
+
+
+
+
+-> COMO 'id()',
+
+no contexto do eloquent,
+
+é sempre uma BIGINT,
+
+
+
+devemos usar 'bigInteger'.. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+---> UMA OUTRA OPTION, MELHOR,
+
+É USAR 
+
+
+'$table->foreignIdFor()'....
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Employer;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('job_listings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Employer::class);
+            $table->string('title');
+            $table->string('salary');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listings');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+COMO FIZEMOS VÁRIAS CHANGES, E ESTAMOS NO INÍCIO DO PROJECT,
+
+
+É VANTAJOSO 
+
+
+RODAR 
+
+
+
+
+
+''''
+
+php artisan migrate:fresh 
+
+
+
+''''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO VAI DROPPAR TUDO E RUN FROM SCRATCH...
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE TODA NOSSA DATA TERÁ SIDO PERDIDA,
+
+
+
+
+TODOS OS JOBS E TODOS OS USERS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS A BOA NOTÍCIA É QUE, EM 'job_listings',
+
+temos 
+
+
+a column de 
+
+'employer_id'
+
+
+
+
+
+QUE SE REFERE À TABLE  de 'employers'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+AGORA, SE VAMOS ATÉ 'JobListingFactory',
+
+
+
+
+
+PERCEBEMOS QUE A LÓGICA ESTÁ ERRADA:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobListing>
+ */
+class JobListingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'title' => fake()->jobTitle(),
+            'salary' => fake()->numberBetween(1000, 10000),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO ACONTECE/ACONTECEU JUSTAMENTE PQ O 
+
+'employer_id'
+ 
+
+
+ NÃO FOI PROVIDENCIADO...
+
+
+
+
+
+
+
+
+
+
+PRECISAMOS UPDATAR ESSA FACTORY,
+
+E COLOCAR UM 'employer_id',
+
+de algum value...
+
+
+
+
+
+
+
+-> PODEMOS HARDCODAR, COLOCAR UM VALUE DE '1'...
+
+
+
+
+
+
+
+-> MAS SERIA MAIS ÚTIL 
+
+
+
+''WHENEVER YOU GENERATE A JOB LISTING,
+    GENERATE ANY CORRESPONDING RELATIONSHIPS,
+    LIKE A CONNECTED EMPLOYER''...
+
+
+
+
+
+
+
+
+
+--> PARA FAZER ISSO, PODEMOS, NOVAMENTE,
+    USAR OS HELPER METHODS DO ELOQUENT,
+
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Employer;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobListing>
+ */
+class JobListingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'title' => fake()->jobTitle(),
+            'employer_id' => Employer::factory(),
+            'salary' => fake()->numberBetween(1000, 10000),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, QUANDO O LARAVEL CHEGAR NESSE TRECHO,
+
+
+
+
+ELE VAI 'KNOW' 
+
+
+
+QUE 
+
+
+VAI PRECISAR CRIAR ESSE EMPLOYER NA DATABASE,
+
+E QUE ENTÃO DEVERÁ SER USADO ESSE unique id 
+
+COMO CORRESPONDING 'employer_id'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ok... mas tentamos  rodar isso, com 
+
+
+
+
+php artisan tinker 
+
+
+
+
+App\Models\JobListing::factory(300)->create();
+
+
+
+
+
+
+
+
+
+
+
+E ISSO VAI, NOVAMENTE, RESULTAR EM UM ERROR...
+
+
+
+
+
+
+
+ENTRETANTO, DESSA VEZ,
+
+
+O ERROR 
+
+SERÁ 
+
+
+''
+
+
+
+> App\Models\JobListing::factory(300)->create();
+
+   Error  Class "Database\Factories\EmployerFactory" not found.
+
+
+
+
+'''
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+PRECISAMOS DE ESSE 'EmployerFactory'...
+
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\employers>
+ */
+class EmployerFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            //
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+E PRECISAMOS, TAMBÉM,
+
+
+CRIAR A LÓGICA CORRESPONDENTE...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+> App\Models\JobListing::factory(300)->create();
+
+   Illuminate\Database\QueryException  SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: employers.name (Connection: sqlite, SQL: insert into "employers" ("updated_at", "created_at") values (2024-09-26 17:42:39, 2024-09-26 17:42:39)).
+
+
+
+
+
+
+
+
+
+
+--> OU SEJA,
+
+AGORA PRECISAMOS DEFINIR A LÓGICA CORRETA,
+
+PARA O CREATE DE ESSES 'Employers'...
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\employers>
+ */
+class EmployerFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->company(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... e isso realmente funciona...
+
+
+
+
+
+
+foram criados 300 job listings,
+
+
+com 300 companies correspondentes...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR 
+
+
+
+
+fala da flag de '--factory', que podemos utilizar,
+
+
+quando fazemos o generate de um model...
+
+
+
+
+
+
+
+
+
+
+
+-> o professor escreve tipo assim:
+
+
+
+
+
+
+
+
+
+php artisan make:model -m -f 
+
+
+
+
+
+
+
+--> COM ISSO, FICAMOS COM O MODEL, COM A MIGRATION E COM A FACTORY...
+
+
+
+
+
+
+
+--> ISSO FEITO,
+
+
+o professor escreve assim:
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\employers>
+ */
+class EmployerFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->company(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... RODAMOS TUDO ISSO... E AÍ FUNCIONA...
+
+
+
+
+
+
+
+
+
+CADA JOB LISTING PERTENCE A 1 EMPLOYER DIFERENTE...
+
+
+
+
+
+
+
+
+
+
+
+--> MAS É CLARO QUE EXISTIRÃO SITUAÇÕES EM QUE VC VAI QUERER 
+    QUE MÚLTIPLOS JOB LISTINGS PERTENÇAM A 1 MESMO EMPLOYER...
+
+
+
+
+
+
+
+
+
+
+--> PARA CASES COMO ESSES, VC PODE USAR UM METHOD CHAMADO DE '->recycle()',
+
+    MAS NÃO VEREMOS ISSO AINDA...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+RESUMINDO:
+
+
+
+
+
+
+
+
+
+1) MODEL FACTORIES ARE GREAT FOR SCAFFOLDING DATA FOR YOUR LOCAL ENVIRONMENT 
+
+
+
+
+
+2) GREAT FOR GENERATING DATA FOR YOUR TESTS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> NÓS ACABAMOS COM 1 POUCO SOBRE DATABASE RELATIONSHIPS...
+
+
+
+
+
+
+
+-> AGORA 1 JOB_LISTING PERTENCE A 1 EMPLOYER...
+
+
+
+--> ISSO ESTÁ FUNCIONANDO NO 'DATABASE-END'...
+
+
+
+-> MAS AINDA NÃO ESTÁ FUNCIONANDO NO 'LARAVEL/APP-END'...
+
+
+
+
+--> SE EU TENHO 1 JOB OBJECT,
+
+EU QUERO FETCHEAR 
+
+O NAME 
+
+DO EMPLOYER QUE CRIOU ESSE JOB...
+
+
+
+
+
+
+
+
+
+
+--> COMO PODEMOS FAZER ISSO?
+
+VEREMOS NA PRÓXIMA AULA...
