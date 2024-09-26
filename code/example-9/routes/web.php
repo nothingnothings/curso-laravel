@@ -10,7 +10,11 @@ Route::get('/', function () {
     $jobs = JobListing::all();
 
 
-    dd($jobs);
+    // dd($jobs[0]); // we can access rows in the collection, as if it was an array.
+
+    // dd($jobs[0]->salary) // We can also access column values, inside of one of those row, as if it was an object.
+    // dd($jobs[0]->title) // We can also access column values, inside of one of those row, as if it was an object.
+
 
     return view('home', [
         'greeting' => 'Hello',

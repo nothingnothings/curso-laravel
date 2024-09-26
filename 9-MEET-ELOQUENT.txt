@@ -1157,4 +1157,1980 @@ TIPO ASSIM:
 
 
 
-      
+    
+
+
+
+COM ISSO, SE VOLTAMOS AO ARQUIVO DE 'web.php',
+
+
+nosso arquivo de routes,
+
+
+
+O PROFESSOR NOS MOSTRA ALGUMAS MANEIRAS PARA 
+
+
+
+FAZER GET DO ''FIRST ITEM''...
+
+
+
+
+
+
+
+PQ EXISTEM VÁRIAS MANEIRAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PARA INÍCIO DE CONVERSA,
+
+
+'JOBS' É UMA COLLECTION,
+
+COMO VIMOS ANTERIORMENTE...
+
+
+
+
+
+
+
+-> E, 1 MANEIRA DE FAZER INTERACT COM ESSA COLLECTION É 
+
+''TREAT IT AS IF IT WERE AN ARRAY''...
+
+
+
+
+
+
+
+
+
+--> OU SEJA,
+
+
+SE QUEREMOS O PRIMEIRO O JOB,
+
+
+
+PODEMOS SIMPLESMENTE USAR O PRIMEIRO INDEX,
+
+DENTRO DAQUELE ARRAY,
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+
+    dd($jobs[0]);
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+CERTO... COM ISSO, NÃO TEREMOS 1 COLLECTION,
+
+E SIM 
+
+TEREMOS 
+
+
+1 ÚNICA INSTANCE DE 'Job',
+
+
+QUE VAI CONTER AQUELES ATTRIBUTES... (que são os column names, no caso)...
+
+
+
+
+
+
+
+
+
+
+
+--> E SE O PROFESSOR QUER ACESSAR ALGUM DESSES ATTRIBUTES/COLUMN NAME VALUES,
+
+BASTA ELE ESCREVER ASSIM:
+
+
+
+
+
+    dd($jobs[0]->title);
+
+
+
+
+
+
+
+
+OU ASSIM:
+
+
+
+    dd($jobs[0]->salary);
+
+
+
+
+
+
+
+
+OU ASSIM:
+
+
+
+
+
+
+
+
+
+    dd($jobs[0]); // we can access rows in the collection, as if it was an array.
+
+    // dd($jobs[0]->salary) // We can also access column values, inside of one of those row, as if it was an object.
+    // dd($jobs[0]->title) // We can also access column values, inside of one of those row, as if it was an object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.... OU SEJA,
+
+É SUPER FÁCIL DE USAR O ELOQUENT PARA PEGAR A DATA 
+
+
+DE DENTRO DE SUAS TABLES...
+
+
+
+
+
+
+
+-> VC BASICAMNETE PODE USAR OS METHODS NATIVOS DO ELOQUENT 
+
+NOS SEUS MODELS,
+
+
+
+
+SEM PRECISAR ADICIONAR CUSTOM METHODS, NA MAIOR PARTE DOS CASOS...
+
+
+
+
+
+
+
+
+''WE WERE ABLE TO ENTIRELY STRIP OUR API THAT WE 
+BUILT ON THAT JOB CLASS, BECAUSE ELOQUENT INCLUDES THIS API/METHODS,
+AND WAY MORE, OUT OF THE BOX...''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... AGORA O PROFESSOR QUER VER SE ELE CONSEGUE 
+
+REPRODUZIR A LIST DE JOBS...
+
+
+
+
+
+
+
+-> ELE FARÁ ISSO COM ESTE CÓDIGO:
+
+
+
+
+
+
+Route::get('/jobs', function () {
+    return view('jobs', [
+        'jobs' => JobListing::all()
+    ]);
+});
+
+
+
+
+
+
+
+E ISSO FUNCIONA...
+
+
+
+
+
+
+
+
+
+
+
+
+--> voltamos ao browser, e aí clicamos em 'jobs'...
+
+
+
+
+
+
+
+
+
+
+-> E FUNCIONA, E TUDO SEM HARDCODE, AGORA...
+
+
+
+
+
+
+
+
+
+-> OS SINGLE JOBS TAMBÉM FUNCIONAM,
+
+    EXATAMENTE COMO ANTES...
+
+
+
+
+
+
+
+
+
+
+--> AINDA NÃO ESTUDAREMOS FORMS... MAS, LOGO AS ESTUDAREMOS...
+
+
+
+
+
+
+
+
+
+
+
+-> ''WE CAN ALSO USE ELOQUENT TO INSERT/DELETE RECORDS 
+FROM THE DATABASE''..
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DIZ QUE PODEMOS USAR 1 COMMAND ARTISAN 
+
+PARA 'PLAY AROUND'...
+
+
+
+
+
+
+BASTA ABRIR O TERMINAL E RODAR 
+
+
+
+
+''''
+
+
+php artisan tinker
+
+
+
+''
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DIZ QUE ISSO É COMO UM 
+
+'CLI PLAYGROUND',
+
+
+QUE PODE SER USADO 
+
+
+PARA TESTAR SEU LARAVEL APP... ELE NOS AJUDA 
+
+
+A PLAY  THINGS AROUND...
+
+
+
+
+
+
+
+
+--> PODEMOS CRIAR VARIABLES,
+
+
+
+TESTAR COISAS,
+
+É TIPO O 'REPL' DO NODE....
+
+
+
+
+
+
+--> EX:
+
+
+
+
+
+
+
+
+
+
+
+Psy Shell v0.12.4 (PHP 8.3.11 — cli) by Justin Hileman
+> $name = 'Arthur';
+= "Arthur"
+
+> echo $name;
+Arthur⏎
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK.... AÍ PODEMOS PLAY AROUND COM O ELOQUENT...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR QUER CRIAR 1 JOB,
+
+
+POR ISSO ELE ESCREVE ASSIM:
+
+
+
+
+
+App\Models\Job::create();
+
+
+
+
+
+
+
+
+OU SEJA,
+
+É O MESMO METHOD QUE USAMOS NO CÓDIGO DE VERDADE,
+
+
+MAS ESCRITO NESSA ESPÉCIE DE 'REPL'...
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+PRECISAMOS PASSAR 1 PARAMETER A ESSE 'create',
+
+que será um 
+
+ASSOCIATIVE ARRAY 
+
+
+
+COM OS VALUES A SEREM PASSADOS AO ROW QUE QUEREMOS CRIAR...
+
+
+
+
+
+
+
+PODEMOS ESCREVER TIPO ASSIM:
+
+
+App\Models\Job::create([
+    'title' => 'Acme Director',
+    'salary' => '$1,0000,000'
+]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO CASO, o nome do meu Job é 
+
+'JobListing',
+
+por isso escrevo assim:
+
+
+
+App\Models\JobListing::create([
+    'title' => 'Acme Director',
+    'salary' => '$1,0000,000'
+]);
+
+
+
+
+
+
+CERTO... MAS SE TENTAMOS RODAR ISSO AÍ,
+
+FICAMOS COM ESTE ERROR:
+
+
+
+
+
+
+
+  Illuminate\Database\Eloquent\MassAssignmentException  Add [title] to fillable property to allow mass assignment on [App\Models\JobListing]
+
+
+
+
+
+
+
+
+
+  ''MassAssignmentException'''...
+
+
+
+
+
+
+
+  O QUE ISSO SIGNIFICA?
+
+
+
+
+
+
+
+
+O PROFESSOR N GOSTA DESSA EXCEPTION... ELE ACHA QUE É CONFUSA PARA 
+NEWCOMERS...
+
+
+
+
+
+
+
+
+
+--> ISSO REQUER 1 POUCO DE CONHECIMENTO QUE VC AINDA NÃO TEM....
+
+
+
+
+
+
+
+
+
+
+--> O QUE ESTÁ ACONTECENDO, AQUI,
+É 
+
+
+''LARAVEL IS PROVIDING SOME SAFETY OUT OF THE BOX...''
+
+
+
+
+
+ELE ESTÁ DIZENDO 
+
+
+''HEY, YOU MIGHT BE A LITTLE CAREFUL ABOUT MASS ASSIGNING 
+THESE ATTRIBUTES ALL IN ONE GO''
+
+
+(pq é isso que estamos tentando fazer)...
+
+
+
+
+
+
+-> MAS QUAL É O DANGER, DE VERDADE?
+
+
+
+
+
+
+---> O PROFESSOR EXPLICA:
+
+
+
+''IN REAL LIFE, 
+    YOU WILL OFTEN BE RESPONDING 
+    TO _ FORM REQUESTS''..
+
+
+
+
+''FOR EXAMPLE,
+YOU WILL HAVE SOMETHING LIKE THIS:
+
+
+<input name="title"> '',
+
+
+
+
+AND THIS WOULD UPDATED A TITLE TO A POST...'''
+
+
+
+
+
+
+
+
+--> POTENCIALMENTE, VC PODERIA PASSAR OS VALUES DENTRO 
+DESSE ARRAY DE ATTRIBUTES AO METHOD DE UPDATE,
+
+
+TIPO ASSIM:
+
+
+
+
+$post->update(requestData());
+
+
+
+
+
+
+
+
+
+
+-> E ISSO SERIA __ TOTALMENTE INSEGURO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> RULE NUMBER ONE:
+
+
+''USERS ARE ALWAYS MALICIOUS, AND ARE ALWAYS TRYING TO DO SOMETHING WRONG''...
+
+
+
+
+
+
+
+
+
+
+
+
+--> VOCE __ SEMPRE _ dEVE ASSUMIR ISSO...
+
+
+
+
+
+
+
+
+
+
+
+--> SE ELES TWEAKAREM A FORM, DE MODO 
+
+
+QUE 
+
+COLOCAM UM INPUT EXTRA,
+
+
+EM QUE 
+
+ALTERAM TAMBÉM O 'author_id' da sua table,
+
+
+
+com algo tipo isto:
+
+
+
+<input name="title">
+<input name="author_id" value="1" type="hidden'>
+
+
+
+
+
+
+
+
+
+COM ISSO, SE O USER ENVIAR O REQUEST,
+
+E SE SUA LÓGICA FOR ISTO:
+
+
+$post->update(requestData());
+
+
+
+
+
+
+
+
+VC VAI BASICAMENTE SOFRER 1 ATAQUE,
+
+E SEU BANCO VAI SER COMPROMETIDO,
+
+
+PQ O AUTHOR_ID 
+
+TAMBÉM 
+
+
+TERÁ SIDO UPDATADO...
+
+
+
+
+
+
+
+
+quer dizer que o que acontecerá 
+
+será isto:
+
+
+$post->author_id = 1
+
+
+
+
+
+
+
+
+
+
+
+AGORA IMAGINE UM CASO EM QUE 
+
+
+VC ACABA 
+
+
+UPDATANDO O 'ADMIN STATUS'
+
+DE UM USER... ISSO SERIA CATASTRÓFICO....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E É EXATAMENTE POR ISSO QUE O LARAVEL TEM ESSA SAFETY...
+
+
+
+
+
+
+
+
+
+
+''AS LONG AS YOU KNOW EXACTLY WHAT DATA IS BEING PASSED 
+TO THE CREATE METHOD, IT IS SAFE...''
+
+
+
+
+
+
+
+MAS O LARAVEL, POR DEFAULT, PROTEGE CONTRA ISSO...
+
+
+
+
+
+
+
+
+
+-> PARA VC PODER EXECUTAR ESSE COMANDO DE 'Model::create()'
+
+dentro do 'php artisan tinker' SEM PROBLEMAS,
+
+
+
+VC TEM DUAS OPÇÕES:
+
+
+
+
+
+
+1) DISABLE THE SECURITY FEATURE (nada recomendado)
+
+
+
+
+2) FAZER AQUILO QUE O PROFESSOR NOS MOSTRARÁ AGORA...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DEPOIS DO WARNING, TEMOS ESTA MESSAGE:
+
+
+
+''''
+
+Add [title] to fillable property to allow mass assignment on [App\Models\JobListing]
+
+''''
+
+
+
+
+
+
+
+
+
+
+
+MAS COMO FAZEMOS ISSO?
+
+
+
+
+
+
+
+
+
+PARA DEMONSTRAR, O PROFESSOR VAI ATÉ 'JobListing',
+
+e aí adiciona uma NOVA PROPERTY,
+
+
+DE NOME '$fillable'...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED'
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+POR EXEMPLO,
+
+SE DEIXAMOS 'salary' e 'title',
+
+ISSO SIGNIFICA QUE 
+
+ESSES 2 ATTRIBUTES,
+
+E APENAS ESSES ATTRIBUTES,
+
+
+
+
+PODEM SER 'MASS-ASSIGNED'...
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, SE O ATTACKER TENTA 
+    MUDAR O 'user_id' ou 'author_id' 
+
+    de sua table,
+
+
+
+    vai ser como se NADA TIVESSE ACONTECIDO...
+
+
+
+    SERÁ __ TOTALMENTE _ IGNORADO...
+
+
+
+
+
+
+
+--> ''IT WILL BE IGNORED ENTIRELY, WHEN WE 
+PASS IT TO THE CREATE METHOD, in this example''...
+
+
+
+
+
+--> OK....
+
+
+
+
+
+DEPOIS DISSO, O PROFESSOR TENTA RE-RODAR O COMANDO....
+
+
+
+
+
+
+
+
+E, COM ISSO, FUNCIONA,
+
+O RECORD É CRIADO 
+
+NA TABLE DE 'job_listings'...
+
+
+
+
+
+
+ALÉM DISSO, O TERMINAL TE RETORNA O PRÓPRIO RECORD QUE FOI INSERIDO..
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+> App\Models\JobListing::create([
+.     'title' => 'Acme Director',
+.     'salary' => '$1,0000,000'
+. ]);
+= App\Models\JobListing {#5235
+    title: "Acme Director",
+    salary: "$1,0000,000",
+    updated_at: "2024-09-26 04:25:57",
+    created_at: "2024-09-26 04:25:57",
+    id: 4,
+  }
+
+
+
+
+
+
+
+
+
+
+ok.... QUER DIZER QUE FUNCIONOU...
+
+
+
+
+
+
+
+
+-> ELE CRIOU O RECORD DENTRO DA DATABASE TABLE,
+
+E AÍ 
+
+RETORNOU ESSA INSTANCE,
+
+
+COM TODOS ESSES ATTRIBUTES...
+
+
+
+
+
+
+
+
+
+
+--> PARA INSPECIONAR TODOS NOSSOS ITEMS NESSA TABLE,
+
+PODEMOS ESCREVER ASSIM:
+
+App\Models\JobListing::all();
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+> App\Models\JobListing::all();
+= Illuminate\Database\Eloquent\Collection {#5207
+    all: [
+      App\Models\JobListing {#5206
+        id: 1,
+        title: "Director",
+        salary: "$40.000",
+        created_at: null,
+        updated_at: null,
+      },
+      App\Models\JobListing {#5181
+        id: 2,
+        title: "Programmer",
+        salary: "$10.000",
+        created_at: null,
+        updated_at: null,
+      },
+      App\Models\JobListing {#5195
+        id: 3,
+        title: "Teacher",
+        salary: "$20.000",
+        created_at: null,
+        updated_at: null,
+      },
+      App\Models\JobListing {#5196
+        id: 4,
+        title: "Acme Director",
+        salary: "$1,0000,000",
+        created_at: "2024-09-26 04:25:57",
+        updated_at: "2024-09-26 04:25:57",
+      },
+    ],
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, SABEMOS SOBRE:
+
+
+
+
+
+
+
+
+1) THE CREATE() METHOD 
+
+
+
+2) THE ALL() METHOD...
+
+
+
+
+
+
+
+
+
+-> E, AGORA, PODEMOS TESTAR O 'find()'
+
+
+também...
+
+
+
+
+
+
+3) THE 'find()' METHOD...
+
+
+
+
+
+
+
+
+
+
+--> PARA USAR O 'FIND',
+
+ESCREVEMOS ASSIM:
+
+
+
+
+
+
+> App\Models\JobListing::find(2);
+= App\Models\JobListing {#5233
+    id: 2,
+    title: "Programmer",
+    salary: "$10.000",
+    created_at: null,
+    updated_at: null,
+  }
+
+>
+
+
+
+
+
+
+
+
+SE VC PASSA 1 INT 
+
+AO FIND,
+
+ELE VAI ASSUMIR QUE VC ESTÁ PROCURANDO PELO FIELD DE 'ID',
+
+
+
+
+que será de type 'int'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''MOST TABLES INCLUDE SOME SORT OF UNIQUE ID''''...
+
+
+
+
+
+
+
+
+
+
+
+-> PENSE NO QUE ESTÁ ACONTECENDO, AQUI:
+
+
+
+
+
+
+
+
+
+'''ITS NOT MAGIC, A SQL QUERY 
+    IS STILL BEING EXECUTED, BEHIND THE SCENES''...
+
+
+
+
+
+
+
+
+--> THE ELOQUENT CODEBASE 
+    IS VERY COMPLICATED...
+
+
+    BUT IT JUST WORKS...
+
+
+
+
+
+
+
+
+
+
+
+-> RATHER THAN MEMORIZING POTENTIALLY LONG 
+AND CONFUSING SQL QUERIES,
+
+
+
+WE JUST EXECUTE THOSE METHODS...
+
+
+
+
+
+
+
+--> WE CAN ADD CONDITIONS, LIKE WHERE, JOINS,
+    ETC,
+
+    USING THIS NICE, CLEAN API...
+
+
+
+
+
+
+
+
+
+
+
+--> OK... O PROFESSOR DELETA 
+
+
+    OS RECORDS ANTIGOS,
+
+    E FICA COM APENAS OS RECORDS GERADOS COM O ELOQUENT...
+
+
+
+
+
+--> PARA DELETAR UM ÚNICO JOB,
+
+PODEMOS 
+
+
+RODAR 
+
+
+'$job->delete()'..
+
+
+
+
+
+
+
+EX:
+
+
+
+$job = App\Models\JobListing::find(2);
+
+
+$job->delete();
+
+
+
+
+
+
+
+
+
+
+
+
+> $job->delete();
+= true
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ELE RETORNA 'true',
+
+para mostrar que esse row foi REALMENTE DELETADO....
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> AGORA TIVEMOS 1 INTRO AO ELOQUENT...
+
+
+
+
+
+
+
+
+
+
+''THE ONLY THING REMAINING IS:''
+
+
+
+
+
+
+
+
+
+''IN THIS EXAMPLE, WE ALREADY HAD A JOB CLASS,
+    WHICH WE CONVERTED INTO AN ELOQUENT MODEL''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NOSSO HOMEWORK:
+
+
+
+
+
+
+
+
+
+
+1) SE RODAMOS 'php artisan',
+
+    FICAMOS COM 1 MONTE DE COMMANDS...
+
+
+
+
+
+
+
+2) HÁ UM COMMAND DE 'make:model'... mas ele tem MUITAS OPTIONS...
+
+
+
+
+
+
+
+3) SE ESCREVEMOS 'php artisan help <command_name>',
+
+    FICAMOS COM 
+
+
+    UMA AJUDA PARA O COMMAND...
+
+
+
+
+
+    --> com 'make:model',
+
+
+    ESCREVEMOS O NOME DO MODEL,
+
+    E AÍ 
+
+
+    PODEMOS ESCREVER UM MONTE DE OPTIONS,
+
+    TIPO ASSIM:
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-9> php artisan help make:model
+Description:
+  Create a new Eloquent model class
+
+Usage:
+  make:model [options] [--] <name>
+
+Arguments:
+  name                  The name of the model
+
+Options:
+  -a, --all             Generate a migration, seeder, factory, policy, 
+resource controller, and form request classes for the model
+  -c, --controller      Create a new controller for the model
+  -f, --factory         Create a new factory for the model
+      --force           Create the class even if the model already exists
+  -m, --migration       Create a new migration file for the model      
+      --morph-pivot     Indicates if the generated model should be a custom polymorphic intermediate table model
+      --policy          Create a new policy for the model
+  -s, --seed            Create a new seeder for the model
+  -p, --pivot           Indicates if the generated model should be a custom intermediate table model
+  -r, --resource        Indicates if the generated controller should be a resource controller
+      --api             Indicates if the generated controller should be an API resource controller
+  -R, --requests        Create new form request classes and use them in the resource controller
+      --test            Generate an accompanying Test test for the Model
+      --pest            Generate an accompanying Pest test for the Model
+      --phpunit         Generate an accompanying PHPUnit test for the Model
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+  -q, --quiet           Do not output any message
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output       
+  -n, --no-interaction  Do not ask any interactive question
+      --env[=ENV]       The environment the command should run under   
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+PS D:\curso laravel\curso-laravel\code\example-9>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO....
+
+
+
+
+
+
+
+O PROFESSOR APONTA QUE 
+
+
+''WHEN WE MAKE A NEW MODEL IN OUR APP,
+
+    THIS IS OFTEN THE __ START_ OF A NEW CONCEPT 
+    IN YOUR APP... SO IT IS A GREAT ENTRYPOINT 
+
+    FOR BUILDING OTHER THINGS''...
+
+
+
+
+
+
+
+
+
+-> E É EXATAMENTE POR ISSO QUE TEMOS ESSAS 'COMPANION OPTIONS'...
+
+
+
+
+
+SÃO OPTIONS COMO 
+
+
+'--controller',
+
+
+
+que faz com que seja criado um COMPANION CONTROLLER 
+
+A ESSE MODEL,
+
+
+ou então '--migration',
+
+mesma coisa,
+
+
+ou 
+
+
+'--policy',
+
+
+'--seed',
+etc...
+
+
+
+
+
+
+
+
+
+'--all' CRIA TODOS ELES...
+
+
+
+
+
+
+
+
+
+
+
+-> '-a' --> GERA TODOS ELES...
+
+
+
+
+
+
+
+
+
+
+
+--> VOCE NÃO PRECISA USAR O '-a' ainda,
+
+    PQ VC NAO SABE METADE DE ESSAS COISAS...
+
+
+
+
+
+
+
+
+
+MAS O PROFESSOR QUER APONTAR QUE 
+
+
+
+''WHEN YOU START WORKING ON THESE NEW IDEAS,
+AND YOU ADD NEW SECTIONS OF YOUR SITE,
+
+
+YOU WOULD NOT START BY CREATING THE MIGRATIONS,
+
+YOU WOULD START ___BY CREATING _ THE MODEL__,
+
+AND THEN _ THE MODEL __ WOULD__ GENERATE THE MIGRATION,
+AS PART 
+
+OF ITS LOGIC''....
+
+
+
+
+
+
+
+
+
+-->  por exemplo,
+
+
+
+O PROFESSOR RODA ASSIM:
+
+
+
+
+
+
+
+
+
+php artisan make:model Comment
+
+
+
+
+
+
+
+
+
+
+-> UMA NOVA FILE SERÁ CRIADA DENTRO DE 'Models'... 
+
+
+
+
+
+
+
+-> TERÁ ESTE FORMATO:
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    use HasFactory;
+}
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+ELE:
+
+
+
+
+
+1) FAZ EXTEND DA CLASS 'Model' (coisa bem normal de models laravel, é o que faz todos os methods funcionarem)
+
+
+
+
+
+
+2) USA  O TRAIT DE 'hasFactory'...
+
+
+
+
+
+
+
+
+-> AINDA NÃO ESTAMOS PRONTOS PARA FALAR SOBRE 'hasFactory',
+
+    MAS FALAREMOS SOBRE ELE, NO FUTURO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ENTÃO ESCREVE 
+
+
+
+php artisan make:model Post,
+
+
+
+
+
+
+
+MAS AÍ COLOCA
+
+
+A FLAG DE '--migration',
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+php artisan make:model Post --migration
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, SERÃO CRIADAS 2 FILES... O MODEL DE 'Post' 
+
+
+E TAMBÉM A MIGRATION DE ESSE 'Post'...
+
+
+
+
+
+ 
+
+
+
+
+
+ -> isso nos ajuda a construir rapidamente a lógica de migration 
+
+ de esse model...
+
+
+
+
+
+
+
+
+ PODEMOS, ENTÃO, ESCREVER A MIGRATION ASSIM:
+
+
+
+
+
+
+
+ <?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('body');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('posts');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS RODAR 'php artisan migrate',
+
+
+
+
+PARA 
+
+
+APLICAR ESSA MIGRATION NA SUA DATABASE...
+
+
+
+
+
+
+
+
+--> ISSO TUDO É MT SÓLIDO...
+
+
+
+
+
+
+
+--> HOMEWORK:
+
+
+GENERATE A LOT OF MODELS,
+
+
+
+GENERATE THE MIGRATIONS, ETC...
+
+
+
+
+
+
+
