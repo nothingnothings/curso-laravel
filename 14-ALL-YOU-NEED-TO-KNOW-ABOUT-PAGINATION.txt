@@ -1,0 +1,550 @@
+
+
+
+
+
+
+
+
+
+OK... HOJE VEREMOS PAGINATION...
+
+
+
+
+
+
+
+
+---> SE VOLTAMOS ATÉ O ARQUIVO DE web.php,
+
+temos isto:
+
+
+
+
+
+
+Route::get('/jobs', function () {
+
+    $jobsWithEmployers = JobListing::with('employer')->get();
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+ESSA CALL DE 'get()'
+
+
+ESTÁ 
+
+
+'FETCHING EVERY SINGLE RECORD OF THE 
+
+jobs table''...
+
+
+
+
+
+
+
+
+
+
+
+
+NA VIDA REAL,
+VC PODE TER 
+
+
+MILHARES, TENS OF THOUSANDS OF JOBS...
+
+
+
+
+
+
+
+E ESSA QUERY FETCHEARIA TODOS ELES... E VC 
+
+NÃO VAI GOSTAR DISSO,
+
+
+PQ SUA MEMORY VAI 'THROUH THE ROOF',
+
+QUASE IMEDIATAMENTE...
+
+
+
+
+
+
+
+
+
+
+-> FELIZMENTE,
+
+NO LARAVEL HÁ VÁRIAS OPTIONS PARA RESOLVER ISSO,
+
+E SÃO SUPER SIMPLES...
+
+
+
+
+
+
+
+--> EM VEZ DE RODAR 
+
+
+'    $jobsWithEmployers = JobListing::with('employer')->get(); ',
+
+
+
+
+
+O PROFESSOR 
+
+
+
+VAI RODAR 
+
+
+
+
+JobListing::with('employer')->paginate();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... DENTRO DA DEFINITION DE ESSE METHOD,
+
+
+
+    temos alguns arguments:
+
+
+
+
+
+
+
+
+
+
+1) '$perPage' -> quantos records vc quer por page...
+
+    --> o professor coloca um número bem baixo, como '3'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ao recarregarmos a page,
+
+
+com este código:
+
+
+
+
+Route::get('/jobs', function () {
+
+    // $jobsWithEmployers = JobListing::with('employer')->get(); // ! No pagination:
+
+    $jobsWithEmployers = JobListing::with('employer')->paginate(3); // * Pagination applied.
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+
+
+
+
+
+
+
+
+FICAREMOS COM APENAS 3 
+
+
+ENTRIES SENDO EXIBIDAS, NA PAGE...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS AINDA NÃO ENXERGAMOS OS LINKS PARA TROCAR DE PAGE...
+
+
+
+
+
+
+
+
+
+E ISSO FAZ SENTIDO,
+
+É PQ 
+
+AINDA NÃO COLOCAMOS ESSES LINKS NA UI...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS ISSO JÁ ESTÁ FUNCIONANDO...
+
+
+
+
+
+
+PARA TESTAR SE ISSO ESTÁ FUNCIONADO,
+
+BASTA EDITAR SUA URL...
+
+
+
+
+
+
+ATUALMENTE,
+
+
+ELA ESTÁ ASSIM:
+
+
+
+
+
+
+http://example-14.test/jobs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS SE VC ALTERAR A URL,
+E COLOCAR QUERY PARAMS COMO ESTE:
+
+
+
+
+
+
+
+http://example-14.test/jobs?page=2
+
+
+
+
+
+
+
+
+
+
+
+VC VERÁ QUE, IMEDIATAMENTE,
+
+
+SERÁ MOSTRADA A SEGUNDA 'PAGE' DE RESULTS,
+
+
+
+NO SEU BROWSER...
+
+
+
+
+
+
+
+
+
+
+QUER DIZER QUE ISSO É UMA SUPER MÃO NA RODA...
+
+
+
+
+
+
+
+
+--> O PAGING JÁ ESTÁ FUNCIONANDO,
+
+    TUDO O QUE RESTOU É 
+
+
+    'SHOW THE INDIVIDUAL LINKS'...
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS FAZER ISSO RAPIDAMENTE..
+
+
+
+
+
+
+
+
+
+
+--> VAMOS ATÉ jobs.blade.php,
+
+
+
+E AÍ ESCREVEMOS OS LINKS DO PAGINATOR,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    <div>
+        {{  $jobs->links() }}
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+E, REALMENTE, É SÓ ESCREVER ISSO AÍ...
+
+
+
+
+
+
+
+É RIDICULAMENTE FÁCIL...
+
+
+
+
+
+
+
+
+
+
+E REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+-> FICAMOS COM A PAGINATION ALI...
+
+
+E ELA JÁ 'LOOKS GREAT',
+
+
+OUT OF THE BOX...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... É TUDO SEAMLESS... IMPRESSIONANTE...
+
+
+
+
+
+
+
+
+
+
+
+AGORA, A PRIMEIRA COISA:
+
+
+
+
+
+
+'''WHY DOES IT LOOK GOOD?'''
+
+
+
+
+
+
+
+
+
+
+''IT LOOKS GOOD BECAUSE __ LARAVEL __ 
+ASSUMES _ THAT YOU ARE USING TAILWIND'''...
+
+
+
+
+'''YOU DON'T HAVE TO USE TAILWIND,
+
+BUT IF YOU ARE USING, YOU GET SOME CONVENIENCES, LIKE THIS ONE''...
+
+
+
+
+
+
+
+
+
+
+
+--> QUER DIZER QUE A FORMATAÇÃO 
+    JÁ FICA PRONTA, SE VC FAZ ASSIM...
+
+
+
+
+
+
+
+
+
+--> MAS É CLARO QUE EXISTIRÃO MTAS SITUAÇÕES EM QUE VC VAI USAR 
+1 CUSTOM LIBRARY QUE VC FEZ,
+
+
+OU ALGUMA OUTRA COISA DO TAILWIND... NESSAS SITUAÇÕES,
+
+
+VC TERÁ DE TWEAKAR O PAGINATOR _ MANUALMENTE_...
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR NOS MOSTRA A MANEIRA PELA QUAL PODEMOS 
+TWEAKAR O PAGINATOR, MANUALMENTE....
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA FAZER ISSO, VC DEVE RODAR 
+
+'php artisan vendor:publish' ...
+
+
