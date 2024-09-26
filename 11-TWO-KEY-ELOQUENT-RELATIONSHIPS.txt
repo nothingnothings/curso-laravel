@@ -1,0 +1,1488 @@
+
+
+
+
+
+
+VEREMOS ELOQUENT RELATIONSHIPS...
+
+
+
+
+
+
+
+
+
+
+-> DISCUTIMOS, NO ÚLTIMO EPISODE,
+
+
+QUE 
+
+
+''THERE SHOULD BE A RELATIONSHIP BETWEEN 
+A JOB LISTING AND AN EMPLOYER''...
+
+
+
+
+
+
+
+
+
+
+-> QUER DIZER QUE 
+
+''A JOB BELONGS TO AN EMPLOYER''...
+
+
+
+
+
+
+
+
+
+
+
+-> imagine que vc tem 1 job object...
+
+
+
+
+
+
+$job....
+
+
+
+
+
+
+
+--> podemos acessar o attribute 
+
+'title',
+
+dentro dele,
+
+com isto:
+
+
+
+
+
+
+$job->title;
+
+
+
+
+$job->salary;
+
+
+
+
+
+
+
+
+-> CERTO, MAS COMO PODEMOS PEGAR INFO _ SOBRE O EMPLOYER,
+
+DE DENTRO DE ESSE '$job'?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-->  BEM... ATUALMENTE,
+
+NÓS NÃO CONSEGUIMOS FAZER ISSO...
+
+
+
+
+
+
+
+
+
+
+-> NÓS DEFINIMOS ESSA ESTRUTURA/RELATION NO LADO DA DATABASE,
+    SIM, 
+
+
+    MAS ELA __ AINDA NÃO EXISTE NO CÓDIGO PHP  EM SI...
+
+
+
+
+
+
+
+
+
+
+
+-> POR ISSO DEVEMOS FAZER ESSA RELATIONSHIP EXISTIR...
+
+
+
+
+
+
+
+--> COMO PODEMOS FAZER ISSO?
+
+
+
+
+
+
+
+
+
+
+-> O ELOQUENT NOS AJUDA...
+
+
+
+
+
+
+
+
+PARA TER 1 RELATIONSHIP COM 'employer',
+
+
+DEVEMOS 
+
+CRIAR 1 METHOD DE NOME 'employer',
+
+
+DENTRO 
+
+
+DO 'JobListing'..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+    public function employer()
+    {
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+E ESSE METHOD, NO CASO,
+
+VAI FAZER RETURN DE 
+
+
+UM 'RELATIONSHIP TYPE'...
+
+
+
+
+
+
+
+
+
+
+-> NESSE CASO,
+
+
+
+TEMOS 
+
+
+''''A JOBLISTING _ BELONGS __ TO AN EMPLOYER''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> 'BELONGS TO' É A KEYWORD...
+
+
+
+
+
+
+
+-> É POR ISSO QUE VAMOS FAZER O RETURN DE 
+
+
+'$this->belongsTo(Employer::class)'
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+    public function employer(): BelongsTo
+    {
+     return $this->belongsTo(Employer::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO,
+
+
+
+
+JÁ DEFINIMOS O RETURN TYPE CORRETO,
+
+
+
+E A LÓGICA TAMBÉM...
+
+
+
+
+
+
+
+
+
+
+
+CERTO... COMO VC PODE IMAGINAR,
+
+
+HÁ DIVERSOS RELATIONSHIP TYPES...
+
+
+
+
+
+
+
+
+
+''A JOB BELONGS TO AN EMPLOYER... BUT, IN REVERSE,
+    DOES A EMPLOYER BELONG TO A JOB...??? NO...''
+
+    
+
+
+
+
+
+
+
+--> ISSO PQ 1 EMPLOYER PODE TER __ MÚLTIPLOS 
+    JOBS DISPONÍVEIS... É POR ISSO QUE 
+
+    ESSE RELATIONSHIP TYPE É CHAMADO DE 
+
+
+
+
+    'one-to-many'...
+
+
+
+
+
+    -> é o 'hasMany'...
+
+
+
+
+
+
+E HÁ VÁRIAS RELATIONSHIPS...
+
+
+
+
+
+
+ALGUMAS DELAS SÃO:
+
+
+
+
+1) hasMany 
+
+2) hasOne 
+
+
+3) belongsTo 
+
+
+4) belongsToMany 
+
+
+
+5) outros...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> RODAMOS php artisan tinker...
+
+
+
+
+
+
+
+
+
+
+
+
+php artisan tinker 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, QUEREMOS ENCONTRAR 'ANY JOB'...
+
+
+
+
+
+
+
+
+
+-> para encontrar qualquer job,
+em vez de rodar 
+
+
+'find(<some_job_id)',
+
+
+
+
+
+
+
+VC PODE USAR O METHOD DE 'first()'...
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+$job = App\Models\JobListing::first();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+> $job = App\Models\JobListing::first();
+= App\Models\JobListing {#5539
+    id: 1,
+    employer_id: 1,
+    title: "Child Care Worker",
+    salary: "7531",
+    created_at: "2024-09-26 17:43:36",
+    updated_at: "2024-09-26 17:43:36",
+  }
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM ESSE OBJECT...
+
+
+
+
+
+
+
+
+
+-> COMO NÓS JÁ TEMOS AQUELA RELATION DEFINIDA NO NOSSO MODEL,
+    PODEMOS SIMPLESMENTE CHAMAR ALGO...
+
+
+
+
+
+
+
+
+
+
+-> pode parecer confuso,
+
+
+    mas não devemos chamar o method de 'employer()'
+
+    assim 
+
+
+
+'$job->employer()'...
+
+
+
+
+
+
+
+
+
+
+EM VEZ DISSO, DEVEMOS CHAMAR 'employer'
+
+COMO SE FOSSE 1 __PROPRIEDADE___,
+
+DENTRO 
+
+
+DO '$job',
+
+
+TIPO ASSIM:
+
+
+
+
+
+$job->employer
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO REALMENTE FUNCIONA:
+
+
+
+
+
+
+
+
+
+
+> $job->employer
+= App\Models\Employer {#5948
+    id: 1,
+    name: "Bode-Gislason",
+    created_at: "2024-09-26 17:43:34",
+    updated_at: "2024-09-26 17:43:34",
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, CONSEGUIMOS OBTER A INSTANCE DE 'EMPLOYER',
+
+    A PARTIR DA INSTANCE DE JOB,
+
+
+    TUDO POR CONTA DO 
+
+
+    'employer_id',
+
+
+    posicionado dentro de cada job...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ACESSAR QUALQUER UMA DAS PROPERTIES DE ESSE EMPLOYER,
+PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+> $job = App\Models\JobListing::first();
+= App\Models\JobListing {#5540
+    id: 1,
+    employer_id: 1,
+    title: "Child Care Worker",
+    salary: "7531",
+    created_at: "2024-09-26 17:43:36",
+    updated_at: "2024-09-26 17:43:36",
+  }
+
+> $job->employer->name
+= "Bode-Gislason"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... isso é bem cool...
+
+
+
+
+
+
+
+
+
+MAS HÁ ALGO MAIS COOL AINDA:
+
+
+
+
+
+
+
+
+ISTO AQUI BASICAMENTE EXECUTA UMA QUERY:
+
+
+> $job = App\Models\JobListing::first();
+
+
+
+
+
+
+
+
+
+
+
+É UMA QUERY COMO 
+
+
+
+
+'SELECT * FROM job_listings
+LIMIT 1;'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, ESTAMOS FAZENDO SELECT APENAS DA TABLE DE 
+
+job_listings,
+
+
+sem disparar nada contra a table de 'employers'...
+
+
+
+
+
+
+
+
+
+
+
+AQUI VC TEM QUE ENTENDER ALGO CRUCIAL:
+
+
+
+
+'''AT THE POINT WHERE I SAY job->employer,
+
+    A SECOND SQL QUERY IS PERFORMED...'''
+
+
+
+
+
+
+
+
+
+--> E ESSE SEGUNDO DISPARO, AÍ,
+
+É CHAMADO DE 'LAZY LOADING'...
+
+
+
+
+
+
+
+
+
+
+ELE É O CONTRÁRIO DE 'EAGER LOADING',
+
+QUE É O QUE OCORRE QUANDO CARREGAMOS TODA A DATA DE UMA VEZ SÓ,
+PREVENTIVAMENTE...
+
+
+
+
+
+
+
+
+
+''''Lazy Loading refers to the delay 
+    of a SQL query until the LAST POSSIBLE MOMENT'''''... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO CASO, ESSA QUERY SERIA 
+
+
+
+
+
+
+
+SELECT * FROM 
+EMPLOYERS 
+WHERE ID=2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SE FAZEMOS O CAMINHO INVERSO,
+
+
+
+É ASSIM:
+
+
+
+
+
+> $employer = App\Models\Employer::first();
+
+
+
+
+
+
+
+
+
+
+
+-> NO CASO, QUEREMOS PEGAR TODOS OS JOBS ASSIGNADOS A ESSE EMPLOYER....
+
+
+
+
+
+fica tipo assim:
+
+
+
+
+$employer->
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS QUAL METHOD usaríamos, aqui?
+
+
+
+
+
+
+
+
+
+
+-> provavelmente algo como '->jobs()'...
+
+
+
+
+
+
+
+
+
+-> BASICAMENTE PRECISAMOS DE 1 METHOD NA CLASS DE 
+
+
+'Employer',
+
+
+de nome 'jobs()'...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Employer extends Model
+{
+    use HasFactory;
+
+    public function jobs() {
+        return $this->hasMany(JobListing::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+'A EMPLOYER HAS MANY JOBS',
+
+
+e é por isso que definimos essa relation aí...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+AGORA PODEMOS CHAMAR 
+
+
+
+
+
+$employer->jobs,
+
+
+
+
+como se fosse 1 property,
+
+
+para 
+
+
+VISUALIZARMOS TODOS OS JOBS DE ESSE EMPLOYER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> 'jobs' -> vai retornar uma COLLECTION..
+
+
+
+PQ PODERÃO SER 1 OU MANY JOBS,
+
+RELACIONADOS COM ESSE EMPLOYER...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+> $employer->jobs
+= Illuminate\Database\Eloquent\Collection {#5188
+    all: [
+      App\Models\JobListing {#6164
+        id: 1,
+        employer_id: 1,
+        title: "Child Care Worker",
+        salary: "7531",
+        created_at: "2024-09-26 17:43:36",
+        updated_at: "2024-09-26 17:43:36",
+      },
+    ],
+  }
+
+
+
+
+
+
+
+
+
+  COMO VC PODE VER,
+
+  FICAMOS COM 1 COLLECTION... COLLECTION OF ITEMS...
+
+
+
+
+
+
+
+
+
+
+
+
+  '''ELOQUENT COLLECTION''' --> É COMO ''AN ARRAY ON STEROIDS''...
+
+
+
+
+
+
+  VC PODE FAZER LOOP POR DENTRO DESSA COLLECTION,
+
+  COMO UM ARRAY COMUM,
+
+
+  MAS ELA CONTÉM 
+
+  UMA API PRÓPRIA,
+
+
+  COM 1 MONTE DE METHODS PARA DEIXAR O PROCESSO DE FILTERING, INSPECTING 
+
+  E LOOPING BEM MAIS FÁCIL,
+
+  TUDO POR CONTA DESSE WRAPPER 'Collection'...
+
+
+
+
+
+
+
+
+
+  --> certo... ficamos com todos os items,
+
+  no caso,
+
+  apenas 
+
+  1 item...
+
+
+
+
+
+
+
+
+
+--> podemos selecionar apenas esse job,
+
+
+com 
+
+
+$employer->jobs[0];
+
+
+
+
+> $employer->jobs[0];
+= App\Models\JobListing {#6164
+    id: 1,
+    employer_id: 1,
+    title: "Child Care Worker",
+    salary: "7531",
+    created_at: "2024-09-26 17:43:36",
+    updated_at: "2024-09-26 17:43:36",
+  }
+
+>
+
+
+
+
+
+
+
+--> isso seleciona e retorna esse value, como se fosse um array...
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+OU, PODEMOS SELECIONAR ISSO COMO SE FOSSE 
+
+UMA COLLECTION,
+
+
+
+com 
+
+$employer->jobs->first();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+> $employer->jobs->first();
+= App\Models\JobListing {#6164
+    id: 1,
+    employer_id: 1,
+    title: "Child Care Worker",
+    salary: "7531",
+    created_at: "2024-09-26 17:43:36",
+    updated_at: "2024-09-26 17:43:36",
+  }
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ESSES 2 TIPOS DE RELATION,
+
+
+
+'hasMany'
+
+
+e 
+
+'belongsTo',
+
+
+
+
+ELAS SÃO USADAS QUASE UNIVERSALMENTE...
+
+
+
+
+
+
+é 85% das relations...
+
+
+
+
+
+
+
+
+
+--> É CLARO QUE HÁ MAIS RELATION TYPES...
+
+
+
+
+
+
+
+
+HÁ A RELATION 'belongsToMany',
+
+
+
+
+que é mt boa para 'PIVOT TABLES' (intermediate tables)...
+
+
+
+
+
+
+
+
+
+
+
+-> TAMBÉM HÁ POLYMORPHIC RELATIONSHIPS,
+
+
+    que ainda não estudamos...
+
+
+
+
+
+
+
+
+
+
+
+
+PENSE NO EXEMPLO DE UM BLOG:
+
+
+
+
+
+
+''A Post can have MANY COMMENTS''...
+
+
+
+        hasMany();
+
+
+''A COMMENT BELONGS TO A POST''...
+
+
+
+        belongsTo();
+
+
+
+
+
+
+
+
+
+
+a relation entre 1 POST e um USER:
+
+
+
+
+
+
+
+
+''A User can have MANY POSTS:''
+
+        hasMany();
+
+
+
+    
+''A POST BELONGS TO A USER'':
+
+
+        belongsTo();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+A RELATION ENTRE 1 POST E TAGS:
+
+
+
+
+
+
+''A POST CAN HAVE MANY TAGS''
+
+
+        hasMany();
+
+    
+
+
+
+
+
+''A tag can belong to MANY POSTS'':
+
+
+        belongsToMany();
+
+
+
+
+
+
+        relation many-to-many...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ESSA RELATION,
+
+'POSTS' TO 'TAGS',
+
+EXIGE 1 NOVO RELATION TYPE,
+
+QUE VEREMOS NA PRÓXIMA AULA...
