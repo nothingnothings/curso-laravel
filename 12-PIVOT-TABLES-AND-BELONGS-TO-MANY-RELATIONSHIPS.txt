@@ -1,0 +1,2892 @@
+
+
+
+
+
+
+
+
+
+
+
+OK... NO DIA 12,
+
+
+QUEREMOS 
+
+
+
+
+''''BUILD A CONNECTION BETWEEN
+    A JOB AND ANY NUMBER OF TAGS...''''
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> BASICAMENTE, TEREMOS QUE CRIAR 
+    ALGUM TIPO DE 'PIVOT TABLE' (INTERMEDIATE TABLE)...
+
+
+
+
+
+
+
+
+CERTO, MAS COMO REPRESENTAMOS ESSA RELATION, DENTRO DE NOSSO CÓDIGO?
+
+
+
+
+
+
+
+
+
+
+
+
+-> A RESPOSTA É 
+
+
+'USE A BELONGS TO MANY RELATIONSHIP'...
+
+
+
+
+
+
+
+
+
+
+
+--> basicamente, vamos precisar de 3 tables:
+
+
+
+
+
+
+
+
+
+1) job_listings 
+
+
+2) tags 
+
+
+
+3) job_listings_tags 
+
+
+
+
+
+
+
+ISSO É PQ __ CADA__ 'job_listing' poderá ter MÚLTIPLAS TAGS,
+    E AS TAGS PODERÃO PERTENCER A MÚLTIPLOS 'job_listing' entries...
+
+
+
+
+
+
+
+
+--> PARA ISSO,
+
+
+TEREMOS DE ESCREVER ALGO COMO ISTO:
+
+
+
+
+php artisan make:model Tag -m -f
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO VAI CRIAR O MODEL DE 'Tag', e já vai criar a factory e a migration, também...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMEÇAMOS COM ISTO, NA MIGRATION:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+VOU TENTANDO, MAS PRECISO DA TABLE INTERMEDIÁRIA...
+
+
+
+
+
+
+
+
+
+
+
+
+-> NA TABLE DE 'tags',
+
+
+O PROFESSOR DEFINE APENAS UM FIELD 
+
+
+DE 'name',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+AÍ PENSE NA RELATION:
+
+
+
+
+
+
+
+
+
+
+''WE HAVE A JOBS TABLE,
+    AND A TAGS TABLE''..
+
+
+
+
+
+
+
+
+--> BUT WE NEED A CONNECTING TABLE...
+
+
+THIS IS OUR PIVOT TABLE, THE INTERMEDIATE TABLE...
+
+
+
+
+
+
+
+-> DENTRO DESSA TABLE, VAMOS ARMAZENAR:
+
+
+
+1) job_id 
+
+
+2) tag_id 
+
+
+
+
+
+
+
+
+ex: 
+
+
+
+
+
+
+1 2 
+
+1 4 
+
+1 6 
+
+
+
+
+
+
+
+
+COM ISSO, O MESMO JOB É 
+
+
+ASSIGNADO A 3 DIFERENTES TAGS...
+
+
+
+
+
+
+
+
+
+
+PARA CRIAR ESSA INTERMEDIATE TABLE, TEMOS 2 CHOICES:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) 'CREATE A BRAND NEW MIGRATION...''
+
+
+--> BUT THERE IS NO HARD RULE THAT A MIGRATION CLASS 
+CAN CONTAIN ONLY A SINGLE 'Schema::create()'' call...
+
+
+
+
+
+--> OU SEJA,
+
+PODERÍAMOS ESCREVER ALGO COMO ISTO:
+
+
+
+
+
+
+    public function up(): void
+    {
+        Schema::table('job_listings_tags', function (Blueprint $table) {
+            $table->foreignIdFor(JobListing::class);
+            $table->foreignIdFor(Tag::class);
+        }
+    );
+    }
+
+
+
+
+
+
+
+
+E ISSO SERIA FINE...
+
+
+
+
+
+
+
+
+OS 2 APPROACHES SÃO FINE,
+
+
+ESTE PRIMEIRO APPROACH É FINE, TAMBÉM..
+
+
+
+
+
+
+
+''''IF YOU WOULD NEED TO ADD THIS 
+    PIVOT TABLE ONE MONTH FROM NOW,
+    YOU WOULD EXECUTE THIS JOB_LISTINGS_TAG 
+    INTERMEDIATE TABLE 
+
+    __WITHIN __ A INDEPENDENT MIGRATION FILE''''...
+
+
+
+
+
+--> MAS, AGORA,
+
+
+    NÃO HÁ NENHUM PROBLEMA COM O SEGUNDO APPROACH,
+
+    QUE É:
+
+
+
+
+
+
+2) GROUP BOTH THE 
+    original tables and the INTERMEDIATE TABLE 
+
+    __WITHIN __ THE SAME MIGRATION FILE...
+
+
+
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+    
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::table('job_listings_tags', function (Blueprint $table) {
+            $table->foreignIdFor(JobListing::class);
+            $table->foreignIdFor(Tag::class);
+        }
+    );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS QUE FIELDS NOSSA PIVOT TABLE (intermediate table)
+
+DEVE TER?
+
+
+
+
+
+
+--> bem, basicamente FOREIGN IDS,
+
+
+TIPO ASSIM:
+
+
+
+
+
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::table('job_listings_tags', function (Blueprint $table) {
+            $table->foreignIdFor(JobListing::class);
+            $table->foreignIdFor(Tag::class);
+            $table->timestamps();
+        }
+    );
+    }
+
+
+
+
+
+
+
+
+
+CERTO... 
+
+
+MAS FALTOU O ID 
+
+comum,
+
+tipo assim:
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::table('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(JobListing::class);
+            $table->foreignIdFor(Tag::class);
+            $table->timestamps();
+        }
+    );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+TIMESTAMPS SÃO UMA PREFERENCE...
+
+
+
+
+
+
+
+
+-> àS VEZES SÃO IMPORTANTES,
+
+
+    MAS GERALMENTE É BOM...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AQUI TEMOS UM GOTCHA...:
+
+
+
+
+
+
+
+
+
+
+'''WHEN WE RUN $table->foreignIdFor(Job::class),
+    THAT IS GOING TO PREPARE A 'job_id' foreign key... ''''
+
+
+
+
+'''HOWEVER, WE WANT TO __bE CAREFUL, BECAUSE WE WANT 
+    THE JOB_ID TO __ POINT __ TO OUR ACTUAL JOB_LISTING TABLE,
+    INSTEAD OF THE TABLE THAT LARAVEL ALWAYS INCLUDES IN 
+    NEW PROJECTS...''''
+
+
+
+PARA EVITAR CONFUSOES, O PROFESSOR CHAMA ESSA COLUMN DE 'job_listing_id'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+RODAMOS TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(JobListing::class, 'job_listing_id'); // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            $table->foreignIdFor(Tag::class);
+            $table->timestamps();
+        }
+    );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... FICAMOS COM A TABLE DE TAGS,
+
+
+E COM A TABLE DE 'job_listings_tag',
+
+
+
+essa intermediate table...
+
+
+
+
+
+
+
+
+
+
+PRESTE ATENÇÃO NA NAMING CONVENTION UTILIZADA AQUI:
+
+
+
+
+
+'''WE TAKE THE SINGLE NAME 
+OF EACH OF THE CONNECTING TABLES,
+SORT THEM BY ALPHABETICAL ORDER,
+
+AND SEPARATE THEM WITH _''
+
+
+
+
+
+
+
+
+
+
+
+
+eu não segui exatamente essa convention, mas tanto faz...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ENTÃO ADICIONA UMA TAG MANUALMENTE,
+
+
+DE 'programming'...
+
+
+
+
+
+
+
+
+
+
+aí ele adiciona uma entry no 'job_listings_tag',
+
+
+
+
+
+com 
+
+
+
+
+
+o mesmo id da tag,
+
+e aí 
+
+
+
+com o id de algum job_listing,....
+
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+[
+  {
+    "id": 1,
+    "job_listing_id": 1,
+    "tag_id": 1,
+    "created_at": null,
+    "updated_at": null
+  }
+]
+
+
+
+
+
+
+
+
+
+CERTO... 
+
+
+
+MAS AGORA IMAGINE QUE 
+ESSA TAG É __ DELETADA_...
+
+
+
+
+
+
+
+
+-> MESMO COM ESSA TAG DELETADA,
+
+
+
+
+A ENTRY DE 'JOB_LISTINGS'
+
+AINDA VAI EXISTIR...
+
+
+
+
+
+
+
+
+
+
+-> E ISSO É UM PROBLEMA...
+
+
+
+    OCORRE BASICAMENTE PELA FALTA DA OPTION 'ON DELETE CASCADE'...
+
+
+
+
+
+
+
+
+--> QUEREMOS QUE ESSA ENTRY ORFÃ SEJA DELETADA,
+    SEMPRE QUE A COISA ORIGINAL FOR APAGADA...
+
+
+
+
+
+
+
+
+
+'''THIS IS WHERE WE CAN ADD A _ FOREIGN CONSTRAINT...'''
+
+
+
+
+
+
+
+
+
+-> E ISSO É __ ESPECIALMENTE_ IMPORTANTE,
+
+    PQ OS DEFAULTS DO 'SQLITE'
+
+
+    SÃO UM POUCO DIFERENTES DOS DEFAULTS 
+
+    DO MYSQL...
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR VOLTA AO CÓDIGO DE 'create_tags_table' (migration),
+
+que está assim:
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(JobListing::class, 'job_listing_id'); // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            $table->foreignIdFor(Tag::class);
+            $table->timestamps();
+        }
+    );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+O PROFESSOR ADICIONA UM CALL AO METHOD DE '->constraint()',
+
+
+em cima desse '->foreignIdFor()"...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table
+            ->foreignIdFor(JobListing::class, 'job_listing_id') // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            ->constrained() // Creates a constraint
+            ->cascadeOnDelete(); // Deletes the associated model (job_listings_tag entry) when the parent model is deleted
+            $table->foreignIdFor(Tag::class);
+            $table->timestamps();
+        }
+    );
+    }
+
+
+
+
+
+
+
+
+
+E FAZEMOS A MESMA COISA PARA O OUTRO FOREIGNID,
+
+
+DE 'Tag':
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table
+            ->foreignIdFor(JobListing::class, 'job_listing_id') // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            ->constrained() // Creates a constraint
+            ->cascadeOnDelete(); // Deletes the associated model (job_listings_tag entry) when the parent model is deleted
+            $table
+            ->foreignIdFor(Tag::class)
+            ->constrained()
+            ->cascadeOnDelete();
+            $table->timestamps();
+        }
+    );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+ISSO VAI BASICAMENTE CRIAR A CONSTRAINT..
+
+
+
+
+
+
+
+
+
+''IF THE PARENT RECORD GETS DELETED,
+
+I WANT TO CASCADE AND DELETE THIS PIVOT 
+RECORD, AS WELL...''
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ENTÃO QUER FAZER 'ROLLBACK' DE ISSO AÍ,
+
+PARA 
+
+
+TER AS CHANGES APLICADAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS PERCEBA QUE 
+
+NOSSA FUNCTION DE 'down()'
+
+
+NÃO ESTÁ CONSIDERANDO O DROP DE 'job_listings_tags' também....
+
+
+
+
+
+--> POR ISSO PRECISAMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listings_tags', function (Blueprint $table) {
+            $table->id();
+            $table
+            ->foreignIdFor(JobListing::class, 'job_listing_id') // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            ->constrained() // Creates a constraint
+            ->cascadeOnDelete(); // Deletes the associated model (job_listings_tag entry) when the parent model is deleted
+            $table
+            ->foreignIdFor(Tag::class)
+            ->constrained()
+            ->cascadeOnDelete();
+            $table->timestamps();
+        }
+    );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listings_tags');
+        Schema::dropIfExists('tags');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+
+O PROFESSOR EXECUTA 
+
+
+
+
+
+
+php artisan migrate:rollback && php artisan migrate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... AÍ CRIAMOS O NEGÓCIO MANUALMENTE MAIS UMA VEZ,
+
+
+
+O ROW DE job_listings_tags...
+
+
+
+
+
+
+
+
+
+
+
+COM O TABLE PLUS,
+
+PARA SABER SE EXISTE ALGUMA CONSTRAINT,
+
+
+BASTA PRESTAR ATENÇÃO NOS VALUES DOS FIELDS...
+
+
+
+
+
+
+SE VC ENXERGA UMA SETINHA (->),
+
+
+isso signfiica que há uma constraint nesse field...
+
+
+
+se vc clicar nessa setinha,
+
+vc vai até a table e o row alvo dessa relation/constraint...
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO FEITO,
+
+PODEMOS TENTAR DELETAR A TAG DE 'programming'...
+
+
+
+
+
+ENTRETANTO, AO FAZER ISSO,
+
+
+
+
+A ROW em 'job_listings_tags' 
+
+
+CONTINUA EXISTINDO... PELO VISTO, ALGO DEU ERRADO...
+
+
+
+
+
+
+
+
+
+MAS QUAL FOI O PROBLEMA? PQ NÃO OCORREU O CASCADE?
+
+
+
+
+
+
+
+
+''THIS IS A COMMON THING  THAT PEOPLE RUN INTO...'''
+
+
+
+
+
+
+
+
+
+
+
+OS __ DEFAULTS _DO SQLITE SÃO 
+
+
+
+''''CONSTRAINTS ARE __ NOT ENFORCED'''...
+
+
+
+
+
+
+
+-> MAS, NO SEU LARAVEL APP,
+
+AS CONSTRAINTS _ _SÃO ACTUALLY ENFORCED....
+
+
+
+
+
+
+
+
+
+
+-> com isso, ficamos com algo REALMENTE ESQUISITO...
+
+
+
+
+
+
+as constraints SÃO RESPEITADAS NO LARAVEL APP,
+ DURANTE A EXECUTION,
+
+
+ MAS _ NÃO SÃO RESPEITADAS NA PRÓPRIA DATABASE,
+
+ NO SQLITE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OU SEJA, TEMOS QUE MUDAR OS 
+    DEFAULTS DO SQLITE...
+
+
+
+
+
+    ''WE NEED TO MANUALLY  TURN OUR DATABASE CONSTRAINTS ON''..
+
+
+
+
+
+
+
+
+
+--> MAS NO NOSSO LARAVEL APP, PODEMOS IGNORAR ISSO,
+    PQ ELES JÁ ESTARÃO LIGADOS, POR DEFAULT..
+
+
+
+
+
+
+
+
+
+
+E, É CLARO, SE VC QUER REVERTER ESSES DEFAULTS,
+
+DO LARAVEL,
+VC PODE FAZER ISSO,
+
+BASTA DEFINIR ESSAS OPTIONS,
+
+NA SUA .env file...
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+
+
+VOLTAMOS à aba da GUI 
+
+
+table plus,
+
+
+para 
+
+
+então 
+
+RODARMOS ESTE COMANDO:
+
+
+
+
+
+
+PRAGMA foreign_keys=on;
+
+
+
+
+PRAGMA foreign_keys=on;
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+Query 1 OK: not an error
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA, SE TENTAMOS DELETAR A TAG,
+
+
+
+ISSO VAI CASCADE E TAMBÉM DELETAR O CORRESPONDING PIVOT RECORD...
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... ISSO REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO, QUEREMOS VER TUDO ISSO NO NOSSO CÓDIGO PHP...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ATUALMENTE,
+
+TEMOS OS MODELS PARA 'Tag' e 'Job',
+
+
+MAS NENHUMA RELATION ENTRE OS 2...
+
+
+
+
+
+
+
+
+
+
+
+
+--> EU JÁ ADICIONEI A RELATION ENTRE OS 2,
+
+FICOU TIPO ASSIM (pode estar errada):
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+    public function employer(): BelongsTo
+    {
+     return $this->belongsTo(Employer::class);
+    }
+
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+}
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    public function jobs(): BelongsToMany
+    {
+        return $this->belongsToMany(JobListing::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ACERTEI... 
+
+ERA REALMENTE 'belongsToMany()'...
+
+
+
+
+
+
+
+
+E ERA BELONGSTOMANY 
+
+
+
+EM AMBOS LADOS...
+
+
+
+
+
+
+
+
+É UMA RELATION MANY-TO-MANY...
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA O PROFESSOR QUER PLAY AROUND COM ISSO...
+
+
+
+
+
+
+
+
+
+
+
+--> ELE ADICIONA UM PIVOT RECORD...
+
+
+
+
+
+
+PIVOT RECORD DE IDS 1 E 2 (tag) ,
+
+
+
+
+
+PARA TER ESSA RELATION...
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+ 
+
+ O PROFESSOR USA 'php artisan tinker',
+
+
+
+ E AÍ 
+
+
+
+
+
+
+ roda este código:
+
+
+
+
+
+ > App\Models\JobListing::find(1);
+= App\Models\JobListing {#6871
+    id: 1,
+    employer_id: 1,
+    title: "Laundry OR Dry-Cleaning Worker",
+    salary: "6071",
+    created_at: "2024-09-26 20:12:16",
+    updated_at: "2024-09-26 20:12:16",
+  }
+
+>
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM ESTE JOB AÍ...
+
+
+
+
+
+
+
+
+
+-> ELE ASSIGNA A 1 VARIABLE DE '$job',
+
+
+e depois 
+
+
+
+
+QUER 'FIND ALL THE TAGS THAT ARE ASSOCIATED WITH 
+        THAT JOB''...
+
+
+
+
+
+
+
+
+    --> PARA ISSO, ELE RODA ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+> $job = App\Models\JobListing::find(1);
+= App\Models\JobListing {#6533
+    id: 1,
+    employer_id: 1,
+    title: "Laundry OR Dry-Cleaning Worker",
+    salary: "6071",
+    created_at: "2024-09-26 20:12:16",
+    updated_at: "2024-09-26 20:12:16",
+  }
+
+> $job->tags
+
+   Illuminate\Database\QueryException  SQLSTATE[HY000]: General error: 1 no such table: job_listing_tag (Connection: sqlite, SQL: select "tags".*, "job_listing_tag"."job_listing_id" as "pivot_job_listing_id", "job_listing_tag"."tag_id" as "pivot_tag_id" from "tags" inner join "job_listing_tag" on "tags"."id" = "job_listing_tag"."tag_id" where "job_listing_tag"."job_listing_id" = 1).
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, FICAMOS COM ESSE ERROR...
+
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, ELE ESTÁ TENTANDO PEGAR A TABLE DE 'job_listing_tag',
+
+
+em vez de 'job_listing_tags'..
+
+
+
+
+
+---> ou seja,
+
+
+    FICAMOS COM 1 ERROR __ JUSTAMENTE__ PQ NÃO SEGUIMOS A CONVENTION,
+
+
+    COMO O PROFESSOR HAVIA MENCIONADO,
+
+
+    ANTERIORMENTE NO CURSO...
+
+
+
+
+
+
+
+
+
+
+
+--> PRECISO TROCAR AS MIGRATIONS,
+PARA QUE 
+
+A CREATION DA TABLE FIQUE COMO 'job_listing_tag',
+
+
+em vez de 
+
+'job_listings_tags'...
+
+
+
+
+
+
+
+
+
+-> FICA TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::Create('job_listing_tag', function (Blueprint $table) {
+            $table->id();
+            $table
+            ->foreignIdFor(JobListing::class, 'job_listing_id') // * second parameter is used to define a custom name for your column, instead of 'job_id'...
+            ->constrained() // Creates a constraint
+            ->cascadeOnDelete(); // Deletes the associated model (job_listings_tag entry) when the parent model is deleted
+            $table
+            ->foreignIdFor(Tag::class)
+            ->constrained()
+            ->cascadeOnDelete();
+            $table->timestamps();
+        }
+    );
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('job_listing_tag');
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo... 
+
+
+
+ISSO FEITO,
+
+REEXECUTO AQUELE CÓDIGO,
+
+
+E FICO COM ISTO:
+
+
+
+
+
+
+
+> $job->tags
+= Illuminate\Database\Eloquent\Collection {#6869
+    all: [
+      App\Models\Tag {#6539
+        id: 2,
+        name: "Programming",
+        created_at: null,
+        updated_at: null,
+        pivot: Illuminate\Database\Eloquent\Relations\Pivot {#6529
+          job_listing_id: 1,
+          tag_id: 2,
+        },
+      },
+    ],
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR FICOU COM OUTRO ERRO...
+
+
+
+
+
+
+
+EM QUE 
+
+
+
+O LARAVEL estava 'expecting job_id',
+
+
+
+EM VEZ DE 
+
+
+
+'job_listing_id'... 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+-> O COLUMN_NAME É 'job_listing_id'...
+
+
+
+
+
+
+
+
+
+
+-> ISSO ACONTECEU PQ O LARAVEL ASSUMIU 
+
+1 DEFAULT QUE __ USUALLY _ FUNCIONARIA...
+
+
+
+
+
+
+
+
+
+
+O PROBLEMA É QUE 
+ 
+
+ O NOME DA CLASS DO PROFESSOR É 'Job',
+
+
+ao mesmo tempo que o table name é 'job_listings'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> EM SITUAÇÕES COMO ESSAS,
+
+EM QUE 
+
+VC 
+TEM QUE 
+
+'AVOID CERTAIN COLLISIONS',
+
+
+
+VC PRECISA SER __ eXPLÍCITO 
+
+SOBRE 
+
+
+O COLUMN IDENTIFIER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONSERTAR ISSO, E SER MAIS EXPLÍCITO,
+
+
+
+O PROFESSOR ALTERA O CÓDIGO DO MODEL DE 'Job',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+    public function employer(): BelongsTo
+    {
+     return $this->belongsTo(Employer::class);
+    }
+
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, foreignPivotKey: 'job_listing_id'); // * second parameter is used to be more explicit about the pivot table foreign key column's name.
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+CERTO... 
+
+
+
+
+
+
+
+
+O PROFESSOR ENTÃO REEXECUTA O CÓDIGO,
+
+
+
+
+com 
+
+"$job->tags',
+
+
+e aí funciona...
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA O PROFESSOR RODA ASSIM:
+
+
+
+
+
+
+$tag = App\Models\Tag::find(2);
+
+
+
+
+
+
+
+
+
+--> CERTO... ISSO  ENCONTRA A TAG DE ID 2...
+
+
+
+
+
+
+
+
+--> SE, ENTÃO, EU QUERO ENCONTRAR TODOS OS JOBS 
+
+
+ASSOCIADOS A ESSA TAG, DE ID 2,
+
+
+POSSO ESCREVER ASSIM:
+
+
+
+
+$tag = App\Models\Tag::find(2);
+$tag->jobs;
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+> $tag = App\Models\Tag::find(2);
+= App\Models\Tag {#6540
+    id: 2,
+    name: "Programming",
+    created_at: null,
+    updated_at: null,
+  }
+
+> $tag->jobs;
+= Illuminate\Database\Eloquent\Collection {#5233
+    all: [
+      App\Models\JobListing {#6866
+        id: 1,
+        employer_id: 1,
+        title: "Laundry OR Dry-Cleaning Worker",
+        salary: "6071",
+        created_at: "2024-09-26 20:12:16",
+        updated_at: "2024-09-26 20:12:16",
+        pivot: Illuminate\Database\Eloquent\Relations\Pivot {#6868
+          tag_id: 2,
+          job_listing_id: 1,
+        },
+      },
+    ],
+  }
+
+
+
+
+
+
+
+
+
+
+
+  ok...
+
+
+
+
+FUNCIONOU...
+
+
+
+
+FICAMOS COM 1 COLLECTION, DE 1 ÚNICO ITEM...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... MAS ANTES DE ACABARMOS ESTA AULA,
+
+O PROFESSOR QUER NOS MOSTRAR 
+
+
+
+
+'''HOW WE CAN ATTACH NEW RECORDS...''''
+
+
+
+
+
+
+
+
+
+
+
+ele começa escrevendo assim:
+
+
+
+
+
+
+$tag->jobs()
+
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO,
+
+
+
+ELE RODA '->attach'...
+
+
+
+
+ISSO PQ ELE QUER FAZER ATTACH DE 1 NOVO JOB, 
+
+A ESSA TAG...
+
+
+
+
+
+
+-> PARA FAZER ISSO,
+
+    PODEMOS 
+
+    OU escrever '7' (adiciona o job de id 7)...
+
+
+
+
+    OU ENTÃO 
+
+
+
+    ESCREVER A CALL COMPLETA DE 'find()', 
+    com parameter de 7...
+
+
+
+
+    OU SEJA,
+
+
+    PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+$tag->jobs()->attach(7);
+
+
+
+
+
+
+OU ASSIM:
+
+
+
+
+
+
+
+$tag->jobs()->attach(App\Models\JobListing::find(7));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... COM ISSO, FICAMOS COM 2 ENTRIES 
+
+
+
+
+NA TABLE de job_listing_tag...
+
+
+
+
+uma para cada JOB QUE FOI ADICIONADO PARA AQUELA TAG...
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+
+
+
+
+
+-> MAS OUTRO GOTCHA:
+
+
+
+''IF WE RUN $tag->jobs,
+
+
+WE STILL GET ONLY A SINGLE JOB ITEM...''
+
+
+
+
+
+ISSO ACONTECEU PQ, DENTRO DE ESSE 'php artisan tinker',
+
+
+
+
+AQUELE RESULT SET JÁ FOI CARREGADO NA MEMORY,
+
+DENTRO 
+
+
+DA VARIABLE DE '$tag'... --> ISSO QUER DIZER QUE 
+                            
+                            NENHUMA QUERY SQL ESTÁ SENDO REEXECUTADA...
+
+
+
+
+
+
+        
+
+
+--> PARA CONSERTAR ISSO,
+VC TEM 2 OPÇÕES:
+
+
+
+
+
+1) RE-FETCH THE TAG, FROM THE DATABASE, AND DO THE CALLS ONCE AGAIN 
+
+
+
+
+
+
+
+
+2) OU RE-RODAR,
+
+
+
+COM 
+
+
+
+$tag->jobs()->get();
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO NOS DÁ UMA COLLECTION, DE EXATOS 2 ITEMS:
+
+
+
+
+
+
+
+
+> $tag->jobs()->get();
+= Illuminate\Database\Eloquent\Collection {#5198
+    all: [
+      App\Models\JobListing {#6870
+        id: 1,
+        employer_id: 1,
+        title: "Laundry OR Dry-Cleaning Worker",
+        salary: "6071",
+        created_at: "2024-09-26 20:12:16",
+        updated_at: "2024-09-26 20:12:16",
+        pivot: Illuminate\Database\Eloquent\Relations\Pivot {#6528
+          tag_id: 2,
+          job_listing_id: 1,
+        },
+      },
+      App\Models\JobListing {#6867
+        id: 7,
+        employer_id: 7,
+        title: "Patternmaker",
+        salary: "8848",
+        created_at: "2024-09-26 20:12:16",
+        updated_at: "2024-09-26 20:12:16",
+        pivot: Illuminate\Database\Eloquent\Relations\Pivot {#6538
+          tag_id: 2,
+          job_listing_id: 7,
+        },
+      },
+    ],
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA DIGAMOS QUE 
+    QUEREMOS 
+
+
+
+
+    PEGAR OS 2 ITEMS DE NOVO,
+
+
+    MAS AÍ 
+
+    QUEREMOS PEGAR APENAS O 'title'
+
+    de cada 1 dos jobs...
+
+
+
+
+
+PARA ISSO,
+
+
+PODEMOS USAR O METHOD 'pluck',
+
+TIPO ASSIM:
+
+
+
+
+
+> $tag->jobs()->get()->pluck('title');
+= Illuminate\Support\Collection {#6541
+    all: [
+      "Laundry OR Dry-Cleaning Worker",
+      "Patternmaker",
+    ],
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EU JÁ TINHA VISTO ISSO...
+
+
+
+
+
+
+
+
+
+
+TEMOS HOMEWORK:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''THE BLOG IDEA...''
+
+
+
+
+
+
+'' A POST CAN BE ASSOCIATED WITH 
+ANY NUMBER OF TAGS...'''
+
+
+
+
+
+
+''AND, NOW, YOU KNOW HOW TO REPRESENT THAT...''
+
+
+
+
+''YOU HAVE A POSTS TABLE AND A TAGS TABLE...''
+
+
+
+''THE NEXT STEP IS TO CREATE A PIVOT TABLE,
+
+
+A 'post_tag' PIVOT TABLE..''
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS FAZER ISSO FUNCIONAR...
+
+
+
+
+
+
+
+
+
+
+CONSEGUI, FICOU TIPO ASSIM:
+
+
+
+
+
+<?php
+
+use App\Models\Post;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('body');
+            $table->timestamps();
+        });
+
+        Schema::create('post_tag', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Post::class, 'post_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Tag::class, 'tag_id')->constrained()->cascadeOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('post_tag');
+        Schema::dropIfExists('posts');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Post extends Model
+{
+    use HasFactory;
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+}
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    public function jobs(): BelongsToMany
+    {
+        return $this->belongsToMany(JobListing::class, relatedPivotKey: 'job_listing_id'); // * second parameter is used to be more explicit about the pivot table related key column's name.
+    }
+
+    public function posts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+CERTO...
