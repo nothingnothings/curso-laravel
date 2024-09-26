@@ -1,0 +1,1592 @@
+ 
+
+
+
+
+
+
+
+
+
+ HOJE VEREMOS O PROBLEMA 'N+1'...
+
+
+
+
+
+
+
+ -> NO ARQUIVO DE web.php,
+
+
+ arquivo de routes,
+
+
+
+
+ TEMOS 
+
+
+
+ AQUELA ROUTE DE 
+
+ JOBS:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ESSA FAZ FETCH DE TODOS OS JOBS 
+
+ DA DATABASE,
+
+
+ E AÍ 
+
+ CARREGA 1 VIEW DE JOBS...
+
+
+
+
+
+
+
+
+
+
+ -> SE VISUALIZAMOS ISSO NO BROWSER,
+
+
+ FICAMOS 
+
+ 
+
+ COM ALGUNS ROWS,
+
+ 1 PARA CADA JOB...
+
+
+
+
+
+
+
+
+
+ -> O PROFESSOR QUER DEIXAR CADA 1 DESSES ITEMS 
+
+ EM 1 CARD, DE CERTA FORMA...
+
+
+
+
+
+
+
+
+ -> PARA ISSO,
+
+
+ COMEÇAMOS COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+ <x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul>
+        @foreach($jobs as $job)
+            <a class="text-gray-500 hover:underline hover:text-blue-500" href="/jobs/{{ $job['id'] }}">
+                <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+            </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+o professor aponta que 
+
+
+
+vai querer deixar a anchor-tag um block level element,
+
+e aí 
+
+
+vai adicionar padding no left e right,
+
+top e bottom,
+
+
+e aí 
+
+tipo isto:
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul>
+        @foreach($jobs as $job)
+        <a class="text-gray-500 hover:underline hover:text-blue-500 block px-4 py-6 border border-gray-200" href="/jobs/{{ $job['id'] }}">
+            <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+        </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+ CERTO...
+
+
+
+
+
+
+
+ AÍ ELE REMOVE O STYLE DE UNDERLINE,
+
+ E O TEXT BLUE...
+
+
+
+
+
+
+
+
+ -> deixa cada 1 rounded,
+
+ e space-y-4, no parent:
+
+
+
+
+
+
+
+
+
+ <x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul class="space-y-4">
+        @foreach($jobs as $job)
+        <a class="text-gray-500 hover:underline hover:text-blue-500 block px-4 py-6 border border-gray-200 rounded-lg" href="/jobs/{{ $job['id'] }}">
+            <li><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></li>
+        </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+AGORA PERCEBEMOS QUE A COISA TODA ESTÁ CLICKABLE,
+
+E CADA 1 DELAS NOS LEVA A 1 PAGE DO JOB CORRESPONDENTE... 
+
+
+
+
+
+
+
+
+
+
+
+O PRÓXIMO PASSO É FAZER 
+
+DISPLAY DO 'EMPLOYER'
+
+
+EM CIMA 
+
+
+
+
+
+DE CADA JOB TITLE...
+
+
+
+
+
+
+
+
+
+-> PARA FAZER ISSO,
+
+    
+    O PROFESSOR ALTERA O CÓDIGO NOVAMENTE,
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul class="space-y-4">
+        @foreach($jobs as $job)
+        <a class="text-gray-500 hover:underline hover:text-blue-500 block px-4 py-6 border border-gray-200 rounded-lg" href="/jobs/{{ $job['id'] }}">
+
+            <li>
+            <div>{{ $job->employer->name }}</div>
+            <strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong>
+            </li>
+        </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+ISSO FEITO, O PROFESSOR DEIXA O TEXTO AZUL E EM BOLD.
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Jobs Page
+    </x-slot:heading>
+    <ul class="space-y-4">
+        @foreach($jobs as $job)
+        <a class="text-gray-500 hover:underline hover:text-blue-500 block px-4 py-6 border border-gray-200 rounded-lg" href="/jobs/{{ $job['id'] }}">
+
+            <li>
+            <div class="text-blue-500 font-bold">{{ $job->employer->name }}</div>
+            <strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong>
+            </li>
+        </a>
+        @endforeach
+    </ul>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA, COM CADA JOB LISTING,
+
+PODEMOS VER O 
+
+'EMPLOYER NAME',
+
+
+
+
+
+O 'JOB TITLE',
+
+
+E AÍ 
+O 
+
+
+'SALARY'..
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS, COM ISSO AÍ,
+
+INTRODUZIMOS 1 PROBLEMA...
+
+
+
+
+
+
+
+
+
+
+O PROBLEMA É O 
+
+
+
+''N+1 PROBLEM''...
+
+
+
+
+
+
+
+
+
+
+
+''THE N+1 PROBLEM REFERS TO DATABASE QUERIES EXECUTED 
+    WHITIN A LOOP,
+     RATHER THAN MAKING A SINGLE QUERY THAT LOADS 
+     ALL OF THE RELEVANT DATA UP FRONT''.
+
+
+
+
+
+
+
+
+    
+
+    E ISSO PODE LEVAR A LOADS MAIS LENTOS...
+
+
+
+
+
+
+
+--> COM LOOPS,
+
+
+
+''EACH ITEM IN A LOOP 
+    WILL EXECUTE ANOTHER SQL QUERY,
+    TO LOAD THE EMPLOYER''...
+
+
+
+
+
+
+E ISSO AÍ 
+
+É O PROBLEMA,
+
+O PROBLEMA DE 'N + 1'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> E HÁ DUAS MANEIRAS DE RESOLVER ISSO,
+
+QUE O PROFESSOR NOS MOSTRARÁ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR FALA SOBRE O 'laravel-debugbar'..
+
+
+
+
+
+
+
+
+
+-> ISSO ADICIONA 
+
+
+
+UMA PARTE DE DEBUG 
+
+
+
+NO CANTO INFERIOR DO SEU BROWSER...
+
+
+
+
+
+
+
+-> basta rodar 
+
+
+
+composer require barryvdh/laravel-debugbar --dev 
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK...
+
+
+
+
+INSTALAMOS ISSO AÍ, NO NOSSO PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+
+
+
+
+''LARAVEL USES PACKAGE AUTO-DISCOVERY'',
+
+
+
+
+o
+ que quer dizer que essa debugbar vai funcionar direto,
+
+ DESDE QUE VC DEIXE O 'APP_DEBUG'
+
+ settado como  true,
+
+
+
+ no seu '.env'...
+
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE, EM PRODUCTION,
+
+ISSO NÃO SERÁ MOSTRADO...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS ISSO É BOM, PQ TEREMOS ESSA DEBUG BAR,
+
+
+NA PARTE DE BAIXO...
+
+
+
+
+
+
+
+--> ali, na parte inferior,
+
+
+podemos visualizar '305 queries'
+
+
+
+sendo executadas..
+
+
+
+
+
+
+
+
+
+-> PARECEM MTAS EXECUTIONS...
+
+
+
+
+
+ESTAMOS COM 1 QUERY PARA CADA 'EMPLOYER',
+
+basicamente...
+
+
+
+
+
+
+
+
+
+
+
+
+SE VC ENXERGAR '''MULTIPLE QUERIES THAT ARE NEARLY IDENTICAL'',
+
+
+
+                ISSO É UM CASO CLARO DE 'N+1 PROBLEM'... (só muda o id)...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+select * from "job_listings"
+230μs
+database/database.sqlite
+web.php#31
+select * from "employers" where "employers"."id" = 1 limit 1
+60μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 2 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 3 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 4 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 5 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 6 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 7 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 8 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 9 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 10 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 11 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 12 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 13 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 14 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 15 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 16 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 17 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 18 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 19 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 20 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 21 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 22 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 23 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 24 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 25 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 26 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 27 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 28 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 29 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 30 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 31 limit 1
+60μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 32 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 33 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 34 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 35 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 36 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 37 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 38 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 39 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 40 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 41 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 42 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 43 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 44 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 45 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 46 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 47 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 48 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 49 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 50 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 51 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 52 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 53 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 54 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 55 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 56 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 57 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 58 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 59 limit 1
+40μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 60 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 61 limit 1
+50μs
+database/database.sqlite
+jobs.blade.php#19
+select * from "employers" where "employers"."id" = 62 li
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SE TEMOS 1 MILHAO DE ROWS DE EMPLOYER,
+
+TEREMOS 1 MILHAO DE QUERIES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> E É DAÍ QUE O NOME 'N+1' SE ORIGINA...
+
+
+
+
+
+'''FOR EVERY SINGLE RECORD,
+WE WILL +1 TO THE SQL QUERY COUNT''...
+
+
+
+
+
+
+
+
+
+-> É UM PROBLEMA, SIM...
+
+
+
+
+
+
+
+
+
+
+-> EM OUTRAS PALAVRAS:
+
+
+
+''LAZY LOADING CAN BE HELPFUL,
+BUT IF YOU DON'T THINK THINGS THROUGH,
+
+THIS SORT OF THING CAN HAPPEN''..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VAMOS CONSERTAR ISSO...
+
+
+
+
+
+
+
+
+
+VOLTAMOS 
+
+
+à ROUTE DE JOBS,
+
+
+
+E AÍ EXTRAÍMOS OS JOBS EM 1 VARIABLE PRÓPRIA, TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+Route::get('/jobs', function () {
+
+    $jobs = JobListing::all();
+    $employers = Employer::all();
+
+    return view('jobs', [
+        'jobs' => $jobs,
+        'employers' => $employers
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, FICAMOS 
+
+COM EAGER LOADING...
+
+
+
+
+
+
+
+
+
+
+
+NO CASO, VAMOS QUERER ALTERAR 
+
+
+O CÓDIGO DE 'JOBS',
+
+PARA QUE 
+
+OS EMPLOYERS SEJAM REGISTRADOS A ELES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QUEREMOS 
+
+
+''GIVE ME ALL THE JOBS __ WITH__ 
+
+THE EMPLOYER, FOR EACH ONE''...
+
+
+
+
+
+-> PARA FAZER O EAGER LOAD DE VERDADE 
+
+
+DOS EMPLOYERS, DENTRO DOS JOBS,
+
+VC PRECISA 
+
+
+RODAR METHODS ESPECÍFICOS...
+
+
+
+
+
+
+
+
+-> EM VEZ DE RODAR '::all()',
+
+
+VC PODE RODAR, INICIALMENTE,
+
+
+'::with('employer)''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+para finalizar, vc chama '->get()',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+Route::get('/jobs', function () {
+
+    $jobsWithEmployers = JobListing::with('employer')->get();
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COM 'get()',
+
+
+FAZEMOS SELECT DE TODOS OS RECORDS...
+
+
+
+SE VC QUER IMPLEMENTAR PAGINATION, VC NÃO VAI QUERER USAR '->get()"...
+
+
+veremos isso mais tarde...
+
+
+
+
+
+
+
+
+
+
+SE VOLTAMOS AO BROWSER, FUNCIONARÁ COMO ANTES,
+
+
+MAS AGORA TEREMOS __BEEEEEM MENOS QUERIES...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+select * from "employers" where "employers"."id" in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300)
+
+
+
+
+
+FICAMOS COM 5 QUERIES, BASICAMENTE...
+
+
+
+
+
+
+
+
+
+OU SEJA, É BEM MELHOR DO QUE O QUE TÍNHAMOS ANTES...
+
+
+
+
+
+
+TUDO ISSO POR CONTA DO EAGER LOADING,
+
+
+EM VEZ DO LAZY LOADING...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> LAZY LOADING PODE SER MEIO RISKY DEMAIS, PORTANTO...
+
+
+
+
+
+
+
+
+
+
+-> PARA SITUAÇÕES COMO ESSAS, É BOM DISABLE 
+    A FEATURE INTEIRAMENTE...
+
+
+
+
+
+
+
+    -> HÁ UMA OPTION PARA 
+        DESABILITAR O LAZY LOADING TOTALMENTE...
+
+
+
+
+
+
+
+
+    --> TUDO DEPENDE DAS SUAS PREFERENCES...
+
+
+ 
+
+
+
+--> OK... DIGAMOS QUE QUEREMOS DISABLE 
+    A FEATURE TOTALMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA DESABILITÁ-LA, DEVEMOS IR ATÉ O FOLDER DE 
+
+'app>providers'...
+
+
+
+
+
+
+
+
+
+
+
+-> LÁ DENTRO, TEMOS APENAS 1 ÚNICO ARQUIVO, NO INÍCIO,
+
+QUE É 
+
+'AppServiceProvider.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''YOU CAN THINK OF THIS AS A FILE 
+    THAT CAN BE USED TO CONFIGURE YOUR APP, IN WHICHEVER 
+    WAY YOU NEED TO...''
+
+
+
+
+
+
+
+
+--> NO NOSSO CASO,
+
+QUEERMOS ADICIONAR UMA CONFIGURATION PARA 'DISABLE LAZY LOADING'...
+
+
+
+
+
+
+
+
+-> PODEMOS FAZER ISSO NO METHOD DE 'boot()'..
+
+
+
+
+
+
+
+
+-> PARA ISSO, DEVEMOS REFERENCIAR O 'Model',
+
+
+E AÍ 
+
+CHAMAR 
+
+
+'::preventLazyLoading()',
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+
+        // * Disables lazy loading entirely, as a safety measure:
+        Model::preventLazyLoading();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+vc quer 'preventLazyLoading',
+
+e não 'prevents'LazyLoading' (pq esse outro method apenas retorna 1 boolean)...
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, SE TENTAMOS EXECUTAR O METHOD DE 
+
+'Job::all()',
+
+
+
+QUE É AQUELE METHOD QUE RESULTA NO LAZY LOADING NA NOSSA VIEW,
+
+COM 
+'$job->employer->title',
+
+
+
+
+FICAMOS IMEDIATAMENTE COM UMA 
+
+EXCEPTION DE 
+
+
+
+
+'LAZYLOADINGVIOLATION'...
+
+
+
+
+
+
+
+A EXCEPTION DIZ ASSIM:
+
+''ATTEMPTED TO LAZY LOAD [employer] on model [App\Models\JobListing], but lazy loading is disabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... QUER DIZER QUE ISSO É REALMENTE SUPER ÚTIL...
+
+
+PARA RESOLVER ISSO, NOVAMENTE,
+
+
+DEVEMOS RODAR 
+
+
+JobListing::with('employer')->get();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.. COM ISSO, ESTAMOS:
+
+
+
+
+
+
+1) EAGER LOADING OUR EMPLOYER RELATIONSHIP 
+
+
+
+2) MINIMIZING THE AMOUNT OF SQL QUERIES..
