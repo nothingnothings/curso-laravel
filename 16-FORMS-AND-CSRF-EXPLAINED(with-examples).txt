@@ -1,0 +1,3494 @@
+
+
+
+
+
+
+
+
+HOJE FINALMENTE VEREMOS FORMS...
+
+
+
+
+
+
+
+
+
+
+
+-> MAS, PARA ESTUDARMOS ISSO,
+TEREMOS QUE VER MTOS OUTROS TÓPICOS, COMO:
+
+
+
+
+
+
+
+
+1) REQUEST DATA 
+
+
+
+2) FOLDER ORGANIZATION 
+
+
+
+
+3) CROSS-SITE REQUEST FORGERY...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> É MT COISA...
+
+
+
+
+
+
+
+
+
+
+
+--> COMEÇAMOS COM A FILE DE 'web.php'..
+
+
+
+
+
+
+ESTAMOS COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Employer;
+use App\Models\Job;
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->simplePaginate(3); // * Pagination applied. This version should be used when you have a huge table with millions of rows, 300+ pages. With this, you get only 'previous' and 'next' buttons, and no clickable page numbers.
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, ESTAMOS 
+
+COM 1 CERTO PATTERN, AQUI...
+
+
+
+
+
+
+
+
+
+
+TEMOS:
+
+
+
+
+
+
+
+
+
+1) UMA ROUTE PARA FAZER SHOW DE __ TODOS OS JOBS...
+
+
+
+
+
+
+
+2) UMA SEGUNDA ROUTE, USADA PARA FAZER 
+    DISPLAY DE 1 SINGLE JOB...
+
+
+
+
+
+
+
+
+
+
+3) AGORA, NO CASO,
+    QUERO TER 1 ROUTE 
+
+
+    PARA 
+
+
+    '''SHOW A PAGE TO CREATE A SINGLE JOB''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> VAMOS NOS ATER ÀS CONVENÇÕES,
+
+
+
+E CRIAR UMA ROUTE 
+
+
+
+
+DE 
+
+'/jobs/create',
+
+
+de tipo GET...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/jobs/create', function () {
+    return view('create');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS ANTES DE FAZER O RENDER DE ESSA VIEW,
+
+
+O PROFESSOR ESCREVE UM 'dd()' (dump and die)
+
+
+DE 'Hello there'..
+
+
+
+
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+Route::get('/jobs/create', function () {
+    dd('Hello there!');
+
+    return view('create');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS AO TENTARMOS CHEGAR A ESSA ROUTE,
+
+ISSO NÃO FUNCIONARÁ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> FICAMOS COM UM ERROR:
+
+
+'''Trying to access array offset on NULL''...
+
+
+
+
+
+
+
+
+
+-> E ISSO É ESTRANHO...
+
+
+
+
+
+
+
+
+-> NÓS ESPERÁVAMOS QUE ELE FARIA UM 'DUMP AND DIE',
+
+
+
+    MAS PARECE QUE ELE ESTÁ TENTANDO 
+
+
+    __CARREGAR_UMA ROUTE DIFERENTE..
+
+
+
+
+
+
+
+
+--> É CLARO, ISSO ACONTECEU POR CONTA  DO CONFLITO ENTRE AS DUAS ROUTES:
+
+
+
+
+    /jobs/{id}
+
+    /jobs/create 
+
+
+
+
+
+
+
+
+--> BASICAMENTE, 'create' está sendo TRATADO 
+    COMO UM 'id', nesse caso...
+
+
+
+
+
+
+
+-> PARA FAZER COM QUE ISSO FUNCIONE, DEVEMOS COLOCAR A ROUTE DE 'create'
+
+
+ANTES DA ROUTE DE '{id}',
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->simplePaginate(3); // * Pagination applied. This version should be used when you have a huge table with millions of rows, 300+ pages. With this, you get only 'previous' and 'next' buttons, and no clickable page numbers.
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+Route::get('/jobs/create', function () {
+    dd('Hello there!');
+
+    return view('create');
+});
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('job', [
+        'job' => $selectedJob,
+    ]);
+});
+
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO PQ A ORDEM __ REALMENTE IMPORTA__....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O PROFESSOR QUER RETORNAR UMA VIEW,
+
+PARA ''CREATE A JOB''...
+
+
+
+
+
+
+
+
+
+-> CERTO... MAS, ANTES DISSO,
+
+O PROFESSOR QUER MELHORAR A NOSSA FOLDER STRUCTURE...
+
+
+
+
+
+
+
+
+
+
+PQ, ATUALMENTE, 
+
+NOSSOS FOLDERS ESTÃO TIPO 
+
+
+
+Components(folder)
+
+about.blade.php 
+contact.blade.php 
+home.blade.php 
+job.blade.php 
+jobs.blade.php 
+
+
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, TEMOS:
+
+
+
+
+1) UMA VIEW PARA TODOS OS JOBS 
+
+
+2) UMA VIEW PARA 1 SINGLE JOB 
+
+
+
+3) UMA VIEW PARA CREATE A SINGLE JOB..
+
+
+
+
+
+
+--> PARA ORGANIZAR ISSO TUDO, DEIXAREMOS TODAS ESSAS VIEWS 
+
+DENTRO DE 1 FOLDER PRÓPRIO,
+
+DE NOME 'jobs'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO,
+
+FICAMOS COM 
+
+
+
+
+
+
+Components (folder)
+
+
+jobs (folder) 
+            ---- job.blade.php 
+            ---- jobs.blade.php 
+
+contact.blade.php 
+home.blade.php 
+about.blade.php
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS O PROFESSOR ACHA QUE 'jobs.blade.php'
+
+É UM NOME QUE NÃO FAZ SENTIDO...
+
+
+
+
+
+
+É POR ISSO QUE ELE RENOMEIA ESSE ARQUIVO, para 'index.blade.php'...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+Components (folder)
+
+
+jobs (folder) 
+            ---- job.blade.php 
+            ---- index.blade.php 
+
+contact.blade.php 
+home.blade.php 
+about.blade.php
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> E ISSO, NO CASO, É UMA CONVENTION...
+
+
+
+
+
+
+
+
+
+'''THE VIEW, AND THE ACTION FOR DISPLAYING ALL OF 
+    A RESOURCE,  THAT IS TYPICALLY CALLED "index" '''
+
+
+
+
+
+
+
+
+
+
+-> ''ON THE OTHER HAND, 
+        THE VIEW FOR DISPLAYING/SHOWING 
+        A _ SINGLE RESOURCE_ OR RECORD 
+
+        IS TYPICALLY NAMED 'show'''''...
+
+
+
+
+
+
+
+
+-> E É POR ISSO QUE O PROFESSOR RENOMEIA O ARQUIVO 'job.blade.php',
+    que faz o show de 1 single job,
+
+
+    PARA 'show.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... E VAMOS REPETIR ISSO PARA TODOS NOSSOS RESOURCES...
+
+
+
+
+
+
+
+
+
+EX: DIGAMOS QUE TEMOS UM RESOURCE DE NOME 'Tasks':
+
+
+
+
+1) VIEW PARA TODAS AS TASKS --> será a view 'index.blade.php' 
+
+
+
+2) VIEW PARA UMA SINGLE TASK --> será a view 'show.blade.php'...
+
+
+
+3) UMA VIEW PARA 'CREATE A SINGLE TAKS' -> será a view 'create.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> AS VIEWS DE CREATE, DE CRIAR A SINGLE NEW RESOURCE,
+
+ELAS GERALMENTE FICAM COM O NOME DE 'create.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COMO VAMOS QUERER CRIAR 1 JOB,
+
+
+deixamos o nome como 'create.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... COM ISSO, TEREMOS DE ADAPTAR OS PATHS DAS VIEWS,
+
+LÁ NO 'web.php'...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->simplePaginate(3); // * Pagination applied. This version should be used when you have a huge table with millions of rows, 300+ pages. With this, you get only 'previous' and 'next' buttons, and no clickable page numbers.
+
+    return view('jobs.index', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+Route::get('/jobs/create', function () {
+    dd('Hello there!');
+
+    return view('jobs.create');
+});
+
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA, EM VEZ DE USAR 'jobs/create',
+
+
+
+
+GERALMENTE É MAIS COMUM USAR A DOT NOTATION PARA OS PATHS,
+
+
+
+como 
+
+'jobs.create',
+
+
+'jobs.index',
+
+'jobs.show',
+
+
+etc...
+
+
+
+
+
+
+
+
+
+CERTO.. AÍ VAMOS CRIANDO A VIEW DE 'create job':
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Create a Job
+    </x-slot:heading>
+    <div>TODO</div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ENTAO PEGA UMA FORM LÁ DO 
+
+TAILWINDUI...
+
+
+
+
+
+
+
+
+
+-> APPLICATION UI --> FORMS...
+
+
+
+
+
+
+
+-> FORM LAYOUTS...
+
+
+--> PEGAMOS 1 LAYOUT FULL...
+
+
+
+
+
+
+
+
+
+
+
+O CÓDIGO É ESTE:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
+<form>
+  <div class="space-y-12">
+    <div class="border-b border-gray-900/10 pb-12">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Profile</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600">This information will be displayed publicly so be careful what you share.</p>
+
+      <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div class="sm:col-span-4">
+          <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username</label>
+          <div class="mt-2">
+            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+              <span class="flex select-none items-center pl-3 text-gray-500 sm:text-sm">workcation.com/</span>
+              <input type="text" name="username" id="username" autocomplete="username" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="janesmith">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-full">
+          <label for="about" class="block text-sm font-medium leading-6 text-gray-900">About</label>
+          <div class="mt-2">
+            <textarea id="about" name="about" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+          </div>
+          <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p>
+        </div>
+
+        <div class="col-span-full">
+          <label for="photo" class="block text-sm font-medium leading-6 text-gray-900">Photo</label>
+          <div class="mt-2 flex items-center gap-x-3">
+            <svg class="h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+            </svg>
+            <button type="button" class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Change</button>
+          </div>
+        </div>
+
+        <div class="col-span-full">
+          <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Cover photo</label>
+          <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+            <div class="text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+              </svg>
+              <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                  <span>Upload a file</span>
+                  <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                </label>
+                <p class="pl-1">or drag and drop</p>
+              </div>
+              <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-b border-gray-900/10 pb-12">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Personal Information</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p>
+
+      <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <label for="first-name" class="block text-sm font-medium leading-6 text-gray-900">First name</label>
+          <div class="mt-2">
+            <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="last-name" class="block text-sm font-medium leading-6 text-gray-900">Last name</label>
+          <div class="mt-2">
+            <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-4">
+          <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
+          <div class="mt-2">
+            <input id="email" name="email" type="email" autocomplete="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Country</label>
+          <div class="mt-2">
+            <select id="country" name="country" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+              <option>United States</option>
+              <option>Canada</option>
+              <option>Mexico</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-span-full">
+          <label for="street-address" class="block text-sm font-medium leading-6 text-gray-900">Street address</label>
+          <div class="mt-2">
+            <input type="text" name="street-address" id="street-address" autocomplete="street-address" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-2 sm:col-start-1">
+          <label for="city" class="block text-sm font-medium leading-6 text-gray-900">City</label>
+          <div class="mt-2">
+            <input type="text" name="city" id="city" autocomplete="address-level2" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="region" class="block text-sm font-medium leading-6 text-gray-900">State / Province</label>
+          <div class="mt-2">
+            <input type="text" name="region" id="region" autocomplete="address-level1" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="postal-code" class="block text-sm font-medium leading-6 text-gray-900">ZIP / Postal code</label>
+          <div class="mt-2">
+            <input type="text" name="postal-code" id="postal-code" autocomplete="postal-code" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-b border-gray-900/10 pb-12">
+      <h2 class="text-base font-semibold leading-7 text-gray-900">Notifications</h2>
+      <p class="mt-1 text-sm leading-6 text-gray-600">We'll always let you know about important changes, but you pick what else you want to hear about.</p>
+
+      <div class="mt-10 space-y-10">
+        <fieldset>
+          <legend class="text-sm font-semibold leading-6 text-gray-900">By Email</legend>
+          <div class="mt-6 space-y-6">
+            <div class="relative flex gap-x-3">
+              <div class="flex h-6 items-center">
+                <input id="comments" name="comments" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              </div>
+              <div class="text-sm leading-6">
+                <label for="comments" class="font-medium text-gray-900">Comments</label>
+                <p class="text-gray-500">Get notified when someones posts a comment on a posting.</p>
+              </div>
+            </div>
+            <div class="relative flex gap-x-3">
+              <div class="flex h-6 items-center">
+                <input id="candidates" name="candidates" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              </div>
+              <div class="text-sm leading-6">
+                <label for="candidates" class="font-medium text-gray-900">Candidates</label>
+                <p class="text-gray-500">Get notified when a candidate applies for a job.</p>
+              </div>
+            </div>
+            <div class="relative flex gap-x-3">
+              <div class="flex h-6 items-center">
+                <input id="offers" name="offers" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              </div>
+              <div class="text-sm leading-6">
+                <label for="offers" class="font-medium text-gray-900">Offers</label>
+                <p class="text-gray-500">Get notified when a candidate accepts or rejects an offer.</p>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend class="text-sm font-semibold leading-6 text-gray-900">Push Notifications</legend>
+          <p class="mt-1 text-sm leading-6 text-gray-600">These are delivered via SMS to your mobile phone.</p>
+          <div class="mt-6 space-y-6">
+            <div class="flex items-center gap-x-3">
+              <input id="push-everything" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              <label for="push-everything" class="block text-sm font-medium leading-6 text-gray-900">Everything</label>
+            </div>
+            <div class="flex items-center gap-x-3">
+              <input id="push-email" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              <label for="push-email" class="block text-sm font-medium leading-6 text-gray-900">Same as email</label>
+            </div>
+            <div class="flex items-center gap-x-3">
+              <input id="push-nothing" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              <label for="push-nothing" class="block text-sm font-medium leading-6 text-gray-900">No push notifications</label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex items-center justify-end gap-x-6">
+    <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+  </div>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS ADAPTÁ-LO...
+
+
+
+
+
+
+
+
+-> VAI FICANDO TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Create a Job
+    </x-slot:heading>
+    <!--
+  This example requires some changes to your config:
+
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
+    <form>
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Profile</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">This information will be displayed publicly so be careful what you share.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <span class="flex select-none items-center pl-3 text-gray-500 sm:text-sm">workcation.com/</span>
+                                <input type="text" name="username" id="username" autocomplete="username" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="janesmith">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-full">
+                        <label for="about" class="block text-sm font-medium leading-6 text-gray-900">About</label>
+                        <div class="mt-2">
+                            <textarea id="about" name="about" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                        </div>
+                        <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+FICAMOS COM APENAS OS FIELDS NECESSÁRIOS A NÓS... 
+
+
+
+
+
+
+ficamos com 2 fields,
+
+basicamente...
+
+
+
+
+
+
+
+
+
+
+
+
+--> TROCAMOS A LABEL 
+
+
+
+DO INPUT,
+
+que está como 
+
+
+'username'...
+
+
+
+
+
+
+
+
+
+-> DEIXAMOS ISSO COMO 'title'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> AGORA PRECISAMOS DE:
+
+
+
+
+
+
+
+1) UMA POST ROUTE 
+
+
+
+
+2) O FIELD DE 'CSRF', DE TYPE 'hidden'..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PRECISAMOS DE UMA ACTION NA FORM,
+
+TAMBÉM...
+
+
+
+
+
+
+
+
+
+
+-> para isso,
+
+devemos escrever assim:
+
+
+
+
+
+<form method="POST" action="">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SE SEGUIMOS A CONVENTION,
+   SETTAREMOS A ACTION COMO SENDO 
+
+   ''THE ROUTE ITSELF''...
+
+
+
+
+
+
+-> OU SEJA, SERÁ DISPARADO CONTRA '/jobs'...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Create a Job
+    </x-slot:heading>
+    <form method="POST" action="/jobs">
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+    <form method="POST" action="/jobs">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TENTAMOS ISSO UMA VEZ.... MAS SABEMOS QUE 
+NÃO TEMOS ROUTE ALGUMA DE 'POST' /jobs...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> RODAMOS ISSO, MAS AÍ FICAMOS COM O ERROR:
+
+
+
+
+
+''''The POST method is not supported for ROUTE jobs...'''
+
+
+
+
+
+
+
+
+
+'''Supported methods: GET, HEAD''..
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ok... PARA CONSERTAR ISSO, VOLTAMOS ATÉ 'web.php',
+
+
+
+E AÍ ADICIONAMOS UMA ROUTE de POST...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK...
+
+
+
+
+
+
+O PROFESSOR COLOCA UM OUTRO 'dd()',
+
+
+PARA TER CERTEZA DE QUE ESSA ROUTE ESTÁ SENDO ATINGIDA:
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    dd('Welcome!!!');
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AO TENTARMOS MANDAR ESSE REQUEST,
+
+FICAMOS COM OUTRO ERROR...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O ERROR É 
+
+'419 PAGE EXPIRED'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> E NÃO TEMOS NENHUMA CLUE DE QUAL É O PROBLEMA...
+
+
+
+
+
+
+
+
+
+
+
+--> 419..
+
+
+
+
+
+
+
+
+
+-> MAS QUAL É O PROBLEMA...?
+
+
+
+
+
+
+
+-> O PROFESSOR ACHA QUE ESSA É UMA ÁREA EM QUE 
+O FRAMEWORK PODERIA SER UM POUCO MAIS CLARO... claro sobre 
+a razão do error... 
+
+
+
+
+
+
+
+
+-> FALAREMOS SOBRE A RAZÃO DE ESSE ERROR...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESSE ERROR 419 --> ''IT REFERS TO LARAVEL'S 
+                        AUTOMATIC 
+                         
+                         ___CSRF__ PROTECTION...'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CSRF --> CROSS-SITE REQUEST FORGERY...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O QUE É ISSO?
+
+
+
+
+
+
+
+
+
+
+
+--> IMAGINE QUE 
+    VC É UM MEMBRO DE 1 BANCO LOCAL,
+
+
+
+    COMO 
+
+
+    LocalBank.test ..
+
+
+
+
+
+
+
+
+--> VC É MEMBRO DE ESSE BANCO...
+
+
+
+
+
+
+
+--> AÍ ELES TE OFERECEM 1 PAGE,
+
+    PARA MUDAR SEU PASSWORD...
+
+
+
+
+
+
+
+
+-> RESET YOUR PASSWORD 
+
+
+CURRENT PASSWORD: 
+
+
+NEW PASSWORD:
+
+
+
+
+
+
+
+
+
+
+OK, ATÉ AÍ, NADA DE MAIS...
+
+
+
+
+
+
+
+
+
+
+-> MAS O LOCALBANK NÃO SABE NADA SOBRE 
+SECURITY... NEM SABE O QUE É CSRF...
+
+
+
+
+
+
+
+
+
+
+-> AÍ, UMA PESSOA MALICIOSA PODE TIRAR VANTAGEM DE ESSE BANCO...
+
+
+
+
+
+
+
+
+
+--> ESSA PESSOA TE ENVIA UM EMAIL,  
+
+    NESSE EMAIL,
+
+
+    O PROFESSOR DIRIA QUE 
+
+
+
+    ELE É UM REPRESENTANTE DE ESSE BANCO...
+
+
+
+
+
+
+
+''Our apologies, please reset your password:''
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> A PESSOA CLICA 
+    NESSE BOTÃO...
+
+
+
+
+
+
+    -> AO CLICAR NESSE BUTTON,
+        ELAS SÃO LEVADAS 
+
+        ATÉ UMA FORM 
+
+        EM QUE PREENCHEM O PASSWORD...
+
+
+
+
+
+    --> COM ISSO, O QUE ACONTECE:
+
+
+    '''THEY DON'T EVEN KNOW THAT SOMETHING WENT DOWN...
+
+
+    WHEN THEY CLICK THAT BUTTON,
+
+    THEY DON'T GO TO LOCALBANK.TEST,
+
+
+    BUT TO A MALICIOUS WEBSITE'''...
+
+
+
+
+
+
+
+
+
+--> E ESSE SITE VAI TER A MESMA APARENCIA 
+DO 'LOCALBANK.TEST',
+
+mas não vai ser...
+
+
+
+
+
+
+
+--> AÍ VC VAI ENTRAR 
+    NESSE SITE,
+
+    E AÍ QUANDO VC PREENCHE 
+
+    O PASSWORD E ENVIA O SUBMIT...
+
+
+
+
+
+
+-> 'HERE IS THE IMPORTANT PART:''
+
+
+
+
+
+''THAT REQUEST __ STILL GOES__ TO LOCALBANK.TEST...
+  
+  IT STILL RESETS/CHANGES THE PASSWORD TO WHAT THE USER 
+  INPUTTED...''
+
+
+
+
+
+''BUT I'M NOT SIGNED IN...'',
+
+
+-> MAS, NA VERDADE, VC ESTARÁ 'SIGNED-IN',
+
+PQ VC TERÁ 1 COOKIE NO SEU BROWSER,
+PQ VC FEZ LOGIN MAIS CEDO NO DIA,
+
+O QUE QUER DIZER QUE VC AINDA ESTÁ LOGGADO... E ESSE REQUEST 
+AINDA FUNCIONA/FUNCIONARÁ
+
+
+
+''
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO,
+
+
+
+''FROM MY MALICIOUS SITE, I BASICALLY 
+    __REPLICATED_ THE FORM OF THE ORIGINAL BANK, 
+        TO RESET THE PASSWORD... YOU BASICALLY 
+        DID THE SAME THING YOU WOULD DO ON THE NORMAL 
+        BANK PAGE, BUT I AM/WAS ABLE __ TO __ INTERCEPT_ 
+        YOUR INPUT, THE NEW PASSWORD INPUT, AND GET ITS VALUE...
+        I CAN THEN, AFTERWARDS, USE THAT PASSWORD TO LOG INTO YOUR 
+        ACCOUNT, AND DO MALICIOUS THINGS...''
+
+
+
+
+
+
+
+
+
+
+------> COM ISSO, NO PRÓXIMO DIA,
+        POSSO SIMPLESMENTE FAZER LOGIN NA SUA CONTA,
+        E AÍ ACESSAR TODA SUA DATA...
+
+
+
+
+
+
+
+
+
+--> MAS COMO PODEMOS CONSERTAR ISSO?
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA NOS PROTEGER CONTRA ISSO,
+
+DEVEMOS 'LEVERAGE' AQUILO QUE 
+
+
+É CONHECIDO COMO CSRF TOKEN....
+
+
+
+
+
+
+
+É ALGO COMO ISTO:
+
+
+
+
+
+<input 
+    type="hidden"
+    name="_token"
+    value="asdsaihasjkxazhkjh12sz"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EXISTIRÁ 1  TOKEN QUE SERÁ INCLUÍDA,
+
+COMO PARTE DA FORM...
+
+
+
+
+
+
+
+
+AÍ VAMOS COMPARAR ESSA TOKEN, DA FORM,
+
+COM 1 TOKEN QUE ESTARÁ NA SUA 'CURRENT SESSION'...
+
+
+
+
+
+
+
+
+
+
+
+-> E, SE AS 2 MATCHEAREM, 
+    WE CAN BE 
+
+
+    ''PRETTY SURE''
+
+
+    THAT YOU ARE THE ACTUAL PERSON, DOING THE 
+    REQUEST, ON THE CORRECT DOMAIN..
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> E, NO CASO DO LARAVEL,
+
+    ELE FAZ O THROW DE ESSE ERROR, DE STATUS 419...
+
+
+
+
+
+
+
+
+
+
+--> CERTO... AGORA VAMOS CONSERTAR O PROBLEMA...
+
+
+
+
+
+
+
+
+
+
+
+-> LÁ NA NOSSA VIEW,
+
+    BEM NO TOPO DA FORM,
+
+    MAS DENTRO DA FORM,
+
+
+    ADICIONAMOS UMA NOVA BLADE DIRECTIVE,
+
+
+    QUE É 
+
+
+    '@csrf'...
+
+
+
+
+
+
+
+
+
+
+DEPOIS QUE  ISSO FOR COMPILADO EM VANILLA PHP,
+
+
+
+ESSA BLADE DIRECTIVE É 
+
+EXPANDIDA, E SE TORNA 
+
+UM 
+
+
+
+'CSRF HIDDEN INPUT FIELD',
+
+
+coisa bem padrão..
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR INSPECIONA ESSE HTML,
+
+
+E AÍ ENCONTRAMOS ISTO:
+
+
+
+
+
+
+<input type="hidden" name="_token" value="sadashsdahsadjasdhj112as" autocomplete="off"> 
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+QUER DIZER QUE ESSA DIRECTIVE É SUPER IMPORTANTE,
+
+E DEVE SER ADICIONADA...
+
+
+
+
+
+
+
+--> É ELA QUE FAZ O GENERATE DE ESSA UNIQUE TOKEN...
+
+
+
+
+
+
+
+
+
+''ONCE WE SUBMIT THIS FORM,
+THAT TOKEN WILL BE INCLUDED, ALONG WITH THE REQUEST''...
+
+
+
+
+
+
+
+
+
+''BEHIND THE SCENES, 
+    LARAVEL IS GOING TO COMPARE THAT 
+    REQUEST TOKEN TO A TOKEN THAT IS IN YOUR 
+    REQUEST SESSION...''
+
+
+
+
+
+
+
+--> ''AS LONG AS THEY MATCH UP, YOU ARE GOOD TO GO...
+BUT IF THEY DON'T MATCH UP,
+YOU ARE GOING TO GET A 419 STATUS CODE RESPONSE, ERROR''..
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI NO HTML, NO BROWSER,
+
+E TROCA O VALUE DO csrf token --> AÍ FICAMOS COM UMA TOKEN COM VALUE INVÁLIDO...
+                                    E, JUSTAMENTE POR CONTA DISSO,
+                                    NOVAMENTE 
+                                    FICAMOS COM UM 
+
+                                    STATUS CODE 419 (sinal de que a protecao está FUNCIONANDO)...
+
+
+
+
+
+
+
+--> ISSO ACONTECE/ACONTECEU PQ 
+    A TOKEN DA FORM NÃO MATCHEOU A TOKEN QUE FICOU CONTIDA NA SUA SESSION,
+    NA DATABASE...
+
+
+
+
+
+
+
+
+
+
+
+In the database, specifically in the "sessions" table, the 
+CSRF token is stored in the payload column. This column 
+contains serialized session data, which includes various session variables,
+ including the CSRF token.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... AGORA PODEMOS VOLTAR 
+
+À FILE DE 'web.php',
+
+para continuarmos com nosso código...
+
+
+
+
+
+
+
+
+
+
+
+--> AGORA QUEREMOS PEGAR A DATA PROVENIENTE 
+
+
+DO REQUEST DE POST a /jobs...
+
+
+
+
+
+
+
+
+
+
+-> TEMOS ISTO:
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+BEM, COMO PODEMOS PEGAR OS ATTRIBUTES, DAQUELA NOSSA FORM?
+
+
+
+
+
+
+
+
+
+
+
+
+-_> BEM, PODEMOS USAR A HELPER FUNCTION 
+
+'request()'...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONSEGUIR _ TODOS OS ATTRIBUTES 
+    DE NOSSA FORM,
+
+
+    PODEMOS USAR 
+
+
+
+
+
+'request()->all()';
+
+
+
+
+
+
+
+
+PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    dd(request()->all()); // This will show us ALL THE DATA that was sent, by the post request to our server.
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, FICAREMOS COM 1 ASSOCIATIVE ARRAY ASSIM:
+
+
+
+[
+    "_token" => "asdassdahdsjahdjhajsda",
+    "title" => "Some Value"
+    "salary" => "$50,000"
+]
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+A OUTRA OPTION QUE TEMOS, AQUI,
+
+COM 'request()',
+
+
+
+
+
+É NÃO USAR '->all()',
+
+
+
+e sim 
+
+
+COLOCAR O NOME 
+
+
+
+DA KEY QUE QUEREMOS ACESSAR, DENTRO DO ASSOC ARRAY...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    // dd(request()->all()); // This will show us ALL THE DATA that was sent, by the post request to our server.
+
+    // dd(request('title')); // This will show us the value of the title field, that was sent, by the post request to our server.
+    // dd(request('salary')); // This will show us the value of the salary field, that was sent, by the post request to our server.
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... COM ISSO, TEMOS TODOS OS FIELDS NECESSÁRIOS A NÓS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NÓS NÃO VEREMOS VALIDATION NESTE EPISODE, MAS VEREMOS 
+NA PRÓXIMA AULA...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+    $requestData = request()->all();
+
+    // * Assuming that everything is valid, we will create a new JobListing entry in the database:
+
+
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+
+
+
+
+NÓS 'ASSUME' QUE A DATA SERÁ VALID,
+
+
+
+E AÍ 
+
+
+CRIAMOS UMA NOVA ENTRY, NA DATABASE,
+COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+    $requestData = request()->all();
+
+    JobListing::create([
+        'title' => $requestData['title'],
+        'salary' => $requestData['salary'],
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+AINDA NÃO VIMOS AUTHENTICATION,
+
+POR ISSO O PROFESSOR FAZ O HARDCODE DO EMPLOYER_ID, como sendo '1'... 
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+MAS, ISSO FEITO,
+
+
+
+
+PARA QUE ROUTE VAMOS QUERER 'return'?
+
+
+
+
+
+-_> BEM, VAMOS QUERER RETURN ATÉ A view de 'jobs' geral,
+
+que é o 'index'...
+
+
+
+
+
+-> POR ISSO QUE ESCREVEMOS ASSIM:
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    $requestData = request()->all();
+
+    // * Assuming that everything is valid, we will create a new JobListing entry in the database:
+    JobListing::create([
+        'title' => $requestData['title'],
+        'salary' => $requestData['salary'],
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+''redirect()->route('jobs.index');'
+
+
+
+
+
+
+
+
+-> A ALTERNATIVA É ESCREVER 
+
+'return redirect('/jobs');'
+
+
+
+
+
+
+
+
+
+-> OK... ENTRETANTO, COM ISSO, FICAMOS COM 1 ERROR:
+
+
+
+
+
+
+
+
+
+
+''integrity constraint violation:
+
+NOT NULL constraint failed: 'job_listings.employer_id''
+
+
+
+
+
+
+
+
+
+
+--> ISSO FICOU ESTRANHO....
+
+
+
+
+
+ISSO PQ NÓS INCLUÍMOS O 'employer_id',
+
+TIPO AQUI:
+
+
+
+
+Route::post('/jobs', function () {
+
+    $requestData = request()->all();
+
+    // * Assuming that everything is valid, we will create a new JobListing entry in the database:
+    JobListing::create([
+        'title' => $requestData['title'],
+        'salary' => $requestData['salary'],
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+OK, MAS ENTÃO, QUAL É O PROBLEMA?
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> BEM, O PROBLEMA 
+
+É JUSTAMENTE AQUELA PROPERTY DE '$fillable',
+
+LÁ 
+
+
+NO NOSSO MODEL DE 'JobListing'...
+
+
+
+
+
+
+
+
+-> ATUALMENTE, ESSA CLASS/MODEL ESTÁ ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+    public function employer(): BelongsTo
+    {
+     return $this->belongsTo(Employer::class);
+    }
+
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, foreignPivotKey: 'job_listing_id'); // * second parameter is used to be more explicit about the pivot table foreign key column's name.
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--. COMO VC PODE VER, ESSA PROPERTY ESTÁ ASSIM:
+
+
+
+
+
+
+    protected $fillable = [
+        'title',
+        'salary',
+    ];
+
+
+
+
+
+
+
+
+
+
+
+-> TEMOS APENAS ESSES 2 FIELDS...
+
+
+
+
+
+
+
+-> 'title' e 'salary'...
+
+
+
+
+
+
+
+
+
+-> APENAS ESSES 2 FIELDS ESTÃO 
+
+
+COMO ''FIELDS THAT CAN BE MASS ASSIGNED''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONSERTAR ISSO,  PODERÍAMOS ESCREVER ASSIM:
+
+
+
+
+
+    protected $fillable = [
+        'title',
+        'salary',
+        'employer_id'
+    ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS É CLARO QUE ISSO É 'KIND OF ANNOYING'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MESMO ASSIM, REFRESHAMOS A PAGE,
+
+E ISSO FUNCIONA,
+
+
+FICAMOS COM O NOVO RECORD...
+
+
+
+
+
+
+
+
+
+--> MAS, MESMO COM O NOVO JOB SENDO ADICIONADO,
+
+    ELE NÃO APARECE DIRETAMENTE NA NOSSA PAGE...
+
+
+
+
+
+
+
+
+
+
+---> ISSO ACONTECE, NO CASO,
+DEVIDO à 'ORDERING' de nossos jobs...
+
+
+
+
+
+
+-> ELES ESTÃO ORDERED COMO 'ASC' na date,
+
+quando deveriam ser 'DESC'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> VAMOS ATÉ A ROUTE DE 'jobs',
+
+
+
+
+
+geral,
+
+
+
+e aí 
+
+
+
+
+ALTERAMOS O CÓDIGO DE '->simplePaginate(3)',
+
+
+para que 
+
+
+
+
+SEJA ORDEREDBY 'created_at',
+
+
+DESC...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, DEVEMOS USAR UM METHOD CHAMADO DE '->latest()',
+
+
+que é um METHOD QUE SEMPRE VAI NOS RETORNAR OS ELEMENTS MAIS 
+
+RECENTES da database, primeiro (usando 'created_at' como critério)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+    $jobsWithEmployers = JobListing::with('employer')->latest()->simplePaginate(3);
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO, POR TRÁS DAS CENAS,
+
+SIMPLESMENTE ADICIONA 
+
+
+UMA CLAUSE DE 'ORDER BY'
+
+NA SUA SQL QUERY...
+
+
+
+
+
+
+
+
+
+
+
+é basicamente 
+
+
+
+
+'ORDER BY created_at DESC;''
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO FUNCIONA...
+
+
+
+
+
+
+
+
+MAS SE VOLTAMOS AO NOSSO CÓDIGO,
+
+
+É MEIO ANNOYING QUE 
+
+
+
+
+'''EVERY TIME THAT 
+    I NEED TO ASSIGN A VALUE TO A NEW FIELD,
+    I NEED TO MAKE SURE THAT IT IS REPRESENTED 
+    IN THE '$fillable' property, in the model itself''
+
+
+
+    (
+
+        tipo isto:
+
+
+'''''''''
+
+
+    <?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class JobListing extends Model
+{
+    use HasFactory;
+
+    // * This represents 'ALL THE ATTRIBUTES THAT ARE ALLOWED TO BE MASS-ASSIGNED' (and only these attributes; attributes that are not specified here cannot be mass-assigned).
+    protected $fillable = [
+        'title',
+        'salary',
+        'employer_id'
+    ];
+
+
+
+
+'''''''''
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ADVERTE QUE 
+
+
+
+
+'''THIS IS SOMETHING 
+    THAT DEVELOPERS DISAGREE UPON''...
+
+
+
+
+
+
+
+
+--> O PROFESSOR TEM 1 VIEW DE QUE 
+
+
+'''AS LONG AS YOU AND ANYONE 
+    ON YOUR TEAM UNDERSTANDS THE POTENTIAL DANGERS,
+
+
+    IT IS OK TO DISABLE THIS FEATURE ENTIRELY''..
+
+
+
+
+
+
+
+---> o professor acha essa feature mais annoying do que helpful...
+
+
+
+
+
+
+
+
+
+
+
+--> MAS COMO PODEMOS DESABILITAR ESSA FEATUREW
+
+
+
+
+
+
+
+
+
+
+-> HÁ 2 MANEIRAS DE FAZER DISABLE DE ESSA FEATURE...
+
+
+
+
+
+
+
+1a MANEIRA) --> ''INSTEAD OF
+                SETTING THE '$fillable' property, 
+
+                WE CAN DO __ JUST THE OPPOSITE,
+
+                DEFINE 
+
+                THE '$guarded' property,
+
+
+                in which we will DEFINE WHAT PROPERTIES/FIELDS 
+                SHOULD NOT BE ALTERED...'''
+
+
+
+
+
+
+                --> E, SE DEIXAMOS ESSA PROPERTY COMO '[]',
+                um empty ARRAY,
+
+
+                BASICAMENTE ESTAMOS DIZENDO 
+
+                ''YOU DON'T NEED TO GUARD ANYTHING'''...
+
+
+                --> EM OUTRAS PALAVRAS, ISSO BASICAMENTE    
+                    DESABILITA A FEATURE INTEIRAMENTE...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class JobListing extends Model
+{
+    // protected $table = 'job_listings'; // * do this if you want to use a different table name (ex: model name is "Job", but table name is "job_listings")
+
+    use HasFactory;
+ 
+    // * Use this if you want to disable the protection against mass-assignment of the model's attributes.
+    protected $guarded = [];
+
+    public function employer(): BelongsTo
+    {
+     return $this->belongsTo(Employer::class);
+    }
+
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, foreignPivotKey: 'job_listing_id'); // * second parameter is used to be more explicit about the pivot table foreign key column's name.
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+com isso, desabilitamos essa feature, inteiramente...
+
+
+
+
+
+
+
+
+-> se vc quer 
+    desabilitar isso nos seus models eloquent, 
+
+    vc precisa adicionar essa property aí, com esse value....
+
+
+
+
+
+
+
+
+
+
+-> ALTERNATIVAMENTE,
+    VC PODE DEFINIR ESSE DISABLE 
+
+    NO SEU APP INTEIRO,
+
+
+
+    SE NAO QUISER TER DE DEFINIR ISSO MANUALMENTE EM CADA 
+
+    MODEL...
+
+
+
+
+
+
+
+
+
+
+
+ENTENDEMOS:
+
+
+
+
+
+1) COMO SUBMIT 1 FORM 
+
+2) O QUE É CSRF 
+
+3) ACCESS REQUEST ATTRIBUTES 
+
+4) $FILLABLE VS $GUARDED FIELDS option, nos seus models...
+
+
+
+
+
+
+
+
+
+
+NA PRÓXIMA AULA, VEREMOS 'REQUEST VALIDAITON'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK, MAS COMO PODEMOS DISABLE A FEATURE DE '$fillable'
+
+no nosso app inteiro?
+
+
+
+
+
+
+
+é assim:
+
+
+
+
+
+
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Model;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        Model::unguard(); // Disable mass assignment protection globally
+    }
+
+    public function register()
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+isso remove essa protection, basicamente...
+
+
+
+
+
+
+
+
+
+
+
+na próxima aula, veremos request validation...
