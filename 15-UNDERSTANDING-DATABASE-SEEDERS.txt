@@ -1,0 +1,1404 @@
+
+
+
+
+
+
+
+
+OK, HOJE FALAREMOS SOBRE 'DATABASE SEEDING'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+IMAGINE QUE VC PRECISE 
+
+
+
+''REFRESH YOUR DATABASE''..
+
+
+
+
+
+
+--> PARA ISSO,
+
+VC PODE RODAR 
+
+
+
+php artisan migrate:fresh 
+
+
+
+
+
+
+
+
+
+
+
+ISSO, É CLARO,
+
+
+VAI DROPPAR TODAS SUAS TABLES,
+
+E VAI 
+
+
+REBUILD THEM FROM SCRATCH...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... ENTRETANTO, AO FAZERMOS ISSO,
+
+É CLARO QUE PERDEMOS TODOS NOSSOS RECORDS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''WHAT WOULD WE HAVE TO DO, AT THIS POINT?''
+
+
+
+
+
+
+
+
+
+BEM, NÓS TERÍAMOS QUE 
+
+RE-RODAR 
+
+
+
+php artisan tinker (basicament o REPL),
+
+
+
+
+
+
+
+e então 
+
+rodar códigos de factory,
+para criar novos rows,
+
+tipo assim:
+
+
+
+
+
+
+
+
+ App\Models\JobListing::factory(300)->create();
+
+
+
+
+
+
+
+
+
+
+
+
+
+ TERÍAMOS QUE MANUALMENTE RODAR ESSES COMMANDS,
+ PARA BUILDAR ESSAS TABLES...
+
+
+
+
+
+
+
+
+
+
+ -> E TERÍAMOS DE FAZER ISSO PARA 
+
+ TODAS AS TABLES DE MEU APP...
+
+
+
+
+
+
+
+
+
+ --> IDEALMENTE,
+
+
+ EU RODARIA 
+
+ '''php artisan migrate:fresh --seed'''',
+
+
+
+ PARA AÍ 
+
+
+ JUSTAMENTE 
+
+
+
+
+
+ ''''SEED THE DATABASE''',
+
+
+ PARA POPULAR 
+
+ TODAS AS TABLES 
+
+ DA MANEIRA QUE QUISERMOS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+E, BEM, NÓS ACTUALLY PODEMOS FAZER ISSO,
+
+POR MEIO DA FEATURE DE DATABASE SEEDERS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DENTRO DO FOLDER DE DATABASE,
+
+
+
+TEMOS 1 NOVO FOLDER,
+
+
+'seeders',
+
+
+
+
+COM 1  EXEMPLO:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+-> com isso, ele dá o exemplo de 
+'create 10 user records',
+
+ou 
+
+'create a single user record'...
+
+
+
+
+
+
+
+-> ISSO É LEGAL,
+
+
+MAS ''HOW DO WE TRIGGER THIS'',
+
+
+
+quando executamos nossos commands?
+
+
+ 
+
+
+
+
+
+
+
+
+
+BEM, LÁ NO TERMINAL,
+
+
+DEVEMOS RODAR 
+
+
+
+php artisan db:seed 
+
+
+
+
+
+
+
+-> podemos visualizar mais info com 'php artisan'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> rodamos php artisan db:seed...
+
+
+
+
+
+
+
+
+
+
+e, então,
+
+com isso,
+
+
+FICAMOS COM 1 ERROR...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+  SQLSTATE[HY000]: General error: 1 table users has no column named name (Connection: sqlite, SQL: insert into "users" ("first_name", 
+"last_name", "email", "email_verified_at", "password", "remember_token", "name", "updated_at", "created_at") values (Bette, Reilly, test@example.com, 2024-09-27 05:06:17, $2y$12$0UcATp8KNMknAusIBXvDj.O0mjxvMu01x3HUhXSkChEHqHpDW9lAu, YuBwvjOtxy, Test User, 2024-09-27 05:06:17, 2024-09-27 05:06:17))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:825
+    821▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    822▕                 );
+    823▕             }
+    824▕
+  ➜ 825▕             throw new QueryException(
+    826▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    827▕             );
+    828▕         }
+    829▕     }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:565
+      PDOException::("SQLSTATE[HY000]: General error: 1 table users has no column named name")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:565
+      PDO::prepare("insert into "users" ("first_name", "last_name", "email", "email_verified_at", "password", "remember_token", "name", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?, ?, ?)") 
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-15> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ELE DIZ QUE A TABLE DE USERS NAO TEM COLUM ALGUMA CHAMADA DE 
+
+'name'...
+
+
+
+
+
+
+
+É O EXATO PROBLEMA QUE ENCONTRAMOS HÁ ALGUMAS LESSONS...
+
+
+
+
+
+
+
+
+-> PARA CONSERTAR ISSO,
+
+
+BASTA MUDAR O CÓDIGO DE CREATION,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+isso feito, testamos mais  vez....
+
+
+
+
+
+
+-> com isso, a database é seedada...
+
+
+
+
+
+
+
+-> dentro da table de users,
+ficamos com esse user aí...
+
+
+
+
+
+
+
+quer dizer que funcionou...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        // * You can execute this with php artisan db:seed OR php artisan db:seed --class=DatabaseSeeder
+        User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+        ]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ANTERIORMENTE,
+
+APRENDEMOS QUE 
+
+
+
+
+php artisan migrate:fresh 
+
+
+
+
+FAZ COM QUE 
+
+TODAS AS TABLES SEJAM DROPPADAS E COM QUE 
+
+TODAS AS MIGRATIONS SEJAM EXECUTADAS...
+
+
+
+
+
+
+
+
+
+MAS A DESVANTAGEM DESSE COMANDO É QUE NÓS PERDEMOS 
+
+TODA A 'SEEDED DATA'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS SE RODAMOS ISSO 
+
+
+
+COM 
+
+
+
+
+''''
+
+
+
+php artisan migrate:fresh --seed
+
+
+
+'''',
+
+
+
+
+
+
+
+NÓS BASICAMENTE COMUNICAMOS AO LARAVEL 
+
+
+
+
+''REFRESH THE DATABASE, AND THEN _ RUN php artisan db:seed''',
+
+
+
+
+
+
+MAS TUDO ISSO COMO PARTE DE 1 ÚNICO COMANDO...
+
+
+
+
+
+
+--> QUER DIZER QUE ELE VAI:
+
+
+
+
+
+1) DROP ALL THE TABLES 
+
+
+2) RUN ALL THE MIGRATIONS 
+
+
+
+3) THEN, SEED ALL THE TABLES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... ISSO QUER DIZER QUE, TALVEZ,
+
+QUANDO VC SEEDA SUA DATABASE,
+
+
+VC 
+
+VAI QUERER:
+
+
+
+1) A SINGLE USER 
+
+
+
+2) 200 JOBS...
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\JobListing;
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        // * You can execute this with php artisan db:seed OR php artisan db:seed --class=DatabaseSeeder
+        User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+        ]);
+
+        // * You can execute this with php artisan db:seed OR php artisan db:seed --class=DatabaseSeeder
+        JobListing::factory(200)->create();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo... mas se TENTAMOS RODAR ISSO 
+
+
+DIRETAMENTE,
+
+COM 
+
+'db:seed',
+
+FICAREMOS 
+
+COM 1 ERROR...
+
+
+
+
+
+
+
+
+
+
+
+-> MAS PQ ISSO FALHA?
+
+
+
+
+
+
+
+
+-> FALHA POR CONTA DE UMA UNIQUE CONSTRAINT,
+
+
+QUE É A DO 'EMAIL' (pq estamos tentando adicionar 
+
+
+1 ROW DE 'USER' COM 1 email que já existe na table )..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''THIS IS SOMETHING THAT YOU NEED TO HAVE IN MIND: ''
+
+
+''' 
+    IF YOU ARE GONNA RUN THAT db:seed command,
+
+    you will need to either:
+
+    1) CLEAR OUT ALL THE PREVIOUS RECORDS....
+
+
+
+    2) COMBINE THIS COMMAND WITH migrate:fresh '''
+
+
+
+
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+O PROFESSOR ENTÃO 
+
+
+RODA 
+
+
+
+php artisan migrate:fresh --seed 
+
+
+
+
+
+
+
+
+COM ISSO, EVITAMOS ESSE PROBLEMA...
+
+
+
+
+
+
+
+
+
+FICAMOS COM:
+
+
+
+
+1) UM ÚNICO USER 
+
+
+
+
+2) 300 RANDOM JOBS...
+
+
+
+
+
+
+
+-> A ÚLTIMA COISA QUE O PROFESSOR 
+
+    NOS MOSTRA É O COMANDO DE 
+
+
+
+    'php artisan make:seeder'...
+
+
+
+
+
+
+
+
+
+-> SE RODAMOS ISSO AÍ,
+
+
+    ELE VAI PEDIR 
+
+    UM NOME PARA O  novo SEEDER...
+
+
+
+
+
+
+--> ''in some situations, it might be 
+advantageous to __ SPLIT __ YOUR 
+
+SEEDERS UP''..
+
+
+
+
+
+
+
+
+
+-> OU SEJA, 1 SEEDER CLASS APENAS PARA SEUS USERS...
+
+
+-> OUTRA SEEDER CLASS, PARA SEUS JOBS...
+
+
+
+
+
+
+
+
+-> e, se vc separa seus seeders, vc ganha alguns benefícios:
+
+
+
+
+
+
+
+1) YOU ARE ABLE TO RUN THEM/TRIGGER THEM IN ISOLATION...
+
+
+
+
+
+2) YOU CAN EVEN ''CREATE DEDICATED SEEDER CLASSES 
+        FOR __ CONSTRUCTING SPECIFIC WORLDS, FOR SPECIFIC TESTS''...
+
+
+
+
+
+
+
+
+-> OU SEJA,
+
+    PODEM AJUDAR COM TESTS COMPLEXOS QUE VC 
+    PODE QUERER RODAR...
+
+
+
+
+
+
+
+
+--> E ISSO PODE SER BEM HELPFUL...
+
+
+
+
+
+
+
+
+-> O PROFESSOR CRIOU UM JOBSEEDER,
+
+
+TIPO ASSIM:
+
+
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-15> php artisan make:seeder
+
+  What should the seeder be named?
+❯ JobSeeder
+
+   INFO  Seeder [D:\AULAS-LARAVEL\curso-laravel\code\example-15\database\seeders\JobSeeder.php] created successfully.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class JobSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+MAS O PROFESSOR RECOMENDA QUE VC 'KEEP IT SIMPLE',
+
+DEIXE TUDO EM 
+
+1 FILE ÚNICA,
+
+INICIALMENTE...
+
+
+
+
+
+
+
+
+
+
+
+-> MAS ASSIM QUE SEU CÓDIGO CRESCER,
+
+
+
+SERÁ MELHOR VC SEPARAR SUAS SEEDER CLASSES,
+
+PARA DEIXAR AS COISAS MAIS ORGANIZADAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS DIGAMOS QUE VC DEIXOU LÓGICA DENTRO DO 
+
+'JobSeeder'...
+
+
+
+
+
+
+
+
+-> SE VC QUER CHAMAR ESSE SEEDER DE DENTRO 
+
+
+DO SEEDER GERAL (DatabaseSeeder),
+
+
+BASTARÁ VC CHAMAR ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\JobListing;
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        // * You can execute this with php artisan db:seed OR php artisan db:seed --class=DatabaseSeeder
+        User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+        ]);
+
+        // * You can execute this with php artisan db:seed OR php artisan db:seed --class=DatabaseSeeder
+        JobListing::factory(200)->create();
+
+
+        // * You can also call other seeders, from within this general seeder, like this:
+        $this->call(JobSeeder::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+ISSO BASICAMENTE NOS AJUDA 
+
+COM STRUCTURE,
+
+
+
+
+EM PROJECTS MAIORES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA TESTAR ISSO, BASTA RODAR 
+
+
+
+
+
+php artisan migrate:fresh --seed
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> com isso, nossas tables     
+
+    SÃO POPULADAS...
+
+
+
+
+
+
+
+
+
+
+
+--> POR FIM,
+
+
+    O PROFESSOR MOSTRA UMA OPTION,
+
+    QUE
+
+    É 
+
+    '--class'...
+
+
+
+
+
+
+
+
+
+ESSA OPTION 
+
+
+
+
+''SETS THE CLASS NAME OF THE ROOT SEEDER''...
+
+
+
+
+
+-> ISSO PODE SER USADO SE VC QUISER RODAR 
+
+APENAS 1 DE SEUS SEEDERS...
+
+
+
+
+
+
+
+
+
+POR EXEMPLO, SE VC QUER RODAR APENAS O JOBSEEDER,
+
+VC RODA ASSIM:
+
+
+
+
+php artisan db:seed --class=JobSeeder 
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, NOSSA FILE DE 'JobSeeder' será executada,
+
+e a file de 'DatabaseSeeder'
+
+será ignorada..
+
+
+
+
+
+
+
+
+
+
+COM ISSO, APRENDEMOS:
+
+
+
+
+
+
+
+1) THE DISTINCTION BETWEEN DATABASE FACTORIES 
+    AND SEEDERS...
+
+
+
+
+
+--> pode ser 1 pouco confusa 
+    a distinção entre os 2...
+
+
+
+
+
+FACTORIES ----> ARE HELPFUL FOR QUICKLY 
+                SCAFFOLDING DATA AND PREPARING TESTS...
+
+
+
+
+
+
+
+SEEDERS -> GIVE US ''CLASSES THAT CAN TRIGGER 
+                    ONE OR MORE FACTORIES, OR DATABASE 
+                    CALLS...''
+
+
+
+
+
+
+
+---> BASICAMENTE, SEEDERS SÃO WRAPPERS 
+    AO REDOR DE FACTORIES...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DESTACA QUE 
+
+''SEEDERS DON'T ACTUALLY HAVE 
+    TO TRIGGER FACTORIES... 
+
+    IT CAN USE ONLY THE DATABASE FACADE DIRECTLY,
+
+    REACH FOR ELOQUENT DIRECTLY...
+
+    BUT THEY ___ WILL _ USUALLY REACH OUT TO FACTORIES 
+    BECAUSE THEY ARE SO EASY TO PREPARE AND USE...'
+
+
+
+
+
+
+
+
+
+
+--> VAMOS USAR SEEDERS E FACTORIES EM CONJUNTO...
+
+
+
+
+
+--> NA PRÓXIMA AULA,
+
+
+DIA 16,
+
+
+
+VEREMOS FORMS...
