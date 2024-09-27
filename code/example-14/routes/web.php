@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Employer;
+use App\Models\Job;
 use App\Models\JobListing;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,11 @@ Route::get('/jobs', function () {
 
     // $jobsWithEmployers = JobListing::with('employer')->get(); // ! No pagination:
 
-    $jobsWithEmployers = JobListing::with('employer')->paginate(3); // * Pagination applied.
+    // $jobsWithEmployers = JobListing::with('employer')->paginate(3); // * Pagination applied. This is the simple/easy way of applying pagination (not good for tables with millions of rows, or 300+ pages).
+
+    $jobsWithEmployers = JobListing::with('employer')->simplePaginate(3); // * Pagination applied. This version should be used when you have a huge table with millions of rows, 300+ pages. With this, you get only 'previous' and 'next' buttons, and no clickable page numbers.
+
+    // $jobsWithEmployers = JobListing::with('employer')->cursorPaginate(3); // * Pagination applied. This is similar to the simplePaginate, but it uses cursors, which are faster than simplePaginate, but which lack the ability to let the user 'jump to page x', by altering the URL (which can be a deal breaker, for certain cases).
 
     return view('jobs', [
         'jobs' => $jobsWithEmployers

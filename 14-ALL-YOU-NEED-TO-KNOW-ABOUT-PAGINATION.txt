@@ -548,3 +548,1829 @@ TWEAKAR O PAGINATOR, MANUALMENTE....
 'php artisan vendor:publish' ...
 
 
+
+
+
+
+
+
+
+
+
+
+'vendor' --> REFERE-SE A 
+
+
+''ANY PACKAGE THAT WE PULL IN, BY USING COMPOSER...''
+
+
+
+
+'':publish'' --> ''MEANS THAT I WANT TO 
+                    PUBLISH ANY RELEVANT ASSETS/ROUTES/FILES/VIEWS 
+                    TO MY APPLICATION FOLDER,
+
+                    SO THAT I CAN MANUALLY CONTROL AND EDIT THEM...
+                    IT IS A VERY COMMON PRACTICE''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO É PQ QUEREMOS EDITAR O CÓDIGO DE ESSES PAGINATION LINKS,
+
+QUEREMOS CUSTOMIZAR ESSES STYLES, ESSAS VIEWSA...
+
+
+
+
+
+
+
+
+--> COMO ESSE CÓDIGO TODO ESTÁ DENTRO DE UMA DAS 'VENDOR PACKAGES',
+
+
+USAMOS 
+'php artisan vendor:publish' 
+
+
+PARA DEIXAR ESSES ARQUIVOS EXPOSTOS...
+
+
+
+
+
+
+
+
+-> NÓS EXECUTAMOS ISSO, E FICAMOS COM ESTE OUTPUT:
+
+
+
+
+
+
+ Which provider or tag's files would you like to publish?
+  All providers and tags ........................................ 0   
+  Provider: Barryvdh\Debugbar\ServiceProvider ................... 1   
+  Provider: Illuminate\Foundation\Providers\FoundationServiceProvider 
+ 2
+  Provider: Illuminate\Mail\MailServiceProvider ................. 3   
+  Provider: Illuminate\Notifications\NotificationServiceProvider  4   
+  Provider: Illuminate\Pagination\PaginationServiceProvider ..... 5   
+  Provider: Laravel\Sail\SailServiceProvider .................... 6   
+  Provider: Laravel\Tinker\TinkerServiceProvider ................ 7   
+  Tag: config ................................................... 8   
+  Tag: laravel-errors ........................................... 9   
+  Tag: laravel-mail ............................................ 10   
+  Tag: laravel-notifications ................................... 11   
+  Tag: laravel-pagination ...................................... 12   
+  Tag: sail .................................................... 13   
+  Tag: sail-bin ................................................ 14   
+  Tag: sail-database ........................................... 15   
+  Tag: sail-docker ............................................. 16   
+>
+
+
+
+
+
+
+
+
+
+
+
+SE VC NAÕ SABE 
+
+
+
+'''WHAT THE PROVIDER/TAG NAME IS'',
+
+
+
+basta vc procurar por oq voce quer...
+
+
+
+--> como nós queremos pagination,
+
+escrevemos 'pagination',
+
+e isso já nos mostra a tag desejada..
+
+
+
+
+ex:
+
+
+
+
+  Which provider or tag's files would you like to publish?
+  All providers and tags ........................................ 0   
+  Provider: Barryvdh\Debugbar\ServiceProvider ................... 1   
+  Provider: Illuminate\Foundation\Providers\FoundationServiceProvider 
+ 2
+  Provider: Illuminate\Mail\MailServiceProvider ................. 3   
+  Provider: Illuminate\Notifications\NotificationServiceProvider  4   
+  Provider: Illuminate\Pagination\PaginationServiceProvider ..... 5   
+  Provider: Laravel\Sail\SailServiceProvider .................... 6   
+  Provider: Laravel\Tinker\TinkerServiceProvider ................ 7   
+  Tag: config ................................................... 8   
+  Tag: laravel-errors ........................................... 9   
+  Tag: laravel-mail ............................................ 10   
+  Tag: laravel-notifications ................................... 11   
+  Tag: laravel-pagination ...................................... 12   
+  Tag: sail .................................................... 13   
+  Tag: sail-bin ................................................ 14   
+  Tag: sail-database ........................................... 15   
+  Tag: sail-docker ............................................. 16
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, TEMOS A TAG DE 'laravel-pagination',
+
+
+que é a 12...
+
+
+
+
+
+
+
+
+
+
+
+
+-> AÍ ELE DIZ ASSIM:
+
+
+
+
+
+❯ 12         
+
+   INFO  Publishing [laravel-pagination] assets.  
+
+  Copying directory [D:\AULAS-LARAVEL\curso-laravel\code\example-14\vendor\laravel\framework\src\Illuminate\Pagination\resources\views] to [D:\AULAS-LARAVEL\curso-laravel\code\example-14\resources\views\vendor\pagination]  DONE
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-14> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, ELE BASICAMENTE RODA 1 COMMAND DE COPY,
+
+PARA COPIAR 
+
+
+ESSE CÓDIGO 
+
+ATÉ 
+
+
+
+\resources\views\vendor\pagination
+
+
+
+
+
+
+
+
+
+
+
+e, realmente, ficamos com 1 folder de 'vendor',
+
+dentro de 'views',
+
+
+que aí terá 1 folder de 'pagination'...
+
+
+
+
+
+
+
+
+
+
+
+-> E, DENTRO DE ESSE FOLDER, FICAMOS COM VÁRIAS FILES DIFERENTES,
+
+TIPO ASSIM:
+
+
+
+bootstrap-4-blade.php
+bootstrap-5-blade.php
+default.blade.php 
+semantic-ui.blade.php 
+simple-bootstrap-4.blade.php
+simple-bootstrap-5.blade.php
+simple-default.blade.php 
+simple-tailwind.blade.php 
+tailwind.blade.php 
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO É ASSIM, É CLARO,
+
+PQ 
+
+
+'''LARAVEL SUPPORTS 
+   MANY DIFFERENT WAYS OF DISPLAYING YOUR 
+   PAGINATION LINKS, AS WELL AS MANY DIFFERENT 
+   CSS FRAMEWORKS (como BOOTSTRAP, SEMANTIC-UI, TAILWIND, etc...
+   )
+
+
+
+
+
+
+
+
+
+
+--> X BOOTSTRAP...
+
+
+
+
+
+
+-> BASICAMENTE, 
+    VC ESCOLHE SUA TOOL OF CHOICE,
+    E O LARAVEL DEVE SER SMART O SUFICIENTE PARA 
+
+    HANDLAR ESSES LINKS IN A REASONABLE WAY....
+
+
+
+
+
+
+
+
+-- POR EXEMPLO, IMAGINE QUE NÃO ESTAMOS USANDO TAILWIND PARA NOSSO PROJECT,
+E SIM ESTAMOS USANDO 
+BOOTSTRAP 5...
+
+
+
+
+
+
+
+
+--> se queremos trocar a DEFAULT VIEW, de 'tailwind' para 
+
+O BOOTSTRAP 5,
+
+
+
+''THIS REQUIRES CONFIGURING OUR APP''...
+
+
+
+
+
+
+
+
+
+
+-> E APRENDEMOS, ANTERIORMENTE, QUE UMA BOA MANEIRA DE 
+CONFIGURAR SEU APP É 
+
+ATRAVÉS 
+DO ARQUIVO DE 
+
+app>Providers>AppServiceProvider.php...
+
+
+
+
+
+
+
+
+
+-> DENTRO DESSE ARQUIVO, JÁ TÍNHAMOS UM METHOD CALL 
+
+PARA CONFIGURAR O PREVENT DE LAZY LOADING, COM ISTO:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+
+        // * Disables lazy loading entirely, as a safety measure:
+        Model::preventLazyLoading();
+    }
+}
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+    public function boot(): void
+    {
+
+        // * Disables lazy loading entirely, as a safety measure:
+        Model::preventLazyLoading();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+MAS, AGORA, O PROFESSOR QUER __ CONFIGURAR O PAGINATOR..
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE ELE CHAMA 
+
+'Paginator',
+
+
+
+
+
+
+
+
+E AÍ 
+
+
+
+
+
+
+ELE USA O METHOD DE '::defaultView()'',
+
+
+
+que é 
+
+
+
+JUSTAMENTE 
+
+
+
+'''USED FOR SETTING THE DEFAULT 
+    VIEW THAT SHOULD BE USED''...
+
+
+
+-> ficaria tipo assim:
+
+
+
+
+Paginator::defaultView('asdsdaasd');
+
+
+
+
+
+-> se vc quer TROCAR A DEFAULT VIEW,
+
+
+VC PODE USAR 
+
+
+ALGUM DOS METHODS DE 'useXXXX()',
+
+
+como:
+
+
+
+Paginator::useBootstrapFive();
+Paginator::useBootstrapFour();
+Paginator::useBootstrapThree();
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+
+        // * Disables lazy loading entirely, as a safety measure:
+        Model::preventLazyLoading();
+
+        // * Switch the type of view that is being used for the paginator:
+        Paginator::useBootstrapFive();
+    }
+
+
+
+
+
+
+
+
+
+COM ISSO, SE RECARREGARMOS A PAGE,
+
+FICAREMOS SEM STYLE ALGUM NO PAGINATOR.... ISSO É 
+
+PQ NÓS NÃO TEMOS NENHUM CDN DO BOOTSTRAP,
+
+NEM ARQUIVO ALGUM CSS DO BOOTSTRAP,
+
+DENTRO DE NOSSO PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS AINDA ASSIM, TEMOS ESSA OPTION,
+    SE NÃO VAMOS USAR TAILWIND NO NOSSO PROJETO...
+
+
+
+
+
+
+
+
+
+
+
+
+---> CERTO...
+
+
+
+
+
+
+
+
+E, SE O TAILWIND É O DEFAULT,
+
+
+ESTE É O CÓDIGO QUE ACABA SENDO DUMPADO NA 
+
+NOSSA VIEW,
+
+
+
+NORMALMENTE:
+
+
+
+
+
+
+
+
+
+
+@if ($paginator->hasPages())
+    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex items-center justify-between">
+        <div class="flex justify-between flex-1 sm:hidden">
+            @if ($paginator->onFirstPage())
+                <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md dark:text-gray-600 dark:bg-gray-800 dark:border-gray-600">
+                    {!! __('pagination.previous') !!}
+                </span>
+            @else
+                <a href="{{ $paginator->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
+                    {!! __('pagination.previous') !!}
+                </a>
+            @endif
+
+            @if ($paginator->hasMorePages())
+                <a href="{{ $paginator->nextPageUrl() }}" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
+                    {!! __('pagination.next') !!}
+                </a>
+            @else
+                <span class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md dark:text-gray-600 dark:bg-gray-800 dark:border-gray-600">
+                    {!! __('pagination.next') !!}
+                </span>
+            @endif
+        </div>
+
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700 leading-5 dark:text-gray-400">
+                    {!! __('Showing') !!}
+                    @if ($paginator->firstItem())
+                        <span class="font-medium">{{ $paginator->firstItem() }}</span>
+                        {!! __('to') !!}
+                        <span class="font-medium">{{ $paginator->lastItem() }}</span>
+                    @else
+                        {{ $paginator->count() }}
+                    @endif
+                    {!! __('of') !!}
+                    <span class="font-medium">{{ $paginator->total() }}</span>
+                    {!! __('results') !!}
+                </p>
+            </div>
+
+            <div>
+                <span class="relative z-0 inline-flex rtl:flex-row-reverse shadow-sm rounded-md">
+                    {{-- Previous Page Link --}}
+                    @if ($paginator->onFirstPage())
+                        <span aria-disabled="true" aria-label="{{ __('pagination.previous') }}">
+                            <span class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-l-md leading-5 dark:bg-gray-800 dark:border-gray-600" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </span>
+                    @else
+                        <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md leading-5 hover:text-gray-400 focus:z-10 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('pagination.previous') }}">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($elements as $element)
+                        {{-- "Three Dots" Separator --}}
+                        @if (is_string($element))
+                            <span aria-disabled="true">
+                                <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 cursor-default leading-5 dark:bg-gray-800 dark:border-gray-600">{{ $element }}</span>
+                            </span>
+                        @endif
+
+                        {{-- Array Of Links --}}
+                        @if (is_array($element))
+                            @foreach ($element as $page => $url)
+                                @if ($page == $paginator->currentPage())
+                                    <span aria-current="page">
+                                        <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 dark:bg-gray-800 dark:border-gray-600">{{ $page }}</span>
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-500 focus:z-10 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('Go to page :page', ['page' => $page]) }}">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($paginator->hasMorePages())
+                        <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md leading-5 hover:text-gray-400 focus:z-10 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('pagination.next') }}">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    @else
+                        <span aria-disabled="true" aria-label="{{ __('pagination.next') }}">
+                            <span class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-r-md leading-5 dark:bg-gray-800 dark:border-gray-600" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </span>
+                    @endif
+                </span>
+            </div>
+        </div>
+    </nav>
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E, EM OUTRAS PALAVRAS,
+
+
+ESSA É A FILE QUE DEVEMOS 'TWEAK',
+
+
+SE  
+
+QUEREMOS REALMENTE APLICAR ALGUMAS CHANGES 
+
+NO NOSSO PAGINATOR...
+
+
+
+
+
+
+
+
+
+
+
+--> COMO VC PODE VER,
+
+
+TEMOS UMA PARTE DE 'showing',
+
+
+
+que é aquele trecho que 
+
+faz aparecer 
+
+
+
+'Showing xx results of yy results''...
+
+
+
+
+
+
+
+-> SE QUEREMOS ALTERAR ISSO,
+
+
+
+FAZER APARECER 
+
+
+
+'Viewing xx results of yy results''...
+
+
+
+
+
+BASTA ALTERAR ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700 leading-5 dark:text-gray-400">
+                    {!! __('Viewing') !!}
+                    @if ($paginator->firstItem())
+                        <span class="font-medium">{{ $paginator->firstItem() }}</span>
+                        {!! __('to') !!}
+                        <span class="font-medium">{{ $paginator->lastItem() }}</span>
+                    @else
+                        {{ $paginator->count() }}
+                    @endif
+                    {!! __('of') !!}
+                    <span class="font-medium">{{ $paginator->total() }}</span>
+                    {!! __('results') !!}
+                </p>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ, DENTRO DE ESSE CÓDIGO,
+
+
+
+
+TEMOS VÁRIOS EXEMPLOS DA API DO PAGINATOR...
+
+
+
+
+
+POR EXEMPLO:
+
+
+
+
+
+
+            @if ($paginator->onFirstPage())
+                <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md dark:text-gray-600 dark:bg-gray-800 dark:border-gray-600">
+                    {!! __('pagination.previous') !!}
+                </span>
+            @else
+                <a href="{{ $paginator->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
+                    {!! __('pagination.previous') !!}
+                </a>
+            @endif
+
+
+
+
+
+
+
+
+
+''ARE WE ON THE FIRST PAGE? (boolean)''
+
+
+
+
+
+
+
+
+ se ESTAMOS NA PRIMEIRA PAGE,
+
+ O BUTTON DE 'BACK' NÃO DEVE SER MOSTRADO, POR ISSO ESSE CÓDIGO...
+
+
+
+
+
+
+
+
+
+
+
+ 
+ TEMOS TAMBÉM 
+
+ <a href="{{ $paginator->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
+
+
+
+
+
+
+
+ QUE FAZ O GET DA 'PREVIOUS PAGE URL'...
+
+
+
+
+
+
+
+
+
+
+
+
+ --> NA MAIOR PARTE DOS CASOS,
+    VC PODE 'KEEP THE DEFAULTS'...
+
+
+
+
+ 
+
+
+-> MAS SE VC PRECISA ALTERAR ALGO NESSE TEMPLATE,
+
+
+VC SEMPRE TEM A OPÇÃO, O QUE É BOM...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... AGORA, UMA COISA QUE 
+VC DEVE TER EM MENTE 
+
+
+
+
+
+É 
+
+
+
+''THERE IS A RELATIVELY SMALL (grande, na verdade)
+    _PERFORMANCE COST __ 
+    TO DISPLAY PAGINATION IN THIS WAY''...
+
+
+
+
+
+
+
+
+
+
+
+''imagine that you have
+    a FORUM with literally 
+
+    __ MILLIONS OF RECORDS''...
+
+
+
+
+
+
+
+
+
+
+-> IT CAN ACTUALLY BE RELATIVELY COSTLY 
+
+TO ''CALCULATE ALL THE PAGE NUMBERS, AND RENDER THEM'''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+->  NO NOSSO CASO ATUAL, É IRRELEVANTE, É SUPÉRFLUO...
+
+
+
+
+
+MAS EM 1 FÓRUM GIGANTE,
+ISSO É ALGO QUE VC DEVE TER EM MENTE...
+
+
+
+
+
+
+
+''IF YOU ARE DISPLAYING PAGE 392,
+
+YOU MIGHT FIND THAT YOUR SQL QUERY COULD 
+TAKE A BIT OF TIME''...
+
+
+
+
+
+
+
+
+
+---> PARA MELHORAR ESSA SITUAÇÃO,
+    VC TEM ALGUMAS OPTIONS:
+
+
+
+
+
+
+
+
+
+
+1) YOU COULD 'RENDER SIMPLE PAGINATION LINKS'
+
+
+
+(é o approach que veremos primeiro...)
+
+
+
+
+
+
+
+2) YOU COULD REACH FOR 'CURSOR-BASED PAGINATION'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI NOS MOSTRAR 'CURSOR-BASED PAGINATION',
+    para terminarmos esta aula...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SE VC QUER SEGUIR O PRIMEIRO APPROACH,
+
+
+VC NÃO DEVE USAR 'paginate(intValue)',
+
+
+
+E SIM 
+
+
+
+
+DEVE USAR O METHOD 'simplePaginate(intValue)',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/jobs', function () {
+
+    // $jobsWithEmployers = JobListing::with('employer')->get(); // ! No pagination:
+
+    // $jobsWithEmployers = JobListing::with('employer')->paginate(3); // * Pagination applied. This is the simple/easy way of applying pagination (not good for tables with millions of rows, or 300+ pages).
+
+    $jobsWithEmployers = JobListing::with('employer')->simplePaginate(3); // * Pagination applied. This version should be used when you have a huge table with millions of rows, 300+ pages.
+
+
+    return view('jobs', [
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, SE RECARREGAMOS A PAGE,
+
+TEMOS 1 RESULTADO 1 POUCO DIFERENTE...
+
+
+
+
+
+
+
+
+--> AGORA VC NÃO VERÁ MAIS O NÚMERO DE PAGES DISPONÍVEIS...
+
+
+
+
+
+
+
+-> COM ISSO, FICAREMOS 
+
+
+COM APENAS 
+
+
+
+
+OS BUTTONS DE 'PREV E NEXT',
+
+
+
+
+
+
+E NÃO FICAMOS COM BUTTONS MOSTRANDO 
+
+
+
+OS PAGE NUMBERS...
+
+
+
+
+
+
+
+
+(E, EM MUITOS CASOS, ISSO É FINE,
+VC NÃO VAI PRECISAR DISPLAY ESSES PAGE NUMBERS...)
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS, EM ALGUNS CASOS, O USER REALMENTE VAI QUERER 'JUMP FROM PAGE 
+2 TO PAGE 25'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, TEMOS 'CURSOR-BASED PAGINATION'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) CURSOR-BASED PAGINATION:
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESSA OPTION/APPROACH 
+
+ 
+
+ VEM COM UM CAVEAT/DESVANTAGEM...
+
+
+
+
+
+
+
+
+
+
+-> para ATIVAR O 'cursor-based pagination',
+
+
+
+DEVEMOS CHAMAR 
+
+
+'->cursorPaginate()'...
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+->cursorPaginate(3)
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR 
+
+
+APONTA QUE 
+
+
+''THIS WILL BE THE MOST PERFORMANT OPTION, NO DOUBT''....
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO, MAS EXISTIRÁ UM ___ COST__...
+
+
+
+
+
+
+
+
+
+
+
+--> O COST 
+
+
+
+
+É VISTO QUANDO VC COLOCA O MOUSE EM CIMA 
+
+
+DO BUTTON DE 'NEXT' OU 'PREVIOUS'...
+
+
+
+
+
+
+-> se examinamos a url,
+
+
+encontramos algo como 
+
+
+
+
+
+http://example-14.test/jobs?cursor=12ashdashdjh1j2hjbzxjkvbkjbas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> E ISSO É ALGO QUE VC DEVE TER EM MENTE:
+
+
+
+'''IF YOU CHOOSE CURSOR-BASED PAGINATION,
+    YOU WILL NO LONGER HAVE THE OPTION/ABILITY 
+    TO SAY 
+    ''GO TO PAGE 12, IN THAT RESULT LIST''' '''
+
+
+
+
+
+
+
+
+
+
+--> ou seja,
+aquela gambiarra de editar a url 
+
+
+
+para colocar 
+
+
+
+
+http://example-14.test/jobs?page=150,
+
+
+
+
+
+
+ESSA GAMBIARRA NÃO VAI FUNCIONAR,
+
+SE A PESSOA ESCOLHER PAGINATION POR MEIO DE 
+
+'cursor-based pagination'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VC TEM QUE DECIDIR...
+
+
+
+
+
+
+
+-> SE VC TEM 1 FÓRUM,
+
+ISSO PROVAVELMENTE É UM DEAL BRAKER...
+
+
+
+PQ VC VAI QUERER ACESSAR PAGES ESPECÍFICAS...
+
+
+
+
+
+
+
+
+
+
+'''BUT FOR SITUATIONS 
+WHERE 
+
+ACCESSING A DIRECT URL IS NOT AS IMPORTANT,
+
+OR INFINITE SCROLLING IS PRESENT,
+
+THIS WOULD BE A PERFECT SCENARIO, for cursor-based 
+pagination''...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA TERMINAR, O PROFESSOR 
+
+
+
+MOSTRA 
+
+
+
+COMO FICAM AS NOSSAS QUERIES, COM O PAGINATE...
+
+
+
+
+
+
+
+
+
+
+->ELAS FICAM TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+SELECT * FROM job_listings 
+LIMIT 4 OFFSET 0
+
+
+
+
+
+
+
+
+
+
+OU, ENTÃO:
+
+
+
+
+
+
+SELECT * FROM job_listings 
+LIMIT 4 OFFSET 4
+
+
+
+
+
+
+
+(isso seria a page 2)...
+
+
+
+
+
+
+
+
+
+
+
+ISSO É DIFERENTE DE '->get()',
+
+pq o get sempre faz o get DE 
+
+TODOS OS ROWS 
+
+DA TABLE 
+
+
+
+
+(tipo 'select * from job_listings')...
+
+
+
+
+
+
+
+
+
+
+O BOM É QUE O LARAVEL FAZ TUDO ISSO PARA NÓS,
+
+ESSES CÁLCULOS DE PAGINATION,
+
+AUTOMATICAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS SE TROCAMOS PARA 
+
+
+'cursor-based pagination',
+
+
+
+
+com 'cursorPaginate(3)',
+
+
+
+
+
+
+
+
+
+
+
+
+
+ficamos com um código como ESTE:
+
+
+
+
+
+
+
+
+
+SELECT * FROM 'job_listings'
+ORDER BY 'job_listings'.'id' ASC 
+LIMIT 4;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QUER DIZER QUE, COM 'CURSOR-BASED PAGINATION',
+
+
+NÃO TEMOS NENHUMA REFERENCE À CLAUSE DE 'OFFSET'...
+
+
+
+
+
+
+-> EM VEZ DISSO, ELE USA ESSES ENCODED VALUES,
+
+ESSES 'CURSOR',
+
+
+
+como 
+
+
+'' http://example-14.test/jobs?cursor=12ashdashdjh1j2hjbzxjkvbkjbas '',
+
+
+
+esse value de 
+
+
+
+
+12ashdashdjh1j2hjbzxjkvbkjbas
+
+
+
+
+
+
+
+
+
+
+
+
+ESSAS 'ENCODED STRINGS'
+
+
+
+REPRESENTAM 
+
+
+
+''THE STARTING POINT/LOCATION FOR THE NEXT 
+SET OF RESULTS THAT LARAVEL SHOULD FETCH FROM THE 
+job_listings table''...
+
+
+
+
+
+
+
+
+-> ESSE É O APPROACH MAIS PERFORMANT,
+E DEVE SER USADO QUANDO VC TEM DATA SETS 
+EXTREMAMENTE LARGOS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OUTRO EXAMPLE:
+
+
+
+
+''SAY YOU ARE BUILDING A TABLE TO DISPLAY 
+800.000 CUSTOMER RECORDS, FOR YOUR COMPANY...''
+
+
+
+
+
+''IN THOSE SITUATIONS, CURSOR-BASED PAGINATION 
+WOULD BE A GREAT CHOICE''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... APRENDEMOS SOBRE:
+
+
+
+
+
+
+
+1) paginate() 
+
+
+
+2) simplePaginate()
+
+
+3) cursorPaginate()
+
+
+
+
+
+4) rendering PAGINATION LINKS
+
+
+(
+
+    com 
+
+    ''
+        <div>
+        {{  $jobs->links() }}
+    </div>
+
+    ''
+)
+
+
+
+
+
+
+
+
+
+
+
+
+5) PUBLISHING PAGINATION VIEWS,
+
+    SO THAT YOU CAN EDIT THEM YOURSELF..
+
+
+
+
+
+6) CONFIGURE THE DEFAULT PAGINATION VIEW 
+    THAT YOU WANT LARAVEL TO REACH FOR...
+
+
+
+
+
+
+
+
+
+(THIS IS 95% OF WHAT YOU NEED TO KNOW)...
+
+
+
+
+
+
+
+
+
+
+-> SE VC ESTÁ CONFORTÁVEL, SIGA ATÉ A AULA 15...
