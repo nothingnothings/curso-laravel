@@ -1,0 +1,2683 @@
+
+
+
+
+
+
+
+
+
+
+-> OK... PARA O DIA 18,
+
+FOCAREMOS NO UPDATE, EDIT E DELETE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... SE CLICAMOS EM QUALQUER JOB LISTING,
+
+    DEVEMOS TER A OPTION,
+
+
+    MAIS EMBAIXO,
+
+
+
+    PARA 'EDIT A JOB'...
+
+
+
+
+
+
+
+
+
+
+
+--> FAREMOS ISSO AGORA...
+
+
+
+
+
+
+
+
+ 
+-> VAMOS ATÉ A VIEW DE 
+
+
+'show.blade.php',
+
+que é a view 
+
+
+responsável por cada individual job...
+
+
+
+
+
+
+
+
+
+
+
+NOSSO CÓDIGO, NO MOMENTO, ESTÁ ASSIM:
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h1 class="font-bold text-lg"><strong>{{ $job['title'] }}: Pays {{ $job['salary'] }} per year.</strong></h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+VAMOS MODIFICÁ-LO UM POUCO, PARA FICAR ASSIM:
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job['title'] }}
+    </h2>
+    <p>
+        This job pays {{ $job['salary'] }} per year.
+    </p>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO,
+
+
+O PROFESSOR ADICIONA OUTRA PARTE,
+
+
+UM P,
+
+
+
+EM QUE VAMOS COLOCAR O COMPONENT DE 'x-button',
+
+component custom criado por nós anteriormente,
+
+
+para 
+
+aí 
+
+
+
+fazer um link até uma page 
+
+
+
+QUE VAI EDITAR O CURRENT JOB....
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job['title'] }}
+    </h2>
+    <p>
+        This job pays {{ $job['salary'] }} per year.
+    </p>
+
+    <p class="mt-6">
+        <x-button href="/jobs/edit/{{ $job['id'] }}">Edit Job</x-button>
+    </p>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM UMA PAGE 
+
+
+
+
+
+COM 
+
+ALGO COMO ISTO:
+
+
+
+
+
+
+
+
+Numerical Control Machine Tool Operator
+This job pays 6942 per year.
+
+
+
+
+[ Edit Job ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... ATÉ AÍ, TUDO BEM...
+
+
+
+
+
+
+
+
+
+-> MAS PARA ONDE DEVEMOS SER DIRECIONADOS,
+QUANDO CLICARMOS NESSE LINK?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> BEM, LÁ NO ARQUIVO web.php,
+
+de routes,
+
+
+
+PODEMOS COMEÇAR A DOCUMENTAR NOSSAS ROUTES...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+/**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application, with pagination
+ */
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->latest()->simplePaginate(3);
+
+    return view('jobs.index', [ //
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', function () {
+
+    return view('jobs.create');
+});
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', function () {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+/**
+ * This is the route that will be used to show the about page
+ */
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+
+/**
+ * This is the route that will be used to show the contact page
+ */
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... O QUE FAREMOS, AGORA,
+
+
+É CRIAR UMA NOVA ROUTE, NA PARTE 
+
+DE BAIXO..
+
+
+
+
+
+
+
+
+
+--> no caso,
+
+a route será 
+
+
+
+
+
+
+/**
+ * This is the route that will be used to SHOW THE FORM to edit a single job
+ */
+Route::get('/jobs/{id}/edit', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SERÁ MOSTRADA 1 FORM, PARA EDITAR 1 JOB,
+
+COM ESSE ID ESPECÍFICO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... PARA ISSO,
+
+
+DEVEMOS 
+CRIAR A VIEW DE 'EDIT'...
+
+
+
+
+
+
+
+-> VAMOS CRIAR 1 VIEW PARECIDA COM A DE 'create.blade.php',
+
+
+
+MAS COM UMA ACTION DIFERENTE...
+
+
+
+
+
+
+
+
+
+--> SERÁ 'edit.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+-> E SEU TEMPLATE FICARÁ ASSIM, INICIALMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Edit Job: {{ $job['title'] }}
+    </x-slot:heading>
+    <form method="POST" action="/jobs/{{ $job['id'] }}/edit">
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                            @error('title')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year" required>
+                            </div>
+                            @error('salary')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, ESTAMOS FAZENDO O DISPLAY DO 'title' do job,
+
+logo no início:
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Edit Job: {{ $job['title'] }}
+    </x-slot:heading>
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO, PODEMOS REMOVER AQUELA SECTION DE INFO..
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR FALA DE 1 DETALHE, AQUI:
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job['title'] }}
+    </h2>
+    <p>
+        This job pays ${{ $job['salary'] }} per year.
+    </p>
+
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, AQUI ESTAMOS ACESSANDO 
+OS ATTRIBUTES DE 2 MANEIRAS DIFERENTES...
+
+
+
+
+
+
+AQUI:
+
+
+    {{ $job['title'] }} 
+
+
+
+
+
+    ESTAMOS ACESSANDO COMO ARRAY KEYS...
+
+
+
+
+
+
+
+JÁ AQUI:
+
+
+
+{{ $job->id }}
+
+
+
+
+
+
+
+ESTAMOS ACESSANDO COMO SE FOSSEM 'ARRAY KEYS'...
+
+
+
+
+
+
+
+
+
+--> CERTO... 
+
+
+
+MAS QUAL O PROBLEMA?
+
+
+
+
+
+
+''''ELOQUENT REALLY DOES NOT CARE 
+ABOUT HOW YOU ACCESS THOSE ATTRIBUTES...
+
+YOU CAN USE THEM AS ARRAY KEYS OR PROPERTIES,
+THEY ARE THE EXACT SAME THING...''''
+
+
+
+
+
+
+-> mas é claro que vc QUER SER CONSISTENTE...
+    E 
+
+
+    É POR ISSO QUE O PROFESSOR TROCA TODOS OS 
+
+    CALLS de 
+
+
+    ''  $job['title'] ''
+
+
+
+    por 
+
+    '$job->title' 
+
+
+    e 
+
+    '$job->salary'...
+
+
+
+
+
+
+
+-> PQ É ISSO AÍ QUE TIPICAMENTE ENCONTRAREMOS, EM PROJECTS LARAVEL...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job->id }}
+    </h2>
+    <p>
+        This job pays ${{ $job->id }} per year.
+    </p>
+
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+O ÚNICO CONTEXTO EM QUE '[]' é aceitável, para acessar esses attributes,
+
+é quando vc NÃO ESTÁ USANDO O ELOQUENT (pq é o eloquent que exige o uso de '->', para acessar attributes como se fossem properties em objects)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... CLICAMOS EM 'EDIT JOB',
+
+e aí 
+
+
+VISUALIZAMOS UMA PAGE 
+
+
+que nos deixará editar 1 job...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS É CLARO QUE OS INPUT FIELDS ESTÃO POPULADOS COM VALUES ERRADOS...
+
+
+
+
+
+
+
+
+
+
+-> PARA POPULÁ-LOs COM OS VALUES CORRETOS, PRECISAMOS INSERIR VALUES 
+
+DENTRO DO ATTRIBUTE 'value' deles..
+
+
+
+
+
+
+
+
+
+
+
+--> fazemos isso tipo assim:
+
+
+
+
+
+
+
+
+
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" value="{{ $job->title }}" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                            @error('title')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" value="{{ $job->salary }}" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year" required>
+                            </div>
+                            @error('salary')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+ <input type="text" value="{{ $job->title }}" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ CERTO....
+
+
+
+
+
+
+
+ AÍ TROCAMOS A CAPTION DO BUTTON,
+
+ PARA 'update'...
+
+
+
+
+
+
+ EX:
+
+
+
+
+
+
+
+  <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
+        </div>
+
+
+
+
+
+
+
+
+-> mas precisamos de alguma action para o button de 'cancel'...
+
+
+
+
+
+
+-> SERIA LEGAL FAZER COM QUE O USER RETORNE À PAGE DE JOBS...
+
+
+
+
+
+--> PARA ISSO, PODEMOS USAR UM ANCHOR TAG...
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ESCREVE TIPO ASSIM:
+
+
+
+
+
+
+
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <a href="/jobs/{{ $job->id }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
+        </div>
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+COM ISSO, ESSE BUTTON NOS LEVARÁ 
+DE VOLTA 
+
+
+à VIEW DE 'show.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... MAS, AGORA, VOLTAMOS AO TÓPICO DO 'UPDATE'...
+
+
+
+
+
+
+A QUE LUGAR ISSO DEVE NOS ENVIAR?
+
+
+
+
+
+
+
+
+
+
+
+-> VOLTAMOS AO 'web.php':
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+/**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application, with pagination
+ */
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->latest()->simplePaginate(3);
+
+    return view('jobs.index', [ //
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', function () {
+
+    return view('jobs.create');
+});
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', function () {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+/**
+ * This is the route that will be used to SHOW THE FORM to edit a single job
+ */
+Route::get('/jobs/{id}/edit', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.edit', [
+        'job' => $selectedJob,
+    ]);
+});
+
+/**
+ * This is the route that will be used to show the about page
+ */
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+
+/**
+ * This is the route that will be used to show the contact page
+ */
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR FALA SOBRE GET E POST REQUESTS...
+
+
+
+
+
+
+
+
+
+
+
+
+--> POST -> COMUM PARA SUBMITTAR FORMS, QUE PODEM ARMAZENAR DATA NA DATABASE...
+
+
+
+
+
+
+
+
+
+--> GET E POST 
+    SÃO ACTUALLY OS ÚNICOS REQUEST TYPES 
+
+    SUPORTADOS PELOS BROWSERS...
+
+
+
+
+
+
+
+-> MAS A MAIOR PARTE DOS 
+    FRAMEWORKS SUPORTAM MAIS 2 TIPOS DE REQUESTS,
+
+    QUE SÃO 
+
+    'PATCH' E 'DELETE'...
+
+
+
+
+
+
+
+--> PATCH --> ''A SET OF INSTRUCTIONS FOR __ HOW TO MODIFY A RESOURCE''...
+
+                ELE BASICAMENTE FAZ O UPDATE DE 1 RESOURCE...
+
+
+
+
+
+
+--> DELETE --> DESTRÓI 1 RESOURCE...
+
+
+
+
+
+
+
+
+
+--> USAREMOS PATCH, PROVAVELMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA A ROUTE DE PATCH, O PROFESSOR DEIXA ASSIM:
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.edit', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... mas agora precisamos MUDAR O 'METHOD'
+
+
+lá do frontend, para 'PATCH'...
+
+
+
+
+
+
+-> O PROFESSOR TAMBÉM DEIXA 1 ROUTE PARA DELETE,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+});
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{id}/', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.edit', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+não há sentido em adicionar '/delete' ao final de nossa route,
+
+pq 
+
+a ação de delete já fica EXPLÍCITA no request em si...
+
+
+
+
+
+
+
+
+
+
+-> queremos deixar nossas uri bem simples...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS O QUE PRECISA ACONTECER, PARA QUE 1 JOB SEJA UPDATADO?
+
+
+
+1) RECEIVE THE REQUEST 
+
+
+2) VALIDATE THE REQUEST  (never trust the user, always validate in the backend)
+
+
+
+3) AUTHORIZE THE REQUEST 
+
+
+
+    AUTHORIZE É MEIO DIFERENTE... -> É BASICAMENTE CHECAR 
+
+                                    ''DO YOU, JOHN, HAVE THE 
+                                    PERMISSION TO UPDATE THIS JOB??'''
+
+
+
+                                    ----> SE A RESPOSTA É SIM,
+                                          NÓS permitimos o update daquele job...
+
+                                    
+
+                                    -> MAS SE FOI O FRANK QUE CRIOU O JOB,
+                                        NÃO DEIXAMOS O JOHN UPDATAR O JOB..
+
+
+
+
+-> MAS VEREMOS ISSO DE AUTHORIZE MAIS TARDE, QUANDO ESTUDARMOS 1 POUCO 
+    MAIS SOBRE AUTHENTICATION DO LARAVEL...
+
+
+
+
+
+
+
+
+FICA TIPO ASSIM:
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    // validate
+    // authorize
+    // update the job
+    // persist the job
+    // redirect to the job's specific page
+
+
+    $selectedJob = JobListing::find($id);
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+-> O ESQUELETO DO NEGÓCIO FICA TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    // validate
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    // authorize // TODO
+    // update the job
+    $job = JobListing::find($id);
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+    // persist the job
+    $job->save();
+    // redirect to the job's specific page
+    return redirect()->route('jobs.show', [
+        'id' => $id
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR 
+
+FALA SOBRE UM OUTRO DETALHE:
+
+
+
+
+
+''''YOU DONT NEED TO ACTUALLY FETCH 
+THESE JOBS MANUALLY...
+
+YOU CAN LET THE FRAMEWORK DO THAT _ FOR _YOU...''
+
+
+
+
+
+
+
+
+
+
+--> SE VC QUER IMPLEMENTAR ISSO AÍ,
+
+    ESSE FETCH AUTOMÁTICO DE COISAS COMO 'JOBS' 
+
+    OU 'USERS',
+
+
+    vc 
+
+
+    DEVE PESQUISAR 
+
+
+    por 
+
+    'Route Model Binding' 
+
+    (é a mesma coisa vista no OUTRO CURSO,
+    
+    do programwithgio, em que 
+    IMPLEMENTEI ISSO MANUALMENTE, MAS EM 1 
+    PROJETO DE SLIM PHP, com middlewares...
+    
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... AGORA QUE O JOB FOI ENCONTRADO,
+
+PODEMOS UPDATAR ESSE RECORD DE 2 MANEIRAS...
+
+
+
+
+
+
+
+
+
+1a MANEIRA) --> FAZEMOS O UPDATE DE CADA UMA DAS PROPERTIES,
+                MANUALMENTE, TIPO ASSIM:
+
+
+
+            
+    $job = JobListing::find($id);
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+
+
+
+    --> FINALMENTE, FAZEMOS SAVE DO RECORD, NA DATABASE:
+
+
+
+    $job->save();
+
+
+
+
+
+
+
+--> E ESSE APPROACH É FINE, VC VAI FREQUENTEMENTE UTILIZÁ-LO...
+
+
+
+
+
+
+
+
+2a MANEIRA) --> VOCÊ VAI SE APROVEITAR 
+                DO METHOD  DE 
+
+
+                '$job->update([])'...
+
+
+
+
+
+
+
+
+--> É BEM SIMILAR AO METHOD DE 'create()'...
+
+
+
+
+
+
+
+--> VC BASICAMENTE PASSA 1 ASSOC ARRAY 
+
+COM AS PROPERTIES QUE VC QUER ATUALIZAR,
+
+TIPO ASSIM:
+
+
+
+
+
+            $job->update(
+                [
+                    'title' => request('title'),
+                    'salary' => request('salary')
+                ]
+            )
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    // validate
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    // authorize // TODO
+    // update the job
+    $job = JobListing::find($id);
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+    // * Alternative way of updating the fields on the record:
+    // $job->update(
+    //     [
+    //         'title' => request('title'),
+    //         'salary' => request('salary')
+    //     ]
+    //     );
+
+    // persist the job
+    $job->save();
+
+
+    // redirect to the job's specific page
+    return redirect()->route('jobs.show', [
+        'id' => $id
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+ENTRETANTO, AQUI,
+
+
+
+VC TAMBÉM DEVE LEVAR EM CONSIDERAÇÃO A POSSIBILIDADE DE 
+
+
+
+''THE JOB ID DOES NOT EXIST IN THE DATABASE''...
+
+
+
+
+
+
+
+
+--> CASO O JOB NÃO EXISTA NA DATABASE (um id inexistente),
+
+
+        o $job VAI RETORNAR 'null'...
+
+
+
+
+
+
+    -. SE ISSO RETORNAR NULL,
+
+    VAI CAUSAR ERRORS...
+
+
+
+
+
+--> É POR ISSO QUE PRECISAMOS ADICIONAR UM IF CHECK,
+
+
+como 
+
+'if (!$job) {
+
+}',
+
+
+
+E AÍ HANDLAR ESSE ERROR....
+
+
+
+
+
+
+
+
+
+
+
+-> ALTERNATIVAMENTE,
+    PODEMOS USAR 
+
+
+    O METHOD 
+
+
+    'findOrFail()'...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+$job = Job::findOrFail($id);
+
+
+
+
+
+
+
+''THIS METHOD TRIES TO FIND A JOB WITH THE MATCHING ID...
+    IF YOU CANNOT FIND IT, THROW AN EXCEPTION,
+
+    A 'MODEL NOT FOUND EXCEPTION''....
+
+
+
+
+    ''THIS EXCEPTION WILL BUBBLE UP,
+    AND LARAVEL WILL CONVERT IT INTO THE APPROPRIATE RESPONSE''..
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    // validate
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    // authorize // TODO
+    // update the job
+    $job = JobListing::findOrFail($id); // * this will throw an exception if the job doesn't exist
+
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+    // persist the job
+    $job->save();
+
+
+    // redirect to the job's specific page
+    return redirect()->route('jobs.show', [
+        'id' => $id
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+OK.. 
+
+
+
+
+
+FINALMENTE, REDIRECIONAMOS O USER à PAGE 
+
+
+de 
+
+'/jobs/ . $job->id '
+
+
+
+
+
+
+
+
+
+
+
+eX:
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    // validate
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    // authorize // TODO
+    // update the job
+    $job = JobListing::findOrFail($id); // * this will throw an exception if the job doesn't exist
+
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+    // * Alternative way of updating the fields on the record:
+    // $job->update(
+    //     [
+    //         'title' => request('title'),
+    //         'salary' => request('salary')
+    //     ]
+    //     );
+
+    // persist the job
+    $job->save();
+
+    // redirect to the job's specific page
+    return redirect('/jobs/' . $job->id);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA VAMOS HANDLAR O DELETE...
+
+
+
+
+
+
+
+
+
+
+
+-> os steps serão:
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{id}/', function ($id) {
+    // authorize // TODO
+    // delete the job
+    // redirect
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMEÇAMOS COM O 'Job::findOrFail()',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{id}/', function ($id) {
+    // authorize // TODO
+
+    // delete the job
+    $job = JobListing::findOrFail($id);
+    $job->delete();
+
+    // redirect
+    return redirect('/jobs');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO FUNCIONARÁ...
+
+
+
+
+
+
+
+
+
+
+
+--> SE VC QUER SIMPLIFICAR AS COISAS MAIS AINDA,
+
+VC PODE RODAR ASSIM:
+
+
+
+
+   JobListing::findOrFail($id)->delete();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO TEMPLATE DE 'edit.blade.php',
+
+
+
+O PROFESSOR EDITA O FORM TAG,
+
+E DEIXA ASSIM:
+
+
+
+
+
+    <form method="PATCH" action="/jobs/{{ $job->id }}">
+
+
+
+
+
+
+
+
+
+
+
+
+--> SE DEIXAMOS 'PATCH',
+
+
+ficamos com problemas no IDE....
+
+
+
+
+
+
+
+--> ISSO É PQ 
+
+
+''THE BROWSER DOES NOT UNDERSTAND THIS VALUE...
+
+BUT THE FRAMEWORK DOES/WILL'''...
+
+
+(pq o browser apenas COMPREENDE 'GET' e 'POST' )
+
+
+
+
+
+
+
+
+
+--> PARA FAZER COM QUE 
+    SEJA ENVIADO 1 REQUEST 
+
+    DE TIPO 'PATCH',
+
+    em vez de 'POST',
+
+
+
+
+    devemos:
+
+
+
+1) DEIXAR O attribute de 'method' como 'POST'...
+
+
+
+2) USAR a BLADE DIRECTIVE '@method()',
+
+
+    e deixar como 
+
+    '@method('PATCH)'...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Edit Job: {{ $job->title }}
+    </x-slot:heading>
+    <form method="POST" action="/jobs/{{ $job->id }}/edit">
+        @method('PATCH')
+        @csrf
+
+
+
+
+
+
+
+
+
+
+
+
+É ASSIM, PORTANTO,
+
+
+
+
+QUE CONSEGUIMOS SINALIZAR AO LARAVEL 
+
+
+
+''we made a POST request because we HAD TO,
+but we ACTUALLY WANT TO SEND __ A PATCH_ REQUEST, and 
+not a POST REQUEST...''
+
+
+
+
+
+
+--> ESSA DIRECTIVE VAI BASICAMENTE SER 'EXPANDED' 
+
+A UM INPUT DE TYPE HIDDEN 
+
+que vai ser actually lido 
+
+pelo laravel,
+
+que 
+
+vai handlar esse request 
+
+
+como um PATCH request, apropriadamente...
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, NOSSA ROUTE VAI FUNCIONAR...
+
+
+
+
+
+
+
+--> OK... FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> A ÚLTIMA ETAPA QUE RESTA É 
+
+
+'ADD A BUTTON TO DELETE THE JOB'...
+
+
+
+
+
+--> O PROFESSOR VAI ADICIONAR 1 BUTTON DE DELETE NO TEMPLATE,
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+        <div class="mt-6 flex items-center justify-between gap-x-6">
+            <div class="flex items-center">
+                <button class="text-sm text-red-500 font-bold leading-6 text-gray-900">Delete</button>
+            </div>
+            <div class="flex items-center gap-x-6">
+                <a href="/jobs/{{ $job->id }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                <div>
+                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS AQUI, FICAMOS COM 1 PROBLEMA...
+
+
+
+ESSE BUTTON DEVE EXISTIR EM 1 FORM PRÓPRIA,
+
+
+
+DE DELETE...
+
+
+
+
+
+
+
+
+--> VC NAO PODE COLOCAR 1 FORM DENTRO DE OUTRA FORM...
+
+
+
+
+
+
+
+
+
+
+-> TEREMOS QUE SER 1 POUCO TRICKY....
+
+
+
+
+
+--> PARA HANDLAR ISSO, O PROFESSOR CRIA UMA OUTRA FORM,
+
+PARA O DELETE...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+    <form method="POST" action="/jobs/{{ $job->id }}" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS NÃO VAMOS COLOCAR O BUTTON DE DELETE DENTRO DE ESSA FORM..
+
+
+
+
+
+
+
+
+EM VEZ DISSO,
+
+
+PODEMOS ADICIONAR 1 ATTRIBUTE 'form' 
+
+LÁ NO BUTTON EM SI,
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+                <button form="" class="text-sm text-red-500 font-bold leading-6 text-gray-900">Delete</button>
+
+
+
+
+
+
+
+
+
+
+MAS PRECISAMOS COLOCAR 1 VALUE NESSE ATTRIBUTE DE 'form'...
+
+
+
+
+
+
+-> O VALUE QUE COLOCAREMOS SERÁ 'delete-form'...
+
+    --> para VINCULAR ESSE BUTTON ÀQUELA FORM DE DELETE,
+    MAIS ABAIXO,
+
+
+    DEVEMOS COLOCAR UM attribute 'id' de 'delete-form'
+
+    NAQUELA FORM...
+
+
+
+
+
+    NO FINAL, AS 2 COISAS FICAM ASSIM:
+
+
+
+
+
+
+
+
+
+
+        <div class="mt-6 flex items-center justify-between gap-x-6">
+            <div class="flex items-center">
+                <button form="delete-form" class="text-sm text-red-500 font-bold leading-6 text-gray-900">Delete</button>
+            </div>
+            <div class="flex items-center gap-x-6">
+                <a href="/jobs/{{ $job->id }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                <div>
+                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form id="delete-form" method="POST" action="/jobs/{{ $job->id }}" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> EU NÃO SABIA QUE ESSE ATTRIBUTE DE 'form' existia...
+
+
+
+
+
+
+
+
+
+--> '' IF YOU DONT HAVE THAT ATTRIBUTE,
+    IT IS SET TO THE __ CLOSEST__ PARENT FORM TO THAT 
+    BUTTON (a parent form, no caso)''..
+
+
+    ''BUT, YEAH, IN SITUATIONS LIKE THIS,
+    WHERE YOU __ WANT__ ANOTHER _ FORM __ TO HANDLE THAT 
+    BUTTON,  YOU CAN SPECIFY ITS VALUE EXPLICITLY''
+
+
+    (e é isso que fizemos aqui,
+    
+    settando o value do attribute 'form' manualmente)
+
+
+
+
+
+
+
+CERTO...
+ 
+
+ E O LARAVEL VAI RECEBER ESSA DATA,
+
+
+
+ TRATAR COMO 1 DELETE REQUEST,
+
+
+ E AÍ VAI DELETAR O JOB, E REDIRECIONAR PARA A PAGE DE JOBS,
+
+
+
+
+
+DE UM JEITO BEM NORMAL...
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+
+-> MAS AINDA NÃO TEMOS AUTHORIZATION ALGUMA...
+
+
+
+
+
+'''ANYONE CAN DELETE THESE JOBS... THIS IS USUALLY NOT FINE''...
+
+
+
+
+
+
+
+
+
+-> VEREMOS ESSA PARTE QUANDO ESTUDARMOS A PARTE DE AUTHORIZATION/AUTHENTICATION..
+
+
+
+
+
+
+
+
+
+OK... ACABAMOS...
+
+
+
+
+
+
+
+
+
+
+TERMINAMOS O ROUNDTRIP PARA 1 RESOURCE:
+
+
+
+1) CREATE A JOB 
+
+2) VIEW A JOB 
+
+3) DELETE 
+
+4) EDIT...
+
+
+
+
+
+
+--> THIS IS CRUD...
+
+
+
+
+
+
+
+NO PRÓXIMO EPISODIO,
+
+
+FAREMOS REFACTORING E VEREMOS OUTROS CONCEPTS...
+
+
+
+TAMBÉM DEDICATED CONTROLLER CLASSES..
