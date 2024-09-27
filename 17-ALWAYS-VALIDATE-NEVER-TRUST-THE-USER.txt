@@ -1,0 +1,1763 @@
+
+
+
+
+
+
+
+
+
+
+
+OK... NESSE EPISODE, FALAREMOS SOBRE VALIDATION...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SERÁ RELATIVAMENTE FÁCIL...
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR FALA SOBRE O SITE DE JOBS....
+
+
+
+
+
+
+
+
+
+-> ATUALMENTE,
+NÃO TEMOS LINK ALGUM PARA 'CREATE A JOB''..
+
+
+
+
+
+
+
+
+
+
+
+-> QUER DIZER QUE, ATUALMENTE, TEMOS QUE DIGITAR A URL MANUALMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA RESOLVER ISSO,
+    O PROFESSOR ADICIONA MAIS 1 LINK NO HEADER,
+
+
+
+    QUEREMOS 
+
+
+
+
+    1 BUTTON DE 'CREATE A JOB' 
+
+    EM TODAS NOSSAS PAGES...
+
+
+
+
+
+
+
+
+
+
+    É POR ISSO QUE, EM 'layout.blade.php',
+
+
+
+    ADICIONAMOS UM LINK DE 'CREATE A JOB'..
+
+
+
+
+
+
+--> TIPO ASSIm:
+
+
+
+
+
+
+
+
+
+
+
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 sm:flex sm:justify-between">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $heading }}</h1>
+                <a href="/jobs/create" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">Create a Job</a>
+            </div>
+        </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TAILWIND ---> MTAS CLASSES...
+
+
+
+
+
+
+
+
+-> O TAILWIND ''ASSUMES'' QUE VC VAI EXTRAIR TODAS ESSAS CLASSES 
+
+EM REUSABLE TAILWIND COMPONENTS/CLASSES... devemos ter isso em mente...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ok, mas o que interessa é que ficamos com esse button aí..
+
+
+
+
+
+
+
+
+
+--> PARA EXTRAIR O STYLE DE ESSE COMPONENT RAPIDAMENTE,
+
+O PROFESSOR CRIA 1 FILE DENTRO DE COMPONENTS,
+
+E AÍ CHAMA DE 
+
+'button.blade.php'...
+
+
+
+
+
+
+
+-> AÍ O PROFESSOR 
+
+COMEÇA COM ESTE CÓDIGO:
+
+
+
+
+
+
+                <a href="/jobs/create" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">Create a Job</a>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ AÍ ELE FALA 
+
+
+ '' I DON'T WANT THE ANCHOR TAG THAT IS BEING PASSED IN,
+ BUT I WANT A DEFAULT SET OF CSS CLASSES, THOSE CLASSES''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -> para isso, o professor escreve 
+
+
+ {{ $attributes->merge(['class' => 'your-css-classes'])}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ TIPO ASSIM:
+
+
+
+
+
+
+
+
+<a {{ $attributes->merge(['class' => 'inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300']) }}>{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+com isso, ficamos com esse component,
+
+'button.blade.php'...
+
+
+
+
+
+
+
+
+
+-> PARA USARMOS ESSE COMPONENT LÁ EM 'layout.blade.php',
+
+
+BASTA ESCREVER ASSIM:
+
+
+
+
+
+
+
+           {{-- <a href="/jobs/create" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">Create a Job</a> --}}
+                <x-button href="/jobs/create">Create a Job</x-button>
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, CONSEGUIMOS SIMPLIFICAR UM __ MONTE__ O NOSSO CÓDIGO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO FEITO, PODEMOS FOCAR NOVAMENTE NA VALIDATION...
+
+
+
+
+
+
+
+
+
+
+
+
+--> LEMBRE-SE DO ARQUIVO 'web.php':
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+    $requestData = request()->all();
+
+    // * Assuming that everything is valid, we will create a new JobListing entry in the database:
+
+    JobListing::create([
+        'title' => $requestData['title'],
+        'salary' => $requestData['salary'],
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+nós ainda não tínhamos adicionado validation,
+estamos 'assuming' que tudo vai dar certo...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> POR EXEMPLO:
+
+
+
+
+
+''ONE OF OUR RESTRICTIONS IS THAT TITLE CANNOT BE NULL, IN THE DATABASE''...
+
+
+
+
+
+
+
+
+
+
+--> PRECISAMOS SEGUIR 2 STEPS, PARA RESOLVER ESSE PROBLEMA...
+
+
+
+
+
+
+--> E UMA STEP VAI LEVAR A OUTRA... (provavelmente é validation no FRONTEND, e no BACKEND, com o laravel)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1a STEP)  CLIENTSIDE VALIDATION...
+
+
+
+
+
+
+
+
+
+-> FELIZMENTE, BROWSERS 
+    JÁ DEIXAM 1 VALIDATION BÁSICA  BEM FÁCIL DE SER 
+    ADICIONADA...
+
+
+
+
+
+
+
+
+-> LÁ NA NOSSA VIEW DE 'create.blade.php',
+
+
+
+NOSSOS INPUTS ESTÃO ASSIM:
+
+
+
+
+
+
+    <form method="POST" action="/jobs">
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... SE QUISERMOS ADICIONAR A VALIDATION MAIS BÁSICA POSSÍVEL,
+
+BASTA 
+
+ADICIONAR 'required'
+
+
+aos input fields,
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+
+    <form method="POST" action="/jobs">
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO VAI ADICIONAR 1 POUCO DE BROWSER-BASED VALIDATION...
+
+
+
+
+
+
+
+
+
+-> ISSO É HELPFUL...
+
+
+
+
+
+
+--> PRECISAMOS ADICIONAR VALIDATION 
+    NO SERVERSIDE...
+
+
+
+
+
+
+
+
+
+--> NUNCA DEVEMOS 'ASSUME' O BROWSERSIDE VALIDATION...
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR REMOVE ESSE ATTRIBUTE DE 'required' temporariamente...
+
+
+
+
+
+
+
+
+-> ELE ENTÃO NOS MOSTRA A VALIDATION NO SERVERSIDE...
+
+
+
+
+
+
+
+
+
+
+
+--> PARA REALIZAR A VALIDATION DO SEU REQUEST,
+
+COM O LARAVEL,
+
+
+BASTA RODAR 
+
+
+
+'request()->validate([])' 
+
+
+
+
+
+
+
+
+
+
+
+-> DENTRO DE 'validate()',
+
+DEVEMOS 
+
+
+
+
+'''PROVIDE AN ARRAY 
+    OF ATTRIBUTES THAT WILL NEED VALIDATION''...
+
+
+
+
+
+
+-> POR EXEMPLO,
+    colocamos 'title',
+
+    'salary'....
+
+
+
+
+    EX:
+
+
+
+
+
+
+
+
+Route::post('/jobs', function () {
+
+
+    // * Here is how you validate the fields of the request:
+
+    request()->validate(
+        [
+            'title' => 'required|string|max:255',
+            'salary' => 'required|numeric|min:10000'
+        ],
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, 
+
+
+podemos adicionar esses critérios de validation...
+
+
+
+
+
+
+
+
+
+
+
+''I CAN PROVIDE ONE OR MORE VALIDATION RULES...'''
+
+
+
+
+
+
+
+RULES:
+
+
+
+'' WHAT IS THE MIN LENGTH 
+
+''SHOULD IT BE A STRING'' 
+
+
+
+''IS IT REQUIRED''
+
+
+
+''IS IT AN IMAGE?''
+
+
+
+
+
+
+
+-> HÁ DEZENAS DE VALIDATION RULES...
+
+
+
+
+
+
+
+
+
+
+-> QUANDO PRECISAMOS DE RULES MAIS EXÓTICAS,
+ELAS ESTARÃO DISPONÍVEIS...
+
+
+
+
+
+
+
+
+-> OS 2 SÃO REQUIRED, title e salary...
+
+
+
+
+
+
+
+
+
+MAS O PROFESSOR ESCREVEU ASSIM:
+
+
+
+
+
+    request()->validate(
+        [
+            'title' => ['required', 'min:3'],
+            'salary' => ['required']
+        ],
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK.. MAS AQUI VEM A PARTE LEGAL DA VALIDATION:
+
+
+
+''''WHAT HAPPENS IF THE VALIDATION FAILS??
+
+    DO YOU NEED TO CHECK THE RESULTS AND THEN REDIRECT MANUALLY???'''
+
+
+
+
+
+
+
+
+
+-> A RESPOSTA É NÃO:
+    
+
+    O LARAVEL TOMA CONTA DE TUDO ISSO PARA NÓS,
+    AUTOMATICAMENTE...
+
+
+
+
+'''IF THIS VALIDATION FAILS,
+    IT WILL __ __ REDIRECT__ BACK TO THE PREVIOUS FORM,
+    _ AND THEN WILL SEND THROUGH AN '$errors' VARIABLE,
+    WHICH WILL BE POPULATED WITH ALL THE ATTRIBUTES THAT 
+    FAILED VALIDATION...''
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA TESTAR ISSO, O PROFESSOR ENVIA A FORM 
+
+COM APENAS 'title' preenchido,
+
+
+e com 'salary' em branco...
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, VAI PARECER QUE NOSSA PAGE FOI REFRESHED...
+
+
+
+--------> NO CASO, O QUE REALMENTE ACONTECEU FOI O 'REDIRECT',
+        POR PARTE DO LARAVEL, PARA A NOSSA PAGE ED 'create a job'...
+
+
+
+
+--> MAS O PROBLEMA, AQUI, É QUE 
+    A VARIABLE DE '$errors' realmente FOI PREENCHIDA, PELO LARAVEL,
+
+    MAS __ NÓS NÃO TEMOS/TÍNHAMOS NENHUMA LÓGICA DE ERROR HANDLING, NO FRONTEND,
+    PARA 
+    EXIBIR ESSES ERRORS AO USER...
+
+
+    (
+        É POR ISSO QUE 
+
+        ''IT FEELS LIKE NOTHING CHANGED, EVEN THOUGH 
+            IT DID CHANGE...''
+    )
+
+
+
+
+
+
+
+
+
+-> PARA RESOLVER O PROBLEMA,
+    DEVEMOS FAZER O DISPLAY DE ESSES VALIDATION ERRORS...
+
+
+
+
+
+
+
+
+-> PARA ISSO, VAMOS ATÉ O TEMPLATE DE 'create.blade.php',
+
+
+
+    E AÍ 
+
+
+    O PROFESSOR 
+
+
+    USA A DIRECTIVE DE '@if',
+
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+
+                @if($errors->any())
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <div class="mt-2">
+                            {{ $errors->first('title') }}
+                            {{ $errors->first('salary') }}
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, 
+
+
+
+SE OCORRER ALGUM VALIDATION ERROR RELACIONADO COM ESSES FIELDS,
+
+
+VAMOS RETRIEVAR O PRIMEIRO ERROR QUE ACONTECER...
+
+
+
+
+
+
+
+
+--> NO CASO, QUANDO DEIXO ESSE FIELD VAZIO,
+
+FICO COM ISTO:
+
+
+
+The salary field is required.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR APONTA QUE 
+
+''THIS $errors variable 
+
+    IS __ ALWAYS AVAILABLE TO YOU...
+
+    THIS MEANS THAT YOU DON'T NEED 
+    TO RUN 'is_set($errors)', to then 
+
+    loop over them... this is not needed''...
+
+
+
+
+
+
+
+
+--> BEM, COMO NÓS NÃO PRECISAMOS RODAR 'is_set',
+
+PODEMOS USAR 
+
+UM SIMPLES CÓDIGO DE 'loop',
+
+
+com 
+
+
+
+
+'@foreach',
+
+PARA LOOPAR POR DENTRO DE TODOS OS ERRORS 
+E AÍ 
+
+EXIBIR 
+
+AS MESSAGES DE ERROR QUE ACONTECEREM...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+             @if($errors->any())
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                @endif
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, AO ENVIARMOS O REQUEST COM ESSES FIELDS VAZIOS,
+
+
+
+
+
+FICAMOS 
+
+
+COM AS MESSAGES DE ERROR...
+
+
+
+
+
+
+
+
+
+
+eX:
+
+
+
+
+
+The title field is required.
+The salary field is required.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> o que o professor faz, então,
+
+
+    É WRAPPAR TUDO EM VOLTA DE 1 DIV,
+
+
+    AÍ COLOCAR UNS STYLES DE ERROR,
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+           <div class="mt-10">
+                @if($errors->any())
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li class="text-red-500">{{ $error }}</li>
+                    @endforeach
+                </ul>
+                @endif
+                </div>  
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO É HELPFUL,
+
+SIM...
+
+
+
+
+
+
+
+
+
+ENTRETANTO, OUTRA OPTION É 
+
+'''DISPLAY THE VALIDATION ERROR 
+    __ DIRECTLY BELOW THE INPUT''''
+
+
+    (é mais comum)
+
+
+
+
+
+
+
+
+--> PARA FAZER ISSO, BASTA ESCREVER ALGO ASSIM:
+
+
+
+
+
+
+
+
+
+
+    <form method="POST" action="/jobs">
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer">
+                            </div>
+                            @if ($errors->has('title'))
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $errors->first('title') }}
+                            </p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year">
+                            </div>
+                            @if ($errors->has('salary'))
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $errors->first('salary') }}
+                            </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS O PROFESSOR USA UM APPROACH MAIS DIFERENTE AINDA,
+
+
+QUE É 
+
+
+COM A DIRECTIVE DE '@error()'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''@error()'' -> É UMA DIRECTIVE ESPECIAL DO BLADE...
+
+
+
+
+
+
+
+
+
+@error()  ---------> VC DEVE PASSAR O  'name' attribute do seu input field....
+
+
+
+
+
+
+
+no caso,
+
+serão 
+
+
+
+@error('title')
+
+
+e 
+
+
+
+@error('salary)
+
+
+
+
+
+
+
+
+
+
+
+
+E O CÓDIGO FICARÁ TIPO ASSIM:
+
+
+
+
+@error('title')
+    {{ $message }}
+@enderror
+
+
+
+
+
+e assim:
+
+
+
+
+@error('salary')
+    {{ $message }}
+@enderror
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO,
+
+
+
+'''IF WE HAVE A VALIDATION ERROR FOR THE TITLE,
+
+    AND ONLY ON THAT CONDITION, WE PROCEED WITH THE 
+    SHOWING OF THE MESSAGE...''
+
+
+
+
+
+
+
+
+
+
+
+--> TENHA EM MENTE QUE ESSA VARIABLE DE '$message'
+    EXISTE _ APENAS__ DENTRO DO CONTEXT
+
+    DE ESSA DIRECTIVE DE '@error()',
+
+
+    e em mais nenhum outro lugar de seus templates...
+
+
+
+
+
+
+
+->  E ISSO É BEM HELPFUL..
+
+
+
+
+
+
+--> O PROFESSOR COLOCA ALGUNS STYLES NA MESSAGE, TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+ <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer">
+                            </div>
+                            @error('title')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year">
+                            </div>
+                            @error('salary')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM VALIDATION NO FRONTEND, O QUE É BEM LEGAL...
+
+
+
+
+
+
+
+
+
+FICAMOS COM INLINE VALIDATION,
+
+VINDA DO SERVER...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR TAMBÉM COLOCA OS ATTRIBUTES DE 'required'
+
+nos input fields...
+
+
+
+
+
+
+
+
+
+
+
+
+
+O CÓDIGO FINAL FICOU ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Create a Job
+    </x-slot:heading>
+    <form method="POST" action="/jobs">
+        @csrf
+        {{-- @csrf is needed to add the token hidden field to the form --}}
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                            {{-- * THIS IS ANOTHER WAY TO SHOW EACH INPUT'S ERRORS TO THE USER: --}}
+                            {{-- @if ($errors->has('title'))
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $errors->first('title') }}
+                            </p>
+                            @endif --}}
+                            {{-- * and this is the best way, using the @error() directive: --}}
+                            @error('title')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-4">
+                        <label for="salary" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="number" name="salary" id="salary" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="$50,000 per Year" required>
+                            </div>
+                            {{-- * THIS IS ANOTHER WAY TO SHOW EACH INPUT'S ERRORS TO THE USER: --}}
+                            {{-- @if ($errors->has('salary'))
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $errors->first('salary') }}
+                            </p>
+                            @endif --}}
+                            {{-- * and this is the best way, using the @error() directive: --}}
+                            @error('salary')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                {{-- * THIS IS ONE OF THE WAYS YOU CAN SHOW ERRORS TO THE USER, USING A LOOP.  --}}
+                {{-- <div class="mt-10">
+                @if($errors->any())
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li class="text-red-500">{{ $error }}</li>
+                @endforeach
+                </ul>
+                @endif
+            </div> --}}
+        </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FICAMOS COM FRONT E BACKEND VALIDATION...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR MOSTRA A PARTE DE 'AVAILABLE VALIDATION RULES' DO LARAVEL:
+
+
+
+https://laravel.com/docs/11.x/validation#available-validation-rules
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> HÁ MUITAS DELAS...
+
+
+
+
+
+
+
+
+
+-> VAMOS USAR 7-8 DELAS,
+    NA MAIOR PARTE DOS CASOS...
+
+
+
+
+
+
+
+
+
+
+
+
+há alguns que checam values na database, o que é bem útil...
+
+
+
+
+
+
+
+
+
+NO DIA 18, VAMOS RETORNAR AO 'web.php',
+
+
+E TERMINAR DE SCAFFOLD A DATA DO 
+
+RESOURCE DE 'jobs'...
+
+
+
+
+
+
+
+
+
+
+
+ATUALMENTE, PODEMOS:
+
+
+1) VIEW ALL JOBS 
+
+
+2) VIEW A SINGLE JOB 
+
+
+3) PERSIST A SINGLE JOB (create) 
+
+
+
+
+
+MAS AINDA PRECISAMOS SABER COMO:
+
+
+
+
+4) EDITING/UPDATING 
+
+
+
+5) DELETING JOBS...
