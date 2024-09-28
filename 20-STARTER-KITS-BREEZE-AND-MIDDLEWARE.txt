@@ -1,0 +1,1168 @@
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+
+
+AGORA VEREMOS AUTHENTICATION...
+
+
+
+
+
+
+
+
+
+
+-> 4 EPISODES SERÃO DEDICADOS AO FINAL PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+-> POR MTOS ANOS, O LARAVEL 
+
+PROVIDENCIOU 
+
+
+
+STARTER KITS PARA 
+COMEÇARMOS 
+
+O MAIS RÁPIDO POSSÍVEL...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> 'STARTER KITS' --> ISSO SIGNIFICA 
+
+
+
+
+'''INITIAL PROJECT SCAFFOLDING POR A TYPICAL APP''..
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR MOSTRA 1 EXEMPLO:
+
+
+
+
+
+
+'''HAVE YOU EVER WORKED IN A PROJECT WHERE YOU NEEDED TO MAKE 
+    SURE USERS COULD LOG IN INTO ACCOUNTS...''
+
+
+
+
+
+
+
+
+
+
+
+-> ANTES MESMO DE VC COMEÇAR COM O PROJECT,
+    CRIAR ALGO UNIQUE A ELE,
+
+    VC PRECISARÁ/PRECISA DE:
+
+
+
+
+
+    1) REGISTRATION 
+    2) LOGIN 
+    3) FORGOT PASSWORD 
+    4) RESET PASSWORD 
+    5) PROFILE
+
+
+
+
+
+
+
+
+
+
+
+--> VC PRECISA DE VIEWS PARA TUDO ISSO,
+    E AÍ LÓGICA/ROUTES PARA ORQUESTRAR TUDO ISSO...
+
+
+
+
+
+
+--> É UMA QUANTIDADE ABSURDA DE TRABALHO..
+
+
+
+
+
+
+
+
+
+
+
+
+-> E OS STARTER KITS, ESPECIFICAMENTE O 'LARAVEL BREEZE',
+    AUTOMATIZAM ESSE PROCESSO INTEIRO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR MOSTRA ISSO A NÓS...
+
+
+
+
+
+
+
+
+
+
+
+-> ELE VAI ATÉ O HERD,
+
+E AÍ 
+
+RODA ASSIM:
+
+
+
+
+
+
+
+
+
+'laravel new app' 
+
+
+
+
+
+
+
+
+
+
+--> AÍ O LARAVEL FAZ A PERGUNTA CLÁSSICA:
+
+
+
+
+
+
+
+
+''Would you like to install a starter kit:''
+
+
+
+
+
+
+
+
+
+
+
+- No Starter Kit 
+- Laravel Breeze
+- Laravel Jetstream 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE STARTER KITS DEVEM SER USADOS __ 
+    NO INÍCIO DE NOVOS PROJECTS...
+
+
+
+
+
+
+
+
+
+
+--> NO NOSSO EXAMPLE APP,
+    PODERÍAMOS FAZER PULL IN DO LARAVEL BREEZE,
+
+    MAS SERIA 1 FRUSTRATING PROCESS...
+
+
+
+
+
+
+
+
+
+--> ISSO É PQ O 'BREEZE'
+
+FAZ ASSUME DE ALGUMAS COISAS:
+
+
+
+
+
+1) IT ASSUMES THAT YOU HAVE A WELCOME VIEW, THAT YOU HAVE ALREADY DELETED....
+
+
+2) IT OVERWRITES YOUR ROUTES FILE (web.php)
+
+
+
+3) IT'S GOING TO OVERWRITE YOUR layout.blade.php file 
+
+
+
+4) IT'S GOING TO PULL IN A BUNCH OF BLADE COMPONENTS, THAT ARE GOING TO CONFLICT 
+    WITH COMPONENTS YOU ALREADY CREATED...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SERIA 1 PROCESSO FRUSTRANTE,
+
+E É POR ISSO QUE A MELHOR IDEIA 
+É USAR ESSE BREEZE, ESSE STARTER KIT,
+
+NO START 
+
+
+DO SEU PROJECT...
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... AO COMEÇARMOS NOSSO PROJECT,
+
+
+FICAMOS COM ESTA PERGUNTA:
+
+
+
+
+
+
+
+
+
+
+
+''Which Breeze stack would you like to install?''
+
+
+
+
+
+> Blade with Alpine   (TRADITIONAL SERVERSIDE  BLADE APP, WITH SOME JS SPRINKLED IN)
+> Livewire (Volt Class API) with Alpine 
+> LiveWire (Volt Functional API) with Alpine 
+> React with Inertia 
+> Vue with Inertia
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESCOLHEMOS A PRIMEIRA OPTION,
+APP TRADICIONAL...
+
+
+
+
+
+
+
+
+''Would you like dark mode support:''
+
+
+NO 
+
+
+
+
+'Which testing framework: 
+
+
+Pest' ...
+
+
+
+
+
+
+
+
+
+INITIALIZE GIT REPOSITORY,
+
+
+
+NO...
+
+
+
+
+
+
+
+
+
+
+-> VAMOS USAR A DATABASE SQLITE...
+
+
+
+
+
+
+
+
+
+
+--> UM MONTE DE COISAS ACONTECERAM...
+
+
+
+
+
+
+
+
+-> aconteceu mais do que 1 simples 'scaffold of a new laravel app'...
+
+
+
+
+
+
+
+-> AQUI OCORREU TAMBÉM O INSTALL DE DEPENDENCIES,
+
+CONFIG DA DATABASE,
+
+
+
+O COPY DE TODO O BREEZE-SPECIFIC SCAFFOLDING,
+
+COMO ROUTES, VIEWS E COMPONENTS...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA VISUALIZARMOS ESSE APP EM AÇÃO, PODEMOS 
+
+
+rodar 
+
+
+'cd app 
+
+php artisan serve'...
+
+
+
+
+
+
+
+
+
+
+-> OU, SE ESTAMOS usando o herd,
+
+
+podemos simplesmente 
+
+
+acessar 
+
+o <folder_name>.test,
+
+
+
+no browser...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SERÁ 1 APP PARECIDO COM 1 APP COMUM LARAVEL,
+
+
+
+MAS, JÁ NA PARTE DE CIMA DO TEMPLATE DA HOME PAGE,
+
+JÁ ENCONTRAMOS 
+
+LINKS DE 'LOGIN' E ' REGISTER'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CLICAMOS EM 'REGISTER',
+
+E JÁ 
+
+TEMOS 1 TYPICAL REGISTRATION FORM...
+
+
+
+
+
+
+
+
+
+
+--> AO PREENCHERMOS ESSA REGISTRATION FORM,
+
+
+ENTRAMOS, E ESTAMOS IN...
+
+
+
+
+
+
+
+--> isso é mindblowing...
+
+
+
+
+
+
+
+
+
+
+
+--> EM 20 SEGUNDOS,
+    INSTALAMOS 1 LARAVEL PROJECT,
+
+
+    REGISTRAMOS (register) 
+
+
+    e estamos 
+
+    viewing our authenticated dashboard...
+
+
+
+
+
+
+
+
+
+
+
+--> FIZEMOS TUDO ISSO EM 20 SEGUNDOS...
+
+
+
+
+
+
+
+
+
+ISSO É MT USEFUL...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O UPDATE DA INFORMATION DA PROFILE TAMBÉM FUNCIONA...
+
+
+
+
+
+
+
+
+-> O UPDATE PASSWORD TAMBÉM FUNCIONA,
+
+
+E O DELETE PASSWORD TAMBÉM...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... 
+
+
+
+
+
+
+
+
+MAS SE EXAMINAMOS NOSSA URL,
+
+PERCEBEMOS QUE ELA É 
+
+'app.test/dashboard'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> FAZEMOS LOGOUT...
+
+
+
+
+
+E AÍ TENTAMOS VISITAR 
+
+
+
+
+'app.test/dashboard'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS, AO FAZERMOS ISSO,
+    NÃO CONSEGUIMOS RETORNAR 
+
+    à PAGE DO DASHBOARD... acabamos 'logged out'...
+
+
+
+
+
+
+
+
+-> ISSO QUER DIZER, EM OUTRAS PALAVRAS,
+
+QUE 
+
+
+
+FOI 'MEIO CAMINHO ANDADO',
+
+
+PQ 
+
+
+
+
+TEMOS 'A CERTAIN LEVEL OF AUTHENTICATION IN PLACE',
+
+
+
+MAS AINDA FALTAM VÁRIAS COISAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> VAMOS ATÉ O FILE EDITOR,
+
+E AÍ 
+
+
+EXAMINAMOS OS ARQUIVOS...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MEIO OVERWHELMING...
+
+
+
+
+
+
+
+
+
+
+-> É PQ O LARAVEL FEZ O PULL-IN DE MUITAS FILES DIFERENTES...
+    É PQ ISSO É NECESSÁRIO...
+
+
+
+
+
+
+
+
+--> É MT EDUCATIVO VER COMO 
+
+A LARAVEL CORE TEAM RECOMENDA O IMPLEMENTATION 
+
+    DE ESSAS FUNCTIONALITIES...
+
+
+
+
+
+
+
+
+
+-> VAMOS ATÉ O CONTROLLER DE 'RegisteredUserController':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
+use Illuminate\View\View;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display the registration view.
+     */
+    public function create(): View
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('dashboard', absolute: false));
+    }
+}
+  
+
+
+
+
+
+
+
+
+
+nesse controller, temos:
+
+
+
+
+
+
+
+
+1) o method de 'create()',
+
+
+que MOSTRA 1 VIEW, DE REGISTER...
+
+
+
+
+
+
+
+
+
+ESSA VIEW, POR SUA VEZ, É ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+<x-guest-layout>
+    <form method="POST" action="{{ route('register') }}">
+        @csrf
+
+        <!-- Name -->
+        <div>
+            <x-input-label for="name" :value="__('Name')" />
+            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        </div>
+
+        <!-- Email Address -->
+        <div class="mt-4">
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password')" />
+
+            <x-text-input id="password" class="block mt-1 w-full"
+                            type="password"
+                            name="password"
+                            required autocomplete="new-password" />
+
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mt-4">
+            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+
+            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                            type="password"
+                            name="password_confirmation" required autocomplete="new-password" />
+
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                {{ __('Already registered?') }}
+            </a>
+
+            <x-primary-button class="ms-4">
+                {{ __('Register') }}
+            </x-primary-button>
+        </div>
+    </form>
+</x-guest-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VC PODE VER QUE ELES:
+
+
+
+
+
+1) FAZEM USO PESADO DE BLADE COMPONENTS (com x-guest-layout, etc)...
+
+
+
+
+
+
+
+2) ELES TEM ESSA LAYOUT FILE, 'x-guest-layout', exatamente como nós criamos...
+
+
+
+
+
+
+
+3) ELES TAMBÉM EXTRAEM BLADE COMPONENTS PARA 'INPUT', 'LABEL' E 'INPUT-ERROR'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+QUANDO ENVIAMOS A FORM DE REGISTRATION,
+
+ELES USAM ESTA LÓGICA:
+
+
+
+
+
+
+
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('dashboard', absolute: false));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VC PODE PERCEBER QUE ELES USARAM 1 PARAMETER DE 'Request'...
+
+
+
+
+
+-> O LARAVEL VAI AUTOMATICAMENTE RESOLVE ESSE PARAMETER E VAI 
+PASSÁ-LO PARA DENTRO 
+DO METHOD...
+
+
+
+
+
+
+
+
+--> É BEM PARECIDO COM A MANEIRA 
+    QUE ESCREVEMOS, ANTERIORMENTE,
+
+    MAS É _ BEM MAIS FORMAL...
+
+
+
+    'request->validate([])'
+    e 
+
+    '$request->validate([])'
+
+
+    SÃO A MESMA COISA, EFETIVAMENTE...
+
+
+
+
+
+
+
+
+
+
+-> OCORRE O VALIDATE DO NAME, EMAIL E PASSWORD....
+
+
+SE ESSA VALIDATION PASSA,
+
+
+
+O USER É CRIADO,
+
+
+
+
+
+E AÍ 
+
+
+OCORRE O 'event()' --> ISSO FAZ O FIRE DE 1 EVENT...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> EVENTS SÃO CRIADOS COM 'artisan make:event'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> FINALMENTE, NÓS FAZEMOS _ O LOGIN __ DO USER,
+
+
+COM 'Auth::login($user)',
+
+
+E AÍ 
+
+FAZEMOS O REDIRECT DO USER, AO DASHBOARD:
+
+
+
+
+
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('dashboard', absolute: false));
+
+
+
+        
