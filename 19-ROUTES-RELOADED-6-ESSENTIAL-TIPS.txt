@@ -1,0 +1,2901 @@
+
+
+
+
+
+
+
+
+
+--> OK... TEMOS 6 TIPS...
+
+
+
+
+
+
+
+
+
+
+
+--> 6 TIPS/TECHNIQUES 
+    DIRETAMENTE RELACIONADAS COM SEU ARQUIVO DE ROUTES...
+
+
+
+
+
+
+
+
+
+
+--> NÓS BASICAMENTE VAMOS 
+    PASSAR 1 VASSOURA NO ARQUVIO DE ROUTES,
+
+    DAR 1 LIMPADA...
+
+
+
+
+
+
+
+
+
+
+INICIALMENTE, NOSSO CÓDIGO ESTÁ ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+/**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application, with pagination
+ */
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->latest()->simplePaginate(3);
+
+    return view('jobs.index', [ //
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', function () {
+
+    return view('jobs.create');
+});
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', function () {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+/**
+ * This is the route that will be used to SHOW THE FORM to edit a single job
+ */
+Route::get('/jobs/{id}/edit', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.edit', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{id}/', function ($id) {
+
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    $job = JobListing::findOrFail($id);
+
+    $job->title = request('title');
+    $job->salary = request('salary');
+
+    $job->save();
+
+    return redirect('/jobs/' . $job->id);
+});
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{id}/', function ($id) {
+    // authorize // TODO
+
+    // delete the job
+    $job = JobListing::findOrFail($id);
+    $job->delete();
+
+    // redirect
+    return redirect('/jobs');
+});
+
+/**
+ * This is the route that will be used to show the about page
+ */
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+
+/**
+ * This is the route that will be used to show the contact page
+ */
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ABRIMOS A ROUTE DE 'SHOW',
+
+QUE MOSTRA 1 ÚNICO RESOURCE:
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{id}', function ($id) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ''WE MAKE A GET REQUEST TO /jobs/{identifier}...
+
+
+
+
+
+
+''WE THEN CAPTURE THAT ID,
+    PASS IT TO THE CLOSURE (function),
+    AND THEN USE THAT 
+
+    ID TO FIND THE CORRESPONDING JOB, IN THE DATABASE''...
+
+
+
+
+
+
+
+
+
+
+--> CERTO... MAS, COMO VC PODE IMAGINAR,
+
+    ISSO É ALGO QUE VC FARÁ MUITAS E MUITAS VEZES,
+
+    NOS SEUS PROJECTS...
+
+
+
+
+
+
+É POR ISSO QUE TEMOS O PRIMEIRO TIP (MODEL INJECTION, OU 'ROUTE MODEL BINDING'):
+
+
+
+
+
+
+
+
+
+
+--> FELIZMENTE,
+    O LARAVEL TEM UMA SHORTHAND (in a way)...
+
+
+
+
+
+    --> ''IF YOU FOLLOW A CERTAIN COMMON CONVENTION, 
+        IT CAN _ FETCH THE MODEL___ INSTANCE FOR YOU....''
+
+
+
+
+
+
+--> PARA ISSO, BASTA FAZER ALGUMAS COISINHAS:
+
+
+
+
+
+
+
+
+
+
+1a coisa) --> VC DEVE TROCAR O IDENTIFIER, DE '{id}', para '{job}'...
+
+
+
+
+            --> JOB É MELHOR PQ É MAIS GENÉRICO DO QUE 'id'...
+
+
+
+
+
+
+            --> '''FETCH ME THE JOB''', tipo isso...
+
+
+
+        
+
+            --> VC PODERIA USAR UM ID, SIM, E O DEFAULT É REALMENTE UM ID,
+                MAS ÀS VEZES VC PODE ACABAR RECEBENDO 1 SLUG, OU ALGUM OUTRO TIPO 
+                DE UNIQUE STRING...
+
+
+
+
+
+
+            --> certo...
+
+            
+
+
+        
+
+        quer dizer que o código vai ficando assim:
+
+    
+
+
+
+
+
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', function ($job) {
+    $selectedJob = JobListing::find($id);
+
+    return view('jobs.show', [
+        'job' => $selectedJob,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+
+
+
+
+
+2a coisa)  DEPOIS DISSO,
+        NÓS VAMOS __ ADICIONAR UM TYPE AO PARAMETER 
+
+        DA CLOSURE...
+
+
+
+
+
+
+    --> NO CASO, O TYPE SERÁ O TIPO DE MODEL QUE VC VAI QUERER 
+        INJECT, NESSA CLOSURE...
+
+
+
+
+
+
+    TIPO ASSIM:
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', function (Job $job) {
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+
+
+
+MAS O QUE ACONTECE, ENTÃO?
+
+
+
+
+
+
+
+
+
+
+
+VOLTAMOS COM AQUELE CÓDIGO ANTIGO DA VIEW,
+
+TIPO ASSIM:
+
+
+
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', function (Job $job) {
+
+
+    return view('jobs.show', ['job' => $job]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> TESTAMOS ISSO AÍ...
+
+
+
+
+
+
+
+
+
+
+
+--> E, SIM, 
+    FUNCIONA, E EXATAMENTE COMO ANTERIORMENTE,
+
+
+    MAS AGORA SEM AQUELE CALL DE 'JobListing::find($id)'...
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', function (Job $job) { // * This is how you can inject a model (job) into a route.
+    return view('jobs.show', [
+        'job' => $job
+    ]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS QUAL É/SÃO AS CONVENTIONS,
+AQUI?
+
+
+
+
+
+
+
+SÃO DUAS:
+
+
+
+
+1) 'YOUR WILDCARD AND THE PARAMETER NAME _ NEED TO BE IDENTICAL' 
+    (os dois são 'JOB', nesse caso....)
+
+
+
+
+
+
+2) A SEGUNDA CONVENTION É O ADD DE UM 'TYPE' ao seu 
+    PARAMETER...
+
+
+
+
+    -> o type, nesse caso, é o Model 'Job'...  
+
+
+
+
+
+    --> é isso que faz com que o laravel entenda que vc 
+
+    ''I WANT A INSTANCE OF <model_name>...''
+
+
+
+    --> O LARAVEL SABE QUE VC VAI QUERER UMA INSTANCE... 
+        MAS QUAL INSTANCE?
+
+
+
+    --> SERÁ A INSTANCE REPRESENTADA PELO value de '$job',
+        que será provavelmente um INT... (será o '{job}'...)
+
+
+
+
+
+
+
+
+
+
+OK... MAS É CLARO QUE EXISTIRÃO CASOS, COMO EM BLOGS,
+
+EM QUE 
+
+
+
+
+''''THE IDENTIFIER/QUERY-PARAM FOR THE __ BLOG'S POST __ IS NOT 
+    THE ID THAT IS IN THE DATABASE''''....
+
+    (nesses casos, o query-param é tipo uma UNIQUE SLUG...)''''
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+Route::get('posts/{post:slug}');
+
+
+
+
+
+
+
+
+--> COM ISSO, DIZEMOS QUE ''THE SLUG, IN THE DATABASE, MUST EQUAL THIS VALUE''...
+
+
+
+
+
+
+
+
+
+-> o default, no caso, é isto:
+
+
+
+Route::get('posts/{post:id}');
+
+
+
+
+
+
+
+( mas isso é literalmente a mesma coisa que escrever isto:
+
+
+Route::get('posts/{post}'),
+
+
+
+
+por isso omitimos esse ':id'...
+
+
+
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO, PODEMOS 
+    UPDATAR TODA E QUALQUER REFERENCE A 'id' 
+
+    em nosso arquivo 'web.php',
+
+
+    colocar 'job' no lugar, e aí alterar o parameter type e etc....
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Job;
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+/**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+Route::get('/', function () {
+
+    $jobs = JobListing::all();
+
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application, with pagination
+ */
+Route::get('/jobs', function () {
+    $jobsWithEmployers = JobListing::with('employer')->latest()->simplePaginate(3);
+
+    return view('jobs.index', [ //
+        'jobs' => $jobsWithEmployers
+    ]);
+});
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', function () {
+
+    return view('jobs.create');
+});
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', function (JobListing $job) { // * This is how you can inject a model (job) into a route.
+    return view('jobs.show', [
+        'job' => $job
+    ]);
+});
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', function () {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+});
+
+
+/**
+ * This is the route that will be used to SHOW THE FORM to edit a single job
+ */
+Route::get('/jobs/{job}/edit', function (JobListing $job) {
+
+    return view('jobs.edit', [
+        'job' => $job
+    ]);
+});
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{job}', function (JobListing $job) {
+
+    request()->validate(
+        [
+        'title' => ['required', 'string', 'min:3'],
+        'salary' => ['required', 'numeric']
+        ]
+    );
+    // False alarm from the IDE.
+    $job->update([
+        'title' => request('title'),
+        'salary' => request('salary')
+    ]);
+
+    return redirect('/jobs/' . $job->id);
+});
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{job}/', function (JobListing $job) {
+    // authorize // TODO
+
+    // delete the job
+
+    $job->delete();
+
+    // redirect
+    return redirect('/jobs');
+});
+
+/**
+ * This is the route that will be used to show the about page
+ */
+Route::get('/about', function () {
+
+    return view('about');
+});
+
+
+/**
+ * This is the route that will be used to show the contact page
+ */
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.. TUDO FUNCIONA EXATAMENTE DO MESMO JEITO QUE FUNCIONAVA...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO, AGORA DEVEMOS VER O TIP NÚMERO 2...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) ''CONTROLLER CLASSES'':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NOSSO CÓDIGO ESTÁ 'FINE AND DANDY',
+
+    PARA 1 PROJECT SIMPLES COMO ESTE..
+
+
+
+
+
+
+
+
+
+
+
+--> MAS PARA PROJECTS GRANDES,
+    COM CENTENAS DE ROUTES,
+
+
+
+    ESSE CÓDIGO FICA UNWIELDY...
+
+
+
+
+
+
+
+
+
+
+
+--> NÃO QUEREMOS TER TANTO SCROLLING..
+
+
+
+
+
+
+
+
+
+-> PARA TODOS APPS SÉRIOS,
+
+    DEVS PREFEREM 
+
+    
+    'DEDICATED CONTROLLER CLASSES'...
+
+
+
+
+
+
+
+
+
+
+-> PARA CRIAR 1 CONTROLLER,
+
+BASTA RODAR ASSIM:
+
+
+
+
+
+
+
+
+
+
+php artisan make:controller <controller_name>...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+php artisan make:controller JobController 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SE NÃO COLOCAMOS 1 NAME, O LARAVEL FAZ 1 SÉRIE DE PERGUNTAS:
+
+
+
+
+
+
+
+1) WHAT IS THE CONTROLLER'S NAME --> 'JobController'...
+
+
+
+
+
+
+
+
+2) WHICH TYPE OF CONTROLLER WOULD YOU LIKE:
+
+
+
+    1) EMPTY 
+    
+    2) RESOURCE 
+
+    3) SINGLETON 
+
+    4) API 
+
+    5) INVOKABLE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EMPTY É UMA EMPTY CLASS....
+
+
+
+
+
+RESOURCE --> AINDA NÃO SABEMOS O QUE É ISSO...
+
+
+
+
+
+
+
+SINGLETON
+
+
+API 
+
+
+INVOKABLE --> É QUASE COMO UM 'SINGLE ACTION CONTROLLER'...
+
+
+
+
+
+
+
+
+
+
+-> ISSO TUDO É MEIO CONFUSO,
+    POR ISSO DEVEMOS ESCOLHER 'EMPTY'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app->Http->Controllers 
+
+
+
+
+
+
+
+
+
+
+
+
+
+- COM ISSO, FICAMOS COM O JOBCONTROLLER,
+    QUE FICA TOTALMENTE VAZIO:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+    //
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, AGORA CRIAREMOS METHODS PARA CADA 1 DAS DIFERENTES ROUTES...
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+
+
+    public function index()
+    {
+
+    }
+
+    public function create()
+    {
+
+
+    }
+
+    public function show() {
+
+    }
+
+    public function store() {
+
+    }
+
+    public function edit() {
+
+    }
+
+    public function destroy() {
+
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... COM ISSO,
+
+
+
+VAMOS QUERER REFATORAR O CÓDIGO DE 'Route::get()'
+
+
+PARA FAZER CALL DO METHOD DENTRO DE ESSE CONTROLLER,
+
+O method de 'index'..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+Route::get('/jobs', []);
+´
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ELE REFATORA ESSE SEGUNDO PARAMETER,
+
+
+QUE ANTES ERA AQUELA CLOSURE...
+
+
+
+
+
+
+
+
+
+--> AGORA SERÁ UM __ ARRAY...
+
+
+
+NESSE ARRAY,
+
+
+O PRIMEIRO ITEM SERÁ 'THE TARGETED CONTROLLER',
+
+
+
+E O SEGUNDO ARGUMENT SERÁ O __ METHOD (no caso, 'index')...
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application (index), with pagination
+ */
+Route::get('/jobs', [JobController::class, 'index']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PEGAMOS O INDEX, OBVIAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VAI FICANDO TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application (index), with pagination
+ */
+Route::get('/jobs', [JobController::class, 'index']);
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', [JobController::class, 'create']);
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', [JobController::class, 'store']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LÁ NO JOBCONTROLLER,
+VAI FICANDO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\JobListing;
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+    public function index()
+    {
+        $jobsWithEmployers = $this->job::with('employer')->latest()->simplePaginate(3);
+
+        return view('jobs.index', [ //
+            'jobs' => $jobsWithEmployers
+        ]);
+    }
+
+    public function create()
+    {
+
+        return view('jobs.create');
+    }
+
+    public function show() {
+        return view('jobs.show', [
+            'job' => $job
+        ]);
+    }
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+    }
+
+    public function edit() {
+
+    }
+
+    public function destroy() {
+
+
+    }
+}
+
+
+
+---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS E QUANTO AO 'Job $job',
+
+aqueles parameter que estava sendo usado?
+
+
+
+
+
+
+
+
+--> podemos simplesmente usá-lo dentro de cada method, naquele controller,
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\JobListing;
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+
+
+
+    public function index(JobListing $job)
+    {
+        $jobsWithEmployers = $job::with('employer')->latest()->simplePaginate(3);
+
+        return view('jobs.index', [ //
+            'jobs' => $jobsWithEmployers
+        ]);
+    }
+
+    public function create()
+    {
+        return view('jobs.create');
+    }
+
+    public function show(JobListing $job) {
+        return view('jobs.show', [
+            'job' => $job
+        ]);
+    }
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+    }
+
+    public function update(JobListing $job) {
+
+        request()->validate(
+            [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+            ]
+        );
+
+        $job->update([
+            'title' => request('title'),
+            'salary' => request('salary')
+        ]);
+
+        return redirect('/jobs/' . $job->id);
+    }
+
+    public function edit(JobListing $job) {
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+    public function destroy(JobListing $job) {
+        $job->delete();
+        return redirect('/jobs');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+COM ISSO, NOSSO CONTROLLER FICOU COM TODA A LÓGICA...
+
+
+
+
+
+
+
+
+-> DENTRO DO WEB.PHP,
+
+FICOU ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This is the route that will be used to display the jobs page of the application (index), with pagination
+ */
+Route::get('/jobs', [JobController::class, 'index']);
+
+/**
+ * This is the route that will be used to view the form that will be used to create a new job
+ */
+Route::get('/jobs/create', [JobController::class, 'create']);
+
+/**
+ * This is the route that will be used to view a single job's details
+ */
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+
+/**
+ * This is the route that will be used to create a single job
+ */
+Route::post('/jobs', [JobController::class, 'store']);
+
+
+/**
+ * This is the route that will be used to SHOW THE FORM to edit a single job
+ */
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+
+
+/**
+ * This is the route that will be used to UPDATE a single job:
+ */
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+
+/**
+ * This is the route that will be used to DELETE a single job:
+ */
+Route::delete('/jobs/{job}/', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.. E REALMENTE FUNCIONOU...
+
+
+
+
+
+
+
+
+FICOU BEM MAIS CLEAN...
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ENTÃO REMOVE OS COMMENTS, E AÍ FICA BEEEM MAIS CLEAN:
+
+
+
+
+
+<?php
+
+use App\Http\Controllers\JobController;
+use App\Models\JobListing;
+use Illuminate\Support\Facades\Route;
+
+
+
+/**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+Route::get('/', function () {
+    $jobs = JobListing::all();
+    return view('home', [
+        'greeting' => 'Hello',
+        'name' => 'Arthur',
+        'age' => 26,
+        'job' => 'programmer',
+        'jobs' => $jobs
+    ]);
+});
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::post('/jobs', [JobController::class, 'store']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}/', [JobController::class, 'destroy']);
+Route::get('/about', function () {
+    return view('about');
+});
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO....
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, TEMOS O TERCEIRO TIP...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3o TIP) -->   'Route::view()'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SE VC TEM UMA ROUTE EM QUE VC FAZ O SIMPLES RETURN DE 1 VIEW,
+    SEM MAIS NENHUM TIPO DE LÓGICA,
+
+    COISA BEM SIMPLES,
+
+
+
+    VC PODE USAR 
+
+
+    O METHOD DE 
+
+    'Route::view()',
+
+    PARA AÍ 
+
+
+
+    FAZER O RETURN DE 1 VIEW SIMPLES,
+
+    SEM TER DE ESCREVER 1 METHOD NO CONTROLLER, PARA O RETURN DE ESSA VIEW..
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /**
+ * This is the route that will be used to display the home page of the application, with my introduction.
+ */
+// Route::get('/', function () {
+
+//     $jobs = JobListing::all();
+
+//     return view('home');
+// });
+
+// * Shorthand:
+Route::view('/', 'home')->name('home');
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, 
+
+
+
+
+FAZEMOS RETURN DE APENAS A VIEW, COM MAIS NADA...
+
+
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+
+
+
+// * Shorthand:
+Route::view('/about', 'about')->name('about');
+
+
+/**
+ * This is the route that will be used to show the contact page
+ */
+// Route::get('/contact', function () {
+//     return view('contact');
+// });
+
+// * Shorthand:
+Route::view('/contact', 'contact')->name('contact');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, TEMOS O TIP 4:
+
+
+
+
+
+
+
+
+
+
+
+TIP 4) --> ''LISTING YOUR ROUTES''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O QUE TEMOS AQUI É 'FINE AND SIMPLE',
+
+
+MAS É CLARO QUE, EM PROJECTS DE VERDADE,
+
+
+O TAMANHO DO SEU ARQUIVO web.php,
+
+de routes,
+
+
+
+vai crescer um MONTE...
+
+
+
+
+
+
+
+
+
+
+
+_> É POR ISSO QUE O LARAVEL TEM 1 COMANDO ÚTIL,
+CHAMADO DE 'php artisan route:list'...
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-19> php artisan route:list
+
+  GET|HEAD   / ......................................................................... home
+  GET|HEAD   _debugbar/assets/javascript debugbar.assets.js › Barryvdh\Debugbar › AssetContr…  
+  GET|HEAD   _debugbar/assets/stylesheets debugbar.assets.css › Barryvdh\Debugbar › AssetCon…  
+  DELETE     _debugbar/cache/{key}/{tags?} debugbar.cache.delete › Barryvdh\Debugbar › Cache…  
+  GET|HEAD   _debugbar/clockwork/{id} debugbar.clockwork › Barryvdh\Debugbar › OpenHandlerCo…  
+  GET|HEAD   _debugbar/open debugbar.openhandler › Barryvdh\Debugbar › OpenHandlerController…  
+  POST       _debugbar/queries/explain debugbar.queries.explain › Barryvdh\Debugbar › Querie…  
+  GET|HEAD   about .................................................................... about  
+  GET|HEAD   contact ................................................................ contact  
+  GET|HEAD   jobs ....................................................... JobController@index  
+  POST       jobs ....................................................... JobController@store  
+  GET|HEAD   jobs/create ............................................... JobController@create  
+  GET|HEAD   jobs/{job} .................................................. JobController@show  
+  PATCH      jobs/{job} ................................................ JobController@update  
+  DELETE     jobs/{job} ............................................... JobController@destroy  
+  GET|HEAD   jobs/{job}/edit ............................................. JobController@edit  
+  GET|HEAD   storage/{path} ................................................... storage.local  
+  GET|HEAD   up .............................................................................  
+
+                                                                          Showing [18] routes 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COMO VC PODE VER, TEMOS AS ROUTES CUSTOM QUE ADICIONAMOS...
+
+
+
+
+
+
+
+MAS TAMBÉM HÁ ALGUMAS ROUTES 
+
+QUE FORAM DEFINIDAS 
+
+
+POR THIRD-PARTY PACKAGES (como 'ignition' e 'debugbar')...
+
+
+
+
+
+
+
+
+
+
+--> ESSAS ROUTES PODEM SER ÚTEIS, SIM,
+    MAS GERALMENTE VC PODE IGNORÁ-LAS...
+
+
+
+
+ 
+
+
+
+
+
+
+
+-> PARA VER APENAS AS ROUTES CUSTOM,
+
+SEM TER ESSAS ROUTES DO VENDOR,
+
+VC 
+
+DEVE RODAR 
+
+
+
+php artisan route:list --except-vendor 
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, FICAMOS COM O OUTPUT DESEJADO, TIPO ASSIM:
+
+
+
+
+
+
+
+
+  GET|HEAD   / ......................................................................... home
+  GET|HEAD   about .................................................................... about  
+  GET|HEAD   contact ................................................................ contact  
+  GET|HEAD   jobs ....................................................... JobController@index  
+  POST       jobs ....................................................... JobController@store  
+  GET|HEAD   jobs/create ............................................... JobController@create  
+  GET|HEAD   jobs/{job} .................................................. JobController@show  
+  PATCH      jobs/{job} ................................................ JobController@update  
+  DELETE     jobs/{job} ............................................... JobController@destroy  
+  GET|HEAD   jobs/{job}/edit ............................................. JobController@edit  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ou seja,
+
+  temos 'home', 'about' e 'contact',
+
+
+  e então as ROUTES RELACIONADAS AO RESOURCE DE 'JOB'...
+
+
+
+
+
+
+
+
+
+
+  como vc pode ver, é bem útil,
+
+  temos o request type, a URI, e aí o method do controller relacionado...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  TIP 5) --> ''you must have noticed that, for the resource,
+            we keep repeating the controller name ('JobController', um monte de vezes)....''
+
+
+
+
+            --> SE VC ODEIA DUPLICATION UM MONTE MSM,
+
+            VC PODE 'GROUP' TODAS SUAS ROUTES 
+
+
+            EM 1 MESMA REFERENCE,
+
+
+            TIPO ASSIM:
+
+
+
+
+
+
+
+
+            Route::controller(JobController::class)->group(
+                function() {
+
+                }
+            );
+
+
+
+
+
+
+
+
+
+
+
+
+            COM ISSO, NÓS ACABAMOS CRIANDO UMA 'ROUTE GROUP',
+
+
+
+            EM QUE TODOS OS METHODS VÃO 'ASSUME' ESSE CONTROLLER...
+
+
+
+
+
+
+
+
+
+--> E FICA TIPO ASSIM:
+
+
+
+
+
+
+Route::controller(JobController::class)->group(function(){ 
+
+    Route::get('/jobs', 'index');
+    Route::get('/jobs/create', 'create');
+    ...
+
+} )
+
+
+
+
+
+
+
+
+
+
+
+E ISSO REALMENTE FUNCIONA, COMO ANTES...
+
+
+
+
+
+
+
+
+
+--> MAS É MEIO RUIM DE LER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TIP 6) -> '''ROUTE RESOURCES''..
+
+
+
+
+
+
+
+
+
+-> MÚLTIPLAS VEZES, AO LONGO DESTE VIDEO,
+    O PROFESSOR USOU O TERMO 'RESOURCE'
+
+    PARA REPRESENTAR 
+
+    ESSA COLLECTION DE ACTIONS..
+
+
+
+
+
+
+COMO ESTAS:
+
+
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::post('/jobs', [JobController::class, 'store']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}/', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR NOS EXPLICA QUE 
+
+''LARAVEL HAS ITS OWN ROUTE RESOURCE METHOD'....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-. ESSE METHOD PODE SER ACESSADO COM 
+
+'Route::resource('<resource_name>');'
+
+
+
+
+
+
+
+
+
+
+
+
+NO CASO,
+
+
+ESCREVEMOS ASSIM:
+
+
+
+
+'Route::resource('jobs');'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-. JÁ O SEGUNDO ARGUMENT É 
+
+
+
+''THE CONTROLLER THAT IS RESPONSIBLE FOR IT''...
+
+
+
+
+
+
+
+
+
+-> POR ISSO ESCREVEMOS ASSIM:
+
+
+
+'Route::resource('jobs', JobController::class);'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SE DEIXAMOS O CÓDIGO ASSIM, COM ESSA ÚNICA LINHA,
+
+
+
+
+E RECARREGAMOS TUDO,
+
+FICAMOS COM O EXATO MESMO RESULT...
+
+
+
+
+'''THAT'S WHAT Route::resource() does:
+    IT REGISTERS ALL OF THE ROUTES FOR 
+    A TYPICAL RESTFUL/RESOURCEFUL CONTROLLER''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS, PARA ISSO, DEVEMOS REPARAR A CONVENTION QUE ESTAMOS SEGUINDO, AQUI:
+
+
+
+
+
+
+
+
+
+'''IF I HAD AN EMPTY CONTROLLER, WITHOUT ANY METHOD,
+    IF I RAN 'php artisan route:list --except-vendor'',
+
+    I WILL STILL SEE THAT __ IT WILL _ ASSUME AND DEFAULT 
+    TO THESE ACTION NAMES (create, store, index, etc)..''
+
+
+
+
+
+
+
+
+
+
+-> E É POR ISSO QUE O PROFESSOR QUERIA SER BEM INCISIVO 
+
+SOBRE ESSES 'ACTION NAMES',
+
+
+AO LONGO DOS ÚLTIMOS EPISODES...
+
+
+
+
+
+
+E É POR ISSO QUE ELE TINHA COLOCADO 1 PEQUENO COMMENT, EM CIMA DE CADA ROUTE DECLARATION,
+
+2 EPISODES ATRÁS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VC TEM QUE SE LEMBRAR 
+
+    DAS CONVENTIONS... É NECESSÁRIO:
+
+
+
+
+
+
+    1) INDEX 
+
+    2) SHOW 
+
+    3) CREATE 
+
+    4) STORE 
+
+    5) EDIT 
+
+    6) UPDATE 
+
+    7) DESTROY 
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\JobListing;
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+
+
+
+    public function index(JobListing $job)
+    {
+        $jobsWithEmployers = $job::with('employer')->latest()->simplePaginate(3);
+
+        return view('jobs.index', [ //
+            'jobs' => $jobsWithEmployers
+        ]);
+    }
+
+    public function show(JobListing $job) {
+        return view('jobs.show', [
+            'job' => $job
+        ]);
+    }
+
+    public function create()
+    {
+        return view('jobs.create');
+    }
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    return redirect()->route('jobs.index');
+    }
+
+    public function edit(JobListing $job) {
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+    public function update(JobListing $job) {
+
+        request()->validate(
+            [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+            ]
+        );
+
+        $job->update([
+            'title' => request('title'),
+            'salary' => request('salary')
+        ]);
+
+        return redirect('/jobs/' . $job->id);
+    }
+
+
+    public function destroy(JobListing $job) {
+        $job->delete();
+        return redirect('/jobs');
+    }
+}
+
+
+
+
+
+
+QUER DIZER QUE NOSSO CÓDIGO FICOU ASSIM:
+
+
+
+
+
+
+
+
+
+
+Route::view('/', 'home');
+
+
+Route::resource('jobs', JobController::class);
+
+Route::view('/contact', 'contact');
+
+Route::view('/about', 'about');
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+MAS É CLARO QUE ÀS VEZES  VC NAO VAI PRECISAR 
+
+REGISTRAR TODAS 
+
+
+
+AS ROUTES DO 'REST API´'...
+
+
+
+
+
+
+
+
+
+
+vc pode talvez querer apenas a route de 'create' e 'delete,'
+
+
+por exemplo....
+
+
+
+
+
+PARA ISSO, VC PODE USAR O TERCEIRO ARGUMENT DO 'Route::resource()',
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+Route::resource('jobs', JobController::class, []);
+
+
+
+
+
+
+
+
+
+
+
+DENTRO DESSE ARRAY, VC TEM 2 OPTIONS:
+
+
+
+
+
+
+
+
+1) USAR A KEY DE 'except',
+
+    para fazer com que 
+
+    'SEJAM ADICIONADAS ROUTES __ PARA __ TODOS OS TIPOS DE METHOD,
+    ___ EXCETO__ estes aqui' (ex: create e delete, são exceptados)
+
+
+
+
+
+
+2) OU USAR A KEY DE 'only',
+
+    PARA FAZER COM QUE APENAS AS ACTIONS X E Y RECEBAM
+     
+     ROUTES PARA SI...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+OK... ESSES ERAM TODOS OS ROUTING-SPECIFIC TIPS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DEIXOU O CÓDIGO ASSIM:
+
+
+
+
+
+
+
+
+
+
+Route::view('/', 'home');
+Route::view('/contact', 'contact');
+Route::view('/about', 'about');
+
+Route::resource('jobs', JobController::class);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
