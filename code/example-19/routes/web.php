@@ -84,9 +84,11 @@ Route::view('/contact', 'contact')->name('contact');
 
 // * THIS IS THE MOST ABBREVIATED VERSION OF THE ROUTES' CODE.
 // Route::view('/', 'home');
+// Route::view('/contact', 'contact');
+// Route::view('/about', 'about');
 
 // Route::resource('jobs', JobController::class);
 
-// Route::view('/contact', 'contact');
 
-// Route::view('/about', 'about');
+
+

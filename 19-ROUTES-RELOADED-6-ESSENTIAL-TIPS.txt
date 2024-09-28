@@ -2899,3 +2899,11 @@ Route::resource('jobs', JobController::class);
 
 
 certo...
+
+
+
+
+
+
+
+NO PRÓXIMO VIDEO, VEREMOS AUTHENTICATION...
