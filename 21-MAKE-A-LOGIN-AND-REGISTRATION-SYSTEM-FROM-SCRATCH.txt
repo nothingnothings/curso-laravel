@@ -1,0 +1,299 @@
+
+
+
+
+AGORA COMPREENDEMOS QUE LARAVEL BREEZE É ALGO QUE PODEMOS USAR 
+AO INÍCIO DE QUALQUER PROJECT....
+
+
+
+
+
+
+
+
+NESSA AULA, POR SUA VEZ, VEREMOS COMO PODEMOS 
+
+IMPLEMENTAR LÓGICA DE REGISTRATION E LOGIN 
+
+
+__MANUALMENTE__ NO NOSSO CÓDIGO...
+
+
+
+
+
+
+
+
+
+
+
+--> COMEÇAMOS COM O BROWSER...
+
+
+
+
+
+
+
+PRECISAMOS DE UMA FORM INICIAL DE 'LOGIN'...
+
+
+
+
+
+
+
+
+-> VAMOS USAR A FORM JÁ EXISTENTE,
+
+
+LÁ DE 'create.blade.php'...
+
+
+
+
+
+
+
+-> PEGAREMOS OS INPUT FIELDS,
+
+
+E REUTILIZAREMOS PARA NOSSA FORM DE LOGIN TAMBÉM...
+
+
+
+
+
+
+
+pegaremos este trecho:
+
+
+
+
+
+
+
+
+
+       <div class="sm:col-span-4">
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                            {{-- * THIS IS ANOTHER WAY TO SHOW EACH INPUT'S ERRORS TO THE USER: --}}
+                            {{-- @if ($errors->has('title'))
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $errors->first('title') }}
+                            </p>
+                            @endif --}}
+                            {{-- * and this is the best way, using the @error() directive: --}}
+                            @error('title')
+                            <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+ISSO REPRESENTA 1 INPUT FIELD...
+
+
+
+
+
+
+-> ELE CONTÉM:
+
+
+
+
+1) FORM LABEL 
+
+
+2) FORM INPUT 
+
+
+3) FORM VALIDATION ERROR...
+
+
+
+
+
+
+
+
+--> PARA ISSO, CRIAREMOS 3 COMPONENTS,
+
+
+
+
+CHAMADOS DE 'FORM-LABEL', 'FORM-ERROR' E 'FORM-INPUT',
+
+
+
+todos dentro da pasta de 'components'...
+
+
+
+
+
+
+
+
+A LABEL FICARÁ ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+                        <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+
+
+
+
+
+
+
+MAS DEVEMOS DEIXAR ISSO MAIS FLEXÍVEL...
+
+
+
+
+EX:
+
+
+
+
+<label class="block text-sm font-medium leading-6 text-gray-900">{{ $slot}}</label>
+
+
+
+
+
+
+
+CERTO... COM ISSO, PRECISAMOS PASSAR O ATTRIBUTE DE 'for' do lado de fora de esse component...
+
+
+
+
+
+
+
+-> fazemos o merge de todos attributes passados a esse label, com 
+este código:
+
+
+
+
+<label {{ $attributes->merge(['class' => 'block text-sm font-medium leading-6 text-gray-900'])}}>{{ $slot}}</label>
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+LÁ NO CREATE.BLADE.PHP,
+
+
+ESCREVEMOS ASSIM:
+
+
+
+                    <div class="sm:col-span-4">
+                         <x-form-label for="title">Title</x-form-label>
+
+
+
+
+
+
+
+
+
+        CERTO...
+
+
+
+
+
+
+
+    DEPOIS DISSO, FAZEMOS A MESMA COISA, MAS PARA O 
+    COMPONENT 'FORM-ERROR.PHP'...
+
+
+
+
+    EX:
+
+
+
+
+
+
+@error('title')
+<p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+@enderror
+
+
+
+
+
+
+OK... MAS PARECE QUE 'name' precisa ser passado, como 
+
+value do prop....
+
+
+
+
+
+
+TIPO ASSIM;
+
+
+
+
+
+
+
+
+
+@props['name']
+
+@error($name)
+<p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
+@enderror
+
+
+
+
+
+
