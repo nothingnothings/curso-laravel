@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobListing;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -52,24 +51,11 @@ class JobController extends Controller
 
     public function edit(JobListing $job) {
 
-        Gate::define('edit-job', function ($user, $job) {
-        // 2nd layer: check if the user is the owner of the job
-        return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
-        });
-
-        // *1st layer: check if the user is logged in
-        if (Auth::guest()) {
-            return redirect()->route('login');
-        }
-
-        Gate::authorize('edit-job',  $job);
-
-
-
-        // * 2nd layer: check if the user is the owner of the job
-        // if ($job->employer->user->isNot(Auth::user())) {
-        //    abort(403);
+        // if (Auth::user()->cannot('edit-job', $job)) {
+        //     abort(403);
         // }
+
+    //    Gate::authorize('edit-job', $job); // * this is the same as the above line
 
         return view('jobs.edit', ['job' => $job]);
     }

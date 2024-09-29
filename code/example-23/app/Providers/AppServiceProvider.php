@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -31,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
         // * Switch the type of view that is being used for the paginator (the default is tailwind, but you can use bootstrap, for example):
         // Paginator::useBootstrapFive();
 
-        Gate::define('edit-job', function ($user, $job) {
+        Gate::define('edit-job', function (User $user, $job) {
             // 2nd layer: check if the user is the owner of the job
             return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
         });

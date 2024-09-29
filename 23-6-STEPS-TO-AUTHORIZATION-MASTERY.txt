@@ -1593,3 +1593,2115 @@ VC VAI __ SEMPRE FAIL_,
     ou por meio do set como nullable,
 
     com '$User'...
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+
+
+        Gate::define('edit-job', function (User $user, $job) {
+            // 2nd layer: check if the user is the owner of the job
+            return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok.... agora, se voltamos ao controller de 'JobController',
+
+
+AQUELA LÓGICA DE 
+
+
+
+
+
+'''
+
+        // *1st layer: check if the user is logged in
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+
+
+'''
+
+
+
+pode ser removida por inteiro,
+
+
+
+pq terá se tornado irrelevante...
+
+
+
+
+
+
+
+
+--> podemos deixar assim, portanto:
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        Gate::authorize('edit-job',  $job);
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA, SIMPLIFICAMOS UM MONTE O NOSSO CÓDIGO...
+
+
+
+
+
+
+
+
+
+
+
+
+A ETAPA 4 É SOBRE 'CAN':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4) CAN, CAN, CAN...
+
+
+
+
+
+
+
+
+
+
+
+
+-> SEU USER MODEL, QUE VEM COM O LARAVEL,
+
+
+JÁ TEM DOIS METHODS ESPECIAIS, CHAMADOS DE 
+
+'->can()'
+
+
+e 
+
+
+'->cannot()'...
+
+
+
+
+
+
+
+
+
+
+
+
+ESSES 2 METHODS SÃO __ IMPORTANTES_....
+
+
+
+
+
+
+ELES SÃO _ UNIQUE_, E SÃO USADOS APENAS__ 
+
+
+
+PARA AUTHORIZATION...
+
+
+
+
+
+
+
+
+
+
+-> PARA USÁ-LOS, DEVEMOS CHAMAR 
+
+
+
+
+
+Auth::user()->can()...
+
+
+
+
+
+
+--> DENTRO DO 'can()',
+
+
+DEVEMOS PASSAR O NOME DE ALGUNS DOS GATES QUE DEFINIMOS MAIS CEDO,
+
+LÁ NO 'AppServiceProvider.php'...
+
+
+
+
+
+
+
+
+
+-> NO CASO,
+
+OS USERS PODEM 'edit-job',
+
+
+POR ISSO ESCREVEMOS ASSIM:
+
+
+
+
+Auth::user()->can('edit-job');
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+       Auth::user()->can('edit-job', $job);
+
+       // Gate::authorize('edit-job', $job);
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ PODEMOS RODAR 
+
+
+'
+SE O USER CANNOT EDIT THE JOB,
+
+WE REDIRECT/FAILURE/ABORT':
+
+
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        if (Auth::user()->cannot('edit-job', $job)) {
+            abort(403);
+        }
+       // Gate::authorize('edit-job', $job);
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+PARA UTILIZARMOS O 'CAN' E 'CANNOT' CORRETAMENTE,
+
+
+PRECISAMOS IR ATÉ O TEMPLATE, 'show.blade.php',
+
+
+
+QUE FAZ O SHOW DE CADA JOB INDIVIDUAL,
+
+
+
+E AÍ WRAPPAR A PARTE DO TEMPLATE QUE TEM O BUTTON DE EDIT
+
+
+
+
+COM 1 NOVA DIRECTIVE,
+
+
+
+AS DIRECTIVE 
+
+
+'@can' 
+
+
+e '@cannot'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESSAS 2 DIRECTIVES SÃO DIRETAMENTE RELACIONADAS COM 
+AUTHORIZATION...
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, ESCREVEMOS TIPO:
+
+
+
+
+
+
+
+
+@can('edit-job', $job)
+
+<x-button></x-button>
+
+
+@endcan
+
+
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job->title }}
+    </h2>
+    <p>
+        This job pays ${{ $job->salary }} per year.
+    </p>
+
+    @can('edit-job', $job)
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+    @endcan
+</x-layout>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... ''IF THE CURRENT USER CAN EDIT THIS JOB,
+                EDIT-JOB,
+                DISPLAY THIS BUTTON''...
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, OS USERS APENAS VISUALIZAM ESSE BUTTON 
+
+
+QUANDO ELES REALMENTE POSSUEM AUTH PARA EDITAR ESSE JOB,
+
+SÃO DONOS DAQUELE JOB...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... AGORA VEREMOS A ETAPA 5...
+
+
+
+
+
+
+
+
+
+
+
+STEP 5)   ''MIDDLEWARE AUTHORIZATION''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... AGORA, SE VOLTAMOS AO 
+    CONTROLLER DE 'JobController',
+
+
+
+    NO METHOD DE 'edit()',
+
+    ESTAMOS COM ISTO:
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+
+       Gate::authorize('edit-job', $job);
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR GOSTA DISSO, PQ FICA 'NICE AND READABLE'...
+
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+       Gate::authorize('edit-job', $job); // this is the same as the above line
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+OK... É APENAS 1 LINE....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS O PROBLEMA É QUE TEMOS QUE REFERENCIAR ISSO __ EM TODAS AS 
+
+ACTIONS EM QUE ISSO É APPROPRIATE...
+
+
+
+
+
+
+
+(''IF YOU WANT TO UPDATE A JOB, YOU ALSO NEED TO HAVE AUTH... IF YOU WANT TO DESTROY A JOB, YOU ALSO NEED AUTH''')...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ALÉM DISSO, AQUI, ESTAMOS 'ASSUMING' QUE, QUANDO PODEMOS 
+FAZER O EDIT DE 1 JOB, TAMBÉM TEMOS PERMISSAO PARA O DELETAR,
+SE SOMOS O USER QUE CRIOU AQUELE JOB... MAS ISSO NEM SEMPRE 
+SERÁ  ASSIM 
+
+
+('scenario where people on your team can view jobs, but 
+only the admins can actually delete jobs from the database')....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO FUNCIONA, SIM, MAS SE VC QUER 
+
+REALMENTE EVITAR REPETIÇÃO,
+VC PODE APLICAR AUTHORIZATION NO LEVEL DAS ROUTES EM SI,
+
+
+USANDO MIDDLEWARE (como vimos no PHP SLIM framework)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO,
+
+
+VAMOS ATÉ O ARQUIVO DE 'web.php':
+
+
+
+
+
+
+
+// * THIS IS THE MOST ABBREVIATED VERSION OF THE ROUTES' CODE.
+Route::view('/', 'home');
+Route::view('/contact', 'contact');
+Route::view('/about', 'about');
+
+Route::resource('jobs', JobController::class);
+
+
+// Auth
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+
+// Login (session management)
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store'])->name('login');
+Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ENTÃO, O PROFESSOR FALA DO SHORTHAND DE 
+
+
+
+' Route::resource('jobs', JobController::class); ''
+
+
+
+
+
+
+
+
+
+
+
+ELE GOSTA DISSO, SIM,
+
+
+
+MAS ELE APONTA UM DOS DOWNSIDES DE ESSE SHORTHAND,
+
+
+
+DE ESSE ONE-LINER APPROACH DE DECLARE DE SUAS ROUTES...
+
+
+
+
+
+
+
+
+
+
+
+
+-> o professor fala sobre o approach de middleware,
+
+que é tipo assim:
+
+
+
+
+Route::resource('jobs', JobController::class)->middleware('auth');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO ACABA APLICANDO ESSA NECESSIDADE DE 'AUTH'
+
+
+EM TODA E QUALQUER ROUTE GERADA POR 'Route::resource('jobs');'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+o professor também adiciona names a nossas routes,
+
+tipo assim:
+
+
+
+
+
+
+
+// Auth
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+// Login (session management)
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store']);
+Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+
+
+
+
+
+
+
+
+
+
+
+ISSO É CHAMADO DE 'NAMED ROUTES'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- OK... MAS VOLTANDO AO TÓPICO EM QUESTÃO:
+
+
+
+
+
+
+
+
+
+
+'''WE NEED TO HANDLE SITUATIONS WHERE WE:
+
+
+1) CAN VIEW ALL JOBS 
+
+2) VIEW SINGLE JOBS 
+
+3) BUT YOU NEED TO BE LOGGED IN, TO DO EVERYTHING ELSE...''
+
+
+
+
+
+
+
+
+
+
+
+
+
+para tirar a proteção das routes de 'index' e 'show' (Que são aquelas 2, de view all e view single),
+
+
+
+vc pode ESCREVER ASSIM:
+
+
+
+
+
+
+Route::resource('jobs', JobController::class)->only(['index', 'show']);
+
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, APENAS ESSAS 2 ROUTES SERÃO CRIADAS, E SEM AUTH..
+
+
+
+
+
+
+
+-> PARA ADICIONAR O RESTO DAS ROUTES COM AUTH,
+VC ESCREVERIA ASSIM:
+
+
+Route::resource('jobs', JobController::class)->only(['index', 'show']);
+Route::resource('jobs', JobController::class)->except(['index', 'show'])->middleware('auth');
+
+
+
+
+
+
+
+
+
+
+
+E ISSO FUNCIONA, SIM, MAS O PROFESSOR NÃO GOSTA...
+
+
+
+
+
+
+
+
+
+
+
+
+-> EM SITUATIONS EM QUE É POSSÍVEL FAZER ISSO,
+
+O PROFESSOR AINDA ACHA QUE É MELHOR REVERTER 
+
+PARA 'SINGLE LINE ROUTE DECLARATIONS',
+
+o padrão normal...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store']);
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+FICOU TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+// Route::resource('jobs', JobController::class);
+
+// * Works, but is ugly:
+// Route::resource('jobs', JobController::class)->only(['index', 'show']);
+// Route::resource('jobs', JobController::class)->except(['index', 'show'])->middleware('auth');
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store']);
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ACHA QUE ISSO MELHOR MT A CLARIDADE, MESMO QUE SEJA 
+
+CÓDIGO DUPLICADO...
+
+
+
+
+
+
+
+
+-> A OUTRA VANTAGEM É QUE PODEMOS 'ADD MIDDLEWARE 
+    IN A BY-ROUTE BASIS''...
+
+
+
+
+
+
+---> ou seja,
+
+
+
+
+VAMOS ADICIONAR o middleware de 'auth' 
+
+
+EM ROUTES ESPECÍFICAS...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth');
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+e, nessa route de 'edit',
+
+
+VAMOS QUERER AINDA ADICIONAR OUTRO MIDDLEWARE,
+
+
+QUE SERÁ 
+
+
+'can:edit-job'...
+
+
+
+
+--> ISSO VAI SE REFERIR AO GATE, QUE ADICIONAMOS APP-WIDE,
+
+MAIS CEDO...
+
+
+
+
+
+
+
+escrevemos 
+
+
+'can:edit-job, job'...
+
+
+
+
+
+
+o segundo job, após a vírgula,
+
+
+VAI SE REFERIR AO JOB PROVIDENCIADO PELA ROUTE, o '{job}' dentro da url...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware(['auth', 'can:edit-job, job']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, O LARAVEL VAI USAR 'ROUTE MODEL BINDING',
+
+PARA OBTER ESSE MODEL E PASSÁ-LO AO SEU GATE...
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, NESSA ÚNICA ROUTE,
+
+ 
+ DECLARAMOS QUE, PARA ACESSÁ-LA, VC PRECISA:
+
+
+
+
+ 1) ESTAR LOGGED IN 
+
+
+
+ 2) TER PERMISSION PARA EDITAR AQUELE JOB (ser o employer que criou o job...)
+
+
+
+
+
+
+
+
+
+
+
+
+ -> COMO RESULTADO DISSO, PODEMOS REMOVER A LINHA 
+
+
+
+ ''        Gate::authorize('edit-job', $job); // this is the same as the above line ''',
+
+
+
+
+
+ LÁ NO JobController...
+
+
+
+
+
+
+ EX:
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        // if (Auth::user()->cannot('edit-job', $job)) {
+        //     abort(403);
+        // }
+
+    //    Gate::authorize('edit-job', $job); // * this is the same as the above line
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, FUNCIONA...
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR EXPLICA QUE 
+
+'MOST PEOPLE PREFER TO PERFORM AUTHORIZATION 
+ON THE ROUTE-LEVEL,
+
+BY USING MIDDLEWARE''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ENTÃO MOSTRA 1 OUTRA MANEIRA DE ESCREVER ISTO:
+
+
+
+
+
+
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware(['auth', 'can:edit-job, job']);
+
+
+
+
+
+
+
+
+
+EM VEZ DE USAR ESSE ARRAY,
+
+
+PODEMOS 
+
+
+
+USAR 
+
+'middleware('auth')->can()'...
+
+
+
+
+
+
+
+--> AÍ, DENTRO do 'can()',
+
+
+
+
+ESCREVEMOS 
+
+'edit-job, 'job'...
+
+
+
+
+
+EX:
+
+
+
+
+
+
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth')->can('edit-job', 'job');
+
+
+
+
+
+
+
+
+
+
+COM ISSO, UTILIZAMOS ESSE METHOD DE 'can()',
+
+
+mais uma vez...
+
+
+
+
+
+
+
+
+
+
+
+QUER DIZER QUE O METHOD DE 'can', USADO APENAS PARA AUTHORIZATION, APARECE EM 3 LOCAIS, NO LARAVEL:
+
+
+
+
+
+
+1)  NO ARQUIVO DE ROUTES DECLARATION...
+
+
+
+
+
+2) no MODEL DE USER...
+
+
+
+(como visto em 
+
+'' Auth::user()->can('edit-job'); ''...
+
+)
+
+
+
+3) NAS VIEWS DO BLADE... também há um can...
+
+
+
+
+
+
+
+
+
+
+
+
+FICOU TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+->middleware('auth')
+->can('edit-job', 'job');
+
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR QUER QUE REPITAMOS ESSAS CALLS PARA TODAS AS 
+ROUTES EM QUE ISSO FAZ SENTIDO...
+
+
+
+
+
+
+(update, destroy, etc)...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+->middleware('auth')
+->can('edit-job', 'job');
+
+Route::patch('/jobs/{job}', [JobController::class, 'update'])
+->middleware('auth')
+->can('edit-job', 'job');
+Route::delete('/jobs/{job}', [JobController::class, 'destroy'])
+->middleware('auth')
+->can('edit-job', 'job'); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA VEREMOS A ÚLTIMA STEP, STEP 6, QUE É 'POLICY'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+STEP 6) -> POLCIIES...
+
+
+
+
+
+
+
+
+
+
+POLICY--> 
+
+
+
+
+''IMAGINE QUE VC TEM 15 ANOS ,
+NÃO PODE ENTRAR EM CLUBS NOTURNOS...
+
+POLICY DE 21 AND UP...''
+
+
+
+
+
+-->  NO CONTEXTO DO LARAVEL,
+    
+
+    ''''POLICIES ARE ___CONNECTED_ TO YOUR LARAVEL MODELS...'''
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS FAZER GENERATE DE 1 POLICY...
+
+
+
+
+
+
+
+
+
+php artisan make:policy
+
+
+
+
+
+
+
+
+
+
+-> ISSO FEITO,
+
+O LARAVEL PEDE O NOME DA POLICY...
+
+
+
+
+
+
+
+
+'JobPolicy'...
+
+
+
+
+
+
+
+
+''What Model should this policy apply to (Optional)''
+
+
+
+--> COLOCAMOS O MODEL DE 'JobListing'...
+
+
+
+
+
+
+
+
+
+-> COM ISSO, FICAMOS COM NOSSA PRIMEIRA POLICY,
+
+NO FOLDER DE 
+
+'app>Policies'...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Policies;
+
+use App\Models\JobListing;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+
+class JobPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> A POLICY TEM 1 MONTE DE EXEMPLOS, NO SEU INTERIOR...
+
+
+
+--> É CLARO QUE SÃO APENAS EXEMPLOS...
+
+
+
+
+
+
+
+
+-> PARA MTAS SITUAÇÕES, 1 ÚNICO 
+METHOD JÁ VAI BASTAR..
+
+
+
+
+
+
+
+
+
+
+--> NO CASO,
+ 
+
+COLOCAMOS 'edit()'...
+
+
+
+
+
+-> o edit vai receber 'User' e um 'JobListing'...
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Policies;
+
+use App\Models\JobListing;
+use App\Models\User;
+
+class JobPolicy
+{
+
+    /**
+     * Determine whether the user can edit the model
+     */
+    public function edit(User $user, JobListing $jobListing): bool
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO....
+
+
+
+
+
+
+
+
+
+E POLICIES SÃO BEM PARECIDAS COM GATES...
+
+
+
+
+
+
+-> DENTRO DA LÓGICA DESSA POLICY, DEVEMOS FAZER O RETURN DE UM BOOL...
+
+
+
+
+
+
+-> FAZEMOS ISSO COM A MESMA LÓGICA DO GATE,
+
+
+COM ISTO:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Policies;
+
+use App\Models\JobListing;
+use App\Models\User;
+
+class JobPolicy
+{
+
+    /**
+     * Determine whether the user can edit the model
+     */
+    public function edit(User $user, JobListing $jobListing): bool
+    {
+        return $jobListing->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+SE DEIXAMOS ESSE CÓDIGO ASSIM,
+
+
+ISSO VAI QUERER DIZER QUE 
+
+
+
+'''WE MIGRATED FROM A GATE CLOSURE 
+
+
+TO 
+
+A __FULL-ON __ MODEL POLICY...'' 
+
+
+
+
+
+
+
+
+
+-> COM ISSO, DEVEMOS ATUALIZAR NOSSO CÓDIGO... PODEMOS 
+
+
+MODIFICAR A PARTE DE 
+
+
+''
+
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+->middleware('auth')
+->can('edit-job', 'job');
+
+
+
+'',
+
+
+E TROCAR 
+
+
+O 'can('edit-job')' 
+
+
+
+POR 
+
+
+'can('edit')''...
+
+
+
+
+
+ISSO PQ, AGORA,
+
+
+
+VAMOS __ REFERENCIAR O METHOD NAME DENTRO DA POLICY, E NÃO MAIS O NOME 
+
+DA GATE QUE TEMOS/TÍNHAMOS...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class, 'create']);
+Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+->middleware('auth')
+// ->can('edit-job', 'job'); // * Referencing a gate
+->can('edit', 'job'); // * Referencing a policy (the JobPolicy, and the 'edit' method).
+
+Route::patch('/jobs/{job}', [JobController::class, 'update'])
+->middleware('auth')
+// ->can('edit-job', 'job'); // * Referencing a gate
+->can('edit', 'job'); // * Referencing a policy (the JobPolicy, and the 'edit' method).
+
+Route::delete('/jobs/{job}', [JobController::class, 'destroy'])
+->middleware('auth')
+// ->can('edit-job', 'job'); // * Referencing a gate
+->can('edit', 'job'); // * Referencing a policy (the JobPolicy, and the 'edit' method).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TAMBÉM TEMOS QUE UPDATAR NOSSA VIEW,
+
+TIPO ASSIM:
+
+
+
+
+
+
+ANTES:
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job->title }}
+    </h2>
+    <p>
+        This job pays ${{ $job->salary }} per year.
+    </p>
+
+    @can('edit-job', $job)
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+    @endcan
+</x-layout>
+
+
+
+
+
+DEPOIS:
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Job Page
+    </x-slot:heading>
+    <h2 class="font-bold text-lg">
+        {{ $job->title }}
+    </h2>
+    <p>
+        This job pays ${{ $job->salary }} per year.
+    </p>
+
+    @can('edit', $job)
+    <p class="mt-6">
+        <x-button href="/jobs/{{ $job->id }}/edit">Edit Job</x-button>
+    </p>
+    @endcan
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+VOLTAMOS AO BROWSER, E TUDO FUNCIONA EXATAMENTE COMO ANTES,
+
+MAS COM 
+
+BEM MENOS CÓDIGO...
+
+
+
+
+
+
+
+
+
+
+--> COMO VC PODE VER, HÁ MT FLEXIBILIDADE 
+    NO LARAVEL, QUANTO A AUTH...
+
+
+
+
+
+
+
+DECISION PARALYSIS:
+
+
+
+
+
+
+''DO I HANDLE AUTH IN MY ROUTES FILE, OR IN MY CONTROLLER...
+DO I USE THE GATE FACADE, OR DO I CREATE SOME POLICIES''..
+
+
+
+
+--> TUDO DEPENDE DO QUE VC QUER FAZER...
+
+
+
+
+
+
+A OPINIAO DO PROFESSOR:
+
+
+
+'''IF YOU ARE BUILDING SOMETHING RELATIVELY SIMPLE,
+THE GATE FACADE IS FINE... OPEN YOUR AppServiceProvider, DEFINE 
+A FEW GATES, AND YOU ARE GOOD TO GO...'''
+
+
+
+
+''' FOR ANYTHING NON-TRIVIAL,
+    LARGER, THE TEACHER __ RECOMMENDS __ POLICIES...'''
+
+
+
+
+
+
+
+    ''USE POLICIES FOR NON-TRIVIAL APPLICATIONS'' (é isso que o professor usa, com o laracast)...
