@@ -1,0 +1,2755 @@
+
+
+
+
+
+
+
+
+
+OK... AGORA ESTAMOS NA PARTE 2...
+
+
+
+
+
+
+
+
+
+
+
+
+--> COMEÇAMOS COM REGISTRATION...
+
+
+
+
+
+
+--> DIGAMOS QUE NÓS 
+
+FAZEMOS FILL OUT DE TODOS OS INPUT FIELDS E CLICAMOS EM 'REGISTER'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> O QUE DEVE ACONTECER, QUANDO ISSO OCORRER?
+
+
+
+
+
+--> SERÁ HITTADA A ACTION DE 'STORE',
+
+NO CONTROLLER DE 'RegisteredUserController'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> A LÓGICA DESSE METHOD AINDA NÃO FOI ESCRITA:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display the registration page.
+     */
+    public function create()
+    {
+        return view('auth.register');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request->all());
+
+        return redirect()->route('home');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O QUE DEVE ACONTECER, PARA CONSEGUIRMOS REGISTER O USER?
+
+
+
+
+
+DEVEMOS:
+
+
+
+//validate 
+//create the user 
+//sign user in (login)
+//redirect user (to dashboard, home page, etc)...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA VALIDATE,
+
+
+PODEMOS USAR O CLÁSSICO 
+
+
+request()->validate(
+
+)
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+
+        request()->validate(
+            [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'password_confirmation' => ['required', 'string', 'min:8', 'same:password'],
+            ]
+            );
+
+        return redirect()->route('home');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    CERTO... MAS VC VAI QUERER ALGUM SHAPE ESPECIAL, PARA SEU PASSWORD? (regex)..
+
+
+
+
+
+
+'AT LEAST 2 NUMBERS, CERTAIN LENGTH, ETC ETC...''
+
+
+
+
+
+
+
+
+
+-> PARA AJUDAR A DEFINIR ESSAS VALIDATION RULES,
+
+O LARAVEL TEM UMA HELPER CLASS,
+
+CHAMADA DE 
+
+'Password::'...
+
+
+
+
+
+
+
+Illuminate\ValidationRules\Password
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VC PODE PENSAR NISSO QUASE COMO UMA 'FLUENT API' 
+
+PARA DEFINIR SUAS RULES...
+
+
+
+
+
+
+podemos escrever tipo assim:
+
+
+
+                'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20)],
+
+
+
+
+
+
+
+
+
+
+TIPO ALGO ASSIM:
+
+
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+
+        request()->validate(
+            [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                //  With the confirmed rule, we can use the same rule for the password and the password_confirmation
+                // With this chaining of the Password rule, we can add multiple rules, using a fluent interface (chaining).
+                'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+            ]
+            );
+
+        return redirect()->route('home');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR EXPLICA QUE, SE VC VAI REPETIR 1 MESMO 
+CONJUNTO DE VALIDATION RULES AO LONGO DO SEU APP INTEIRO,
+
+ÀS VEZES É UMA BOA IDEIA DEFINIR ESSE CONJUNTO DE RULES (set de rules)
+
+LÁ NO 'AppServiceProvider' (arquivo que define várias coisas gerais do seu laravel app),
+
+
+
+para que então vc CONSIGA ACESSAR ESSE CONJUNTO DE RULES sem duplicação,
+
+por meio do call de 
+
+'Password::default()'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+o professor escreve assim:
+
+
+
+
+Password::min(6), 'confirmed'
+
+
+
+
+
+
+
+
+
+
+
+
+''confirmed'' 
+
+
+
+
+
+
+
+
+
+
+-> ''CONFIRMED'' -> SE VC APLICA ISSO A ALGUM REQUEST FIELD,
+
+                        O LARAVEL VAI AUTOMATICAMENTE PROCURAR 
+                        POR 1 OUTRO FIELD,
+                        LÁ NA SUA FORM/BODY DA FORM,
+
+                        QUE TENHA 
+
+                        O NAME DE 'password_confirmation',
+
+                        EXATAMENTE COMO TÍNHAMOS ESCRITO LÁ NA FORM 
+                        DE REGISTER,
+
+                        TIPO ASSIM:
+
+
+
+                    
+                
+            
+        
+    
+
+          <x-form-field>
+                        <x-form-label for="first_name">First Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="first_name" id="first_name" placeholder="John" required />
+                            <x-form-error name="first_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="last_name">Last Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="last_name" id="last_name" placeholder="Doe" required />
+                            <x-form-error name="last_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password_confirmation">Confirm Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" required />
+                            <x-form-error name="password_confirmation" />
+                        </div>
+                    </x-form-field>
+
+
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+            <x-form-field>
+                        <x-form-label for="password_confirmation">Confirm Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" required />
+                            <x-form-error name="password_confirmation" />
+                        </div>
+                    </x-form-field>
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, O LARAVEL VAI CHECAR SE ESSES 2 VALUES 
+SERÃO EXATAMENTE OS MESMOS...
+
+
+
+
+
+
+
+-> GERALMENTE ESSA VALIDATION É APLICADA 
+AO FIELD DE 'password',
+
+
+MAS VC PODERIA FAZER EM COISAS COMO O EMAIL FIELD,
+
+SE ISSO FAZ SENTIDO PARA VOCÊ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> E, PARA QUE ISSO FUNCIONE,
+
+O NAME REALMENTE TEM QUE SER 'password_confirmation',
+
+lá no input field.... não pode ser 'confirm_password'...
+
+
+
+
+
+
+
+
+
+
+a naming convention é sempre 
+
+''<the_related_attribute>_confirmation'',
+
+
+
+
+
+no caso...
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR TERMINA ESSA PARTE...
+
+
+
+
+
+
+
+
+
+-> DEPOIS DE TER FEITO O VALIDATE DO REQUEST,
+ 
+ O PRÓXIMO PASSO É 'VALIDATE THE USER'...
+
+
+
+
+
+
+
+
+
+
+
+ -> PARA ISSO,
+
+
+
+ PODEMOS ESCREVER 
+
+
+ User::create(
+    [
+
+    ]
+ );
+
+
+
+
+
+
+
+
+
+
+
+ -> DENTRO DE ESSA CALL,
+    PODERÍAMOS REPETIR AQUELES ATTRIBUTES ALI, SIM...
+
+
+    tipo assim:
+
+    
+ User::create(
+    [
+        'first_name' => request('first_name'),
+        'last_name' => request('last_name')
+    ]
+ );
+
+
+
+
+etc etc...
+
+
+
+
+
+
+
+
+
+--> MAS, SE VC QUISER,
+
+
+E ASSUMINDO QUE 
+
+ESSE VALIDATE METHOD __ DEU CERTO,
+
+
+
+
+
+VC PODE _ ARMAZENAR O VALUE DISSO EM 1 VARIABLE,
+
+E AÍ PASSAR APENAS A VARIABLE,
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'first_name' => ['required', 'string', 'max:255'],
+                    'last_name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'email', 'max:255', 'unique:users'],
+                    'password' => ['required', 'string', 'min:8', 'confirmed'],
+                    //  With the confirmed rule, we can use the same rule for the password and the password_confirmation
+                    // With this chaining of the Password rule, we can add multiple rules, using a fluent interface (chaining).
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Create the user
+        User::create($validatedAttributes);
+
+
+        return redirect()->route('home');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ISSO VAI _ CRIAR _ 
+    O USER, NA DATABASE...
+
+
+
+
+
+
+
+
+
+$attributes = xxxxx 
+
+
+
+$validatedAttributes = xxxx 
+
+
+
+
+
+
+
+
+
+
+--> OK... AGORA TEMOS QUE FAZER O LOGIN DO USER...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, USAREMOS A CLASS 
+
+'Auth', de
+
+'Illuminate\Support\Facades'
+
+
+
+
+
+
+
+
+-> USAREMOS O METHOD DE '::login()',
+    dentro de essa class...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+    public function store(Request $request)
+    {
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'first_name' => ['required', 'string', 'max:255'],
+                    'last_name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'email', 'max:255', 'unique:users'],
+                    'password' => ['required', 'string', 'min:8', 'confirmed'],
+                    //  With the confirmed rule, we can use the same rule for the password and the password_confirmation
+                    // With this chaining of the Password rule, we can add multiple rules, using a fluent interface (chaining).
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Create the user
+        $user = User::create($validatedAttributes);
+
+
+
+        // Log the user in, with one of laravel's packages:
+        Auth::login($user);
+
+
+        return redirect()->route('home');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... NÓS BASICAMENTE PEGAMOS O OBJECT 'USER' RETORNADO 
+
+POR 'User::create',
+
+
+E AÍ
+
+
+passamos a esse method, de essa package...
+
+
+
+
+
+
+
+
+-> POR FIM, FAZEMOS REDIRECT À PAGE DE 'jobs'...
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'first_name' => ['required', 'string', 'max:255'],
+                    'last_name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'email', 'max:255', 'unique:users'],
+                    'password' => ['required', 'string', 'min:8', 'confirmed'],
+                    //  With the confirmed rule, we can use the same rule for the password and the password_confirmation
+                    // With this chaining of the Password rule, we can add multiple rules, using a fluent interface (chaining).
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Create the user
+        $user = User::create($validatedAttributes);
+
+
+        // Log the user in, with one of laravel's packages:
+        Auth::login($user);
+
+
+        return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... DEIXAMOS TUDO ISSO PRONTO,
+
+
+E TENTAMOS CRIAR 1 USER...
+
+
+
+
+
+
+
+
+
+-> GANHAMOS UM ERROR, FAIL:
+
+
+
+
+
+
+integrity constraint violation: 19 NOT NULL constraint failed: users.first_name...
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO ACONTECEU POR CONTA DA SETTING DE 'MASS ASSIGNABLE FIELDS',
+    LÁ NO NOSSO MODEL...
+
+
+
+
+
+
+
+
+--> basicamente, são as properties '$fillable' 
+
+    e '$guarded',
+
+    lá nos models...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+
+NOSSO USER NÃO DEIXA QUE FAÇAMOS WRITE DO FIELD DE 'first_name' e 'last_name'...
+
+
+
+
+
+
+PARA CONSERTAR ISSO, BASTA ADICIONAR 'first_name' e 'last_name' a esses fields...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+SE VC  QUER DESABILITAR ESSA FEATURE POR INTEIRO,
+
+SE CONSIDERAR QUE A PROTECTION É DESNECESSÁRIA,
+
+
+BASTA 
+
+ESCREVER 
+
+
+
+'$guarded = [];'
+
+
+
+
+
+
+
+
+
+(define todos os attributes como writable, 
+    nos seus rows)...
+
+
+
+
+
+
+
+
+-> OK...
+
+
+
+
+O USER ESTÁ SENDO REDIRECIONADO COM SUCESSO,
+
+
+MAS AINDA 
+
+NÃO TEMOS NENHUM USER FEEDBACK, DE QUE ELE JÁ ESTÁ AUTH...
+
+
+
+
+
+
+
+
+
+
+
+'''IT MIGHT BE USEFUL TO HAVE A FLASH MESSAGE,
+    THAT WE PUT INTO THE SESSION....'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA CONFIRMAR QUE O CREATE FUNCIONOU,
+
+BASTA EXAMINAR A DATABASE... FICAMOS COM 1 ENTRY
+
+
+NA DATABASE, SUCESSO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR USOU O PASSWORD 'password',
+
+
+MAS AÍ NA DATABASE
+
+
+ISSO ACABOU HASHEADO...
+
+
+
+
+
+
+
+
+
+E ISSO É INTERESSANTE,
+
+PQ NÓS NÃO HASHEAMOS COISA ALGUMA,
+
+NÃO HASHEAMOS NOSSO PASSWORD,
+
+DENTRO DO CONTROLLER...
+
+
+
+
+
+
+--> MESMO ASSIM, ISSO FUNCIONOU... MAS PQ FUNCIONOU?
+
+
+
+
+
+
+
+
+
+
+
+
+
+PARA ENCONTRAR A RESPOSTA, VAMOS ATÉ O MODEL DE 'User.php':
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COMO VC PODE VER,
+
+
+TEMOS AQUELE METHOD de 'casts()'... 
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO TUDO É PROVIDENCIADO, OUT OF THE BOX,
+
+PELO LARAVEL FRAMEWORK...
+
+
+
+
+
+
+'''' Get the attributes that should be cast. '''
+
+
+
+
+
+
+
+
+
+-> VC DEVE PENSAR NISSO COMO 
+
+
+
+'''A WAY TO MANIPULATE A VALUE WHEN YOU ___ FETCH IT __ OR SET IT__...''
+
+
+
+
+
+
+
+
+
+
+
+
+--> e o password está como 'hashed'...
+
+
+
+
+
+
+
+
+--> ISSO SIGNIFICA, EM OUTRAS PALAVRAS,
+
+QUE QUANDO nós settamos 1 password,
+ em 'User',
+
+ NÓS VAMOS QUERER HASHEÁ-LO, AUTOMATICAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -> O LARAVEL PROVIDENCIA ALGUNS DESSES CASTS OUT OF THE BOX,
+
+ E VC PODE ATÉ MESMO PROVIDENCIAR SEUS PRÓPRIOS CASTS, SE QUISER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ O PROFESSOR ENTÃO FALA SOBRE A LÓGICA DE '@guest  <CONTENT>   @endguest',
+
+
+
+
+ QUE FOI USADO PARA 
+
+
+ FAZER COM QUE OS LINKS DE AUTH (login e register)
+
+ APAREÇAM 
+ APENAS QUANDO O USER ESTIVER SEM AUTH...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -> AGORA FAREMOS ALGO PARECIDO, MAS O OPOSTO,
+
+ COM O LINK DE 'LOGOUT'...
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ENTÃO FALA DA LÓGICA DE LOGOUT...
+
+
+
+
+
+--> BEGINNERS GERALMENTE USAM um href para uma página de logout,
+
+como 'GET /logout',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+                            <x-nav-link href="/logout" >Log Out</x-nav-link>
+
+
+
+
+E ISSO PODE SER ÚTIL, SIM,
+
+
+PQ AÍ VC PODE TER 1 ANCHOR TAG QUE PODE SER USADA PARA DESLOGGAR O USER INSTANTANEAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+-> ENTRETANTO, ESSE TIPO DE PRÁTICA 
+NÃO É MT ACEITA...
+
+
+
+
+
+
+
+-> IDEALMENTE,
+
+''''WE SHOULD ALWAYS __ USE __ A POST REQUEST, WHEN LOGGING OUT 
+THE USER''...
+
+
+
+
+
+
+
+
+
+(isso pq sites externos podem conter 1 link ao seu site,
+
+que então fará com que o user seja logged out, mesmo que esse seja um OUTRO SITE... e esse outro site 
+não deveria ter a capacidade de fazer isso... por isso que POST requests para logout são melhores...)
+
+
+
+
+
+
+
+
+
+
+
+--> É POR ISSO QUE USAREMOS UMA __ FORM _ PARA O LOGOUT,
+
+E NÃO 
+
+UM LINK...
+
+
+
+
+
+
+-> PODEMOS ESCREVER ASSIM;
+
+
+
+
+
+
+                        @auth
+                            <form action="/logout" method="POST">
+                                @csrf
+                                <x-form-button>Log Out</x-form-button>
+                            </form>
+                            @endauth
+
+
+
+                    EX:
+
+
+
+
+    
+
+
+
+                           <div class="ml-4 flex items-center md:ml-6">
+                            <!-- GUEST is a custom directive that checks if the user is logged in or not (if it is a GUEST or not) -->
+                            @guest
+                            <x-nav-link href="/login" :active="request()->is('login')">Log In</x-nav-link>
+                            <x-nav-link href="/register" :active="request()->is('register')">Register</x-nav-link>
+                            @endguest
+
+                            @auth
+                            <form action="/logout" method="POST">
+                                <x-form-button>Log Out</x-form-button>
+                            </form>
+                            @endauth
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... QUANDO VC FIZER 1 REQUEST A 'logout',
+
+
+VC VAI DISPARAR O METHOD DE 'destroy',
+
+dentro do 'SessionController',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+// Login (session management)
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store'])->name('login');
+Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NO SESSIONCONTROLLER,
+
+
+DEVEMOS TER A LÓGICA PARA LOG THE USER OUT...
+
+
+EX:
+
+
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SessionController extends Controller
+{
+    /**
+     * Display the registration page.
+     */
+    public function create()
+    {
+        return view('auth.login');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request->all());
+
+        return redirect('jobs');
+    }
+
+    public function destroy()
+    {
+        return redirect('jobs');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA PRECISAMOS DE ESSA LÓGICA...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS FAZER LOGIN DE UM USER COM 
+
+'Auth::login($user)',
+
+
+
+COMO VIMOS ANTERIORMENTE...
+
+
+
+
+
+
+
+
+--> PARA FAZER O __ LOGOUT DE UM USER,
+
+
+    PODEMOS USAR 
+
+
+
+    'Auth::logout();'
+
+
+
+
+
+
+
+--> NESSE CASO,
+
+
+
+    '''WE DON'T NEED TO PROVIDE AN USER AS AN ARGUMENT,
+    BECAUSE IT WILL AUTOMATICALLY 'ASSUME THE CURRENTLY AUTHENTICATED USER''....
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DE OCORRER O LOGOUT, NÓS FAZEMOS O REDIRECT PARA A PAGE DE LOGIN,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class SessionController extends Controller
+{
+    /**
+     * Display the registration page.
+     */
+    public function create()
+    {
+        return view('auth.login');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request->all());
+
+        return redirect('jobs');
+    }
+
+    public function destroy()
+    {
+
+        Auth::logout();
+
+        return redirect('/');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+AGORA ESTAMOS NA ÚLTIMA PARTE,
+
+
+QUE É O ACTUAL 'LOGIN'...
+
+
+
+
+
+
+
+-->> VAMOS BASICAMENTE USAR OS CREDENTIALS PASSADOS PELO REQUEST,
+
+E AÍ RODAR VALIDATION NOVAMENTE,
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+        // dd($request->all());
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'email' => ['required', 'email', 'max:255', 'unique:users'],
+                    'password' => ['required', 'string', 'min:8', 'confirmed'],
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Log the user in, with one of laravel's packages:
+        Auth::login($validatedAttributes);
+
+        return redirect('jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS É CLARO QUE SÓ ISSO NÃO BASTA...
+
+
+
+
+
+
+
+
+
+TEMOS ALGUMAS STEPS QUE DEVEM SER SEGUIDAS:
+
+
+
+
+
+1) validate 
+
+2) attempt to login the user 
+
+3) regenerate the session token (devemos fazer isso, é mais seguro)...
+
+4) redirect the user to the dashboard/home page...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMEÇAMOS ASSIM:
+
+
+
+
+
+
+
+
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'email' => ['required', 'email'],
+                    'password' => ['required'],
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+
+
+
+
+
+
+
+
+
+E, DEPOIS DISSO,
+
+
+
+DEVEMOS USAR OUTRO METHOD DO LARAVEL,
+
+QUE É 
+
+
+
+
+'Auth::attempt()'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESSE METHOD TEM 2 PARAMETERS:
+
+
+
+
+
+
+
+
+1) AS CREDENTIALS 
+
+
+
+
+
+
+2) SE VC QUER QUE 
+    A APPLICATION/SESSION FAÇA 'REMEMBER' DO USER,
+
+    VC PODE DEFINIR O SEGUNDO PARAMETER COMO 'TRUE'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> o method de 'Auth::attempt()'
+
+
+
+VAI SEMPRE RETORNAR 1 BOOLEAN..
+
+
+
+
+
+
+
+-> PODEMOS ARMAZENAR O BOOLEAN EM 1 VARIABLE,
+
+E AÍ CHECAR SE DEU FALSE....
+
+
+SE DEU FALSE,
+
+
+FAZEMOS UM ABORT, OU O THROW DE UMA EXCEPTION, PARA RECEBER FEEDBACK NO FRONTEND...
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS ESCREVER ASSIM, POR ENQUANTO:
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+        // dd($request->all());
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'email' => ['required', 'email'],
+                    'password' => ['required'],
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Log the user in, with one of laravel's packages:
+        $isValidated = Auth::attempt($validatedAttributes);
+
+        if (!$isValidated) {
+            return redirect()->route('login')->withErrors('Invalid email or password');
+        }
+
+        // regenerate the session token:
+        request()->session()->regenerate();
+
+
+        return redirect('jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+--> o regenerate da session é uma medida de segurança,
+
+    que recicla a session token...
+
+
+
+
+
+
+
+--> NÓS TESTAMOS O LOGIN,
+    MAS SEM AQUELE IF STATEMENT...
+
+
+
+
+
+
+
+
+
+--> O FALSE FOI RETORNADO PELO ATTEMPT METHOD... (pq colocamos 1 senha errada)
+
+
+
+
+
+
+--> não fizemos coisa alguma com esse false..
+
+
+-> aí a token foi regenerated,
+
+e aí 
+
+fomos redirecionados para a page de jobs... (e sem o login...)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> QUER DIZER QUE PRECISAMOS HANDLAR O CASO DE 'FAILED AUTHENTICATION'...
+
+
+
+
+
+--> SERÁ TIPO 1 VALIDATION ERROR... 
+
+
+''Sorry, you did not provide an email''
+
+''Sorry, the password is wrong, credentials don't match''...
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ -> QUEREMOS, ENTÃO, FAZER O THROW DE 1 VALIDATION EXCEPTION,
+
+ CASO O VALIDATE DO USER VENHA A FALHAR...
+
+
+
+
+
+
+
+
+ -_> PODEMOS ESCREVER ISSO ASSIM:
+
+
+
+
+
+         // Log the user in, with one of laravel's packages:
+        $isValidated = Auth::attempt($validatedAttributes);
+
+        if (!$isValidated) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+essa ValidationException
+
+é providenciada pelo próprio laravel,
+
+com isto:
+
+
+
+use Illuminate\Validation\ValidationException;
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS, AQUI, FICAMOS COM 1 PROBLEMA:
+
+
+
+
+
+
+
+'''OUR INPUT FIELDS' VALUES HAVE 
+    BEEN EATEN''...
+
+
+
+
+
+
+--> seria legal PROVIDENCIAR OS VALUES DOS INPUT FIELDS DE VOLTA,
+
+    PELO MENOS O 'email',
+
+    SEMPRE QUE 
+
+    A VALIDATION FALHAR...
+
+
+
+
+
+
+
+
+
+
+-> QUEREMOS FAZER ISSO PARA QUE O USER NÃO TENHA QUE PREENCHER TUDO DE NOVO...
+
+
+
+
+
+
+--> PARA ISSO,
+
+
+VAMOS ATÉ A PAGE DE 'LOGIN' MAIS UMA VEZ:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Log In
+    </x-slot:heading>
+    <form method="POST" action="/login">
+        @csrf
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <a href="/" type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+            <x-form-button>Log In</x-form-button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> TEMOS O INPUT FIELD DE 'email':
+
+
+
+
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+
+TEMOS O ATTRIBUTE DE 'value'...
+
+
+
+
+
+
+
+
+-> O LARAVEL PROVIDENCIA UMA HELPER FUNCTION CHAMADA DE 'old()',
+
+
+    QUE PODE SER USADA PARA OBTER 
+
+
+    ''THE OLD VALUE, FOR THE ATTRIBUTE,
+
+    FOR THE SESSION''...
+
+
+
+
+
+
+tipo 'old('email')' 
+
+
+
+
+
+
+--> PODEMOS ESCREVER ASSIM, PORTANTO:
+
+
+
+
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" value="old('email')" required />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... MAS ISSO NÃO FUNCIONARÁ, INCIALMENTE... E ISSO PODE 
+SER __CONFUSO_ para newcomers...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> VOLTAMOS AO BROWSER,
+
+E AÍ enxergamos 'old('email')',
+
+
+EM VEZ DE 1 VALUE DINÂMICO..
+
+
+
+
+
+
+
+
+
+
+--> PARA CONSEGUIRMOS 1 ACTUAL VALUE DINAMICO,
+
+
+do value antigo da form que foi enviada,
+
+devemos escrever :value="old('email')"
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" :value="old('email')" required />
+
+
+
+
+
+
+
+
+
+
+FAZEMOS ISSO PARA QUE ESSE CÓDIGO SEJA TRATADO COMO 1 EXPRESSION,
+
+E NÃO COMO 1 STRING...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... REFRESHAMOS A PAGE, TENTAMOS 1 PASSWORD ERRADO,
+
+
+
+
+E AÍ FUNCIONA,
+
+CONSEGUIMOS ENXERGAR O OLD VALUE...
+
+
+
+
+
+
+
+
+
+
+
+-> DEIXAMOS O OLD VALUE APENAS PARA O FIELD DE 'EMAIL',
+
+E NÃO PARA O FIELD DE 'PASSWORD',
+
+PQ ISSO NÃO FARIA SENTIDO...
+
+
+
+
+
+
+
+--> SE COLOCAMOS CREDENTIALS VERDADEIRAS,
+SOMOS REDIRECTED, MAS AO MESMO TEMPO ESTANDO 'AUTH'...
+
+
+
+
+
+
+
+-> CERTO... O PROFESSOR ENTÃO QUER ACABAR COM 2 NOTES:
+
+
+
+
+
+
+
+
+
+
+
+1) ''' AS YOU'VE LEARNED,
+        IF WE USE 'request()->validate()',
+
+        IF IT FAILS,
+         
+         __ WE DON'T HAVE TO MANUALLY REDIRECT BACK 
+         TO THE LOGIN FORM... LARAVEL DOES IT AUTOMATICALLY...
+         AND THAT IS REALLY HELPFUL...''
+
+        
+    '''THE EXACT SAME THING IS TRUE FOR 'ValidationException'...
+        WE DON'T NEED TO CATCH IT ANYWHERE... IT WILL BUBBLE UP,
+        AND THEN LARAVEL WILL CATCH IT... IT WILL THEN INSPECT THE 
+        EXCEPTION, AND REDIRECT BACK TO THE FORM, AND SEND THROUGH 
+        THE ERROR MESSAGES...'''
+
+
+
+
+
+
+
+2) 'request()->session()->regenerate()'-->  IS A SECURITY MEASURE 
+                                            USED TO PROTECT 
+                                            AGAINST 'SESSION HIJACKING'...
+
+
+
+
+
+
+
+
+
+
+'SESSION HIJACKING' --> 
+
+                                
+                        ''' AN ATTACK WHERE A HACKER GETS ACCESS 
+                        TO YOUR SESSION TOKEN... AND A SESSION TOKEN IS 
+                        A SORT OF UNIQUE IDENTIFIER THAT SAYS  THAT YOU 
+                        ARE AUTH FOR THAT APP, IN THAT BROWSER'''...
+
+
+
+
+
+
+    --> e uma maneira de proteger contra o get de essa token
+    e use de essa token pelos attackers é justamente o REGENERATE 
+    DELA, sempre que  o USER FAZ SIGN IN...
+
+
+    (''THAT WAY, EVEN IF SOMEONE HAS THE OLD TOKEN,
+    IT WON'T WORK, BECAUSE EACH TIME YOU LOGIN, IT WILL BE REGENERATED...'' ) 
+
+
+
+
+
+
+
+
+
+recapitulando a lógica de login:
+
+
+
+
+
+
+1) validate the request 
+
+2) attempt to sign you in 
+
+3) regenerate the token 
+
+4) redirect to where user needs to go...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+        // dd($request->all());
+
+        // Validate the input
+        $validatedAttributes = request()->validate(
+                [
+                    'email' => ['required', 'email'],
+                    'password' => ['required'],
+                    'password_confirmation' => ['required', Password::min(5)->letters()->numbers()->max(20), 'same:password'],
+                ]
+                );
+
+        // Log the user in, with one of laravel's packages:
+        $isValidated = Auth::attempt($validatedAttributes);
+
+        // If the credentials are invalid, we will throw an exception, which will be handled by laravel, automatically.
+        if (!$isValidated) {
+            throw ValidationException::withMessages([
+                'email' => ['Sorry, the provided credentials do not match.'],
+            ]);
+        }
+
+        // regenerate the session token:
+        request()->session()->regenerate();
+
+        // redirect the user to the desired page.
+        return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FALTAM ALGUMAS COISAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> FALTA:
+
+
+
+
+
+
+
+1) RATE LIMITING 
+
+
+
+
+
+
+
+''CONTROL THE RATE OF REQUESTS THAT MAY BE SENT TO THE SERVER''..
+
+
+
+
+
+
+2) RESET PASSWORD...
+
+
+
+
+
+
+
+
+
+3) DELIVERING EMAILS (estudaremos antes)...
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR MOSTRARÁ AUTHORIZATION NA PRÓXIMA AULA...
