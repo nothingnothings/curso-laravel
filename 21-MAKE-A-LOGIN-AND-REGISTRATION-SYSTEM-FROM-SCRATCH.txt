@@ -285,8 +285,7 @@ TIPO ASSIM;
 
 
 
-
-@props['name']
+@props(['name'])
 
 @error($name)
 <p class="text-xs font-semibold mt-1 text-red-600">{{ $message }}</p>
@@ -297,3 +296,1928 @@ TIPO ASSIM;
 
 
 
+
+
+
+
+
+ISSO PQ QUEREMOS RECEBER 'name' como um PROP, dentro do component...
+
+
+
+
+
+
+
+
+
+-> AÍ UTILIZAMOS ISSO, DENTRO DO COMPONENT, PARA ENTÃO TER 1 
+    VERSÃO FLEXÍVEL DE '@error('<seu_valor>')' 
+
+
+
+
+
+
+
+
+
+
+NO CASO, 
+
+O COMPONENT AÍ FICA ASSIM, EM 'create.blade.php':
+
+
+
+
+
+
+
+                     <x-form-error name="title" />
+
+
+
+
+
+
+
+
+VAI FICANDO TIPO ASSIM:
+
+
+
+
+                    <div class="sm:col-span-4">
+                        <x-form-label for="title">Title</x-form-label>
+                        <div class="mt-2">
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+                            <x-form-error name="title" />
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+POR FIM, TEMOS QUE SIMPLIFICAR O INPUT FIELD EM SI...
+
+
+
+
+
+
+
+
+--> BASTA EXTRAIR TIPO ASSIM:
+
+
+
+
+
+
+                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                <input type="text" name="title" id="title" autocomplete="title" class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Programmer" required>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NA PARTE INICIAL, FICOU ASSIM:
+
+
+
+
+
+
+                  <div class="sm:col-span-4">
+                        <x-form-label for="title">Title</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input name="title" id="title" placeholder="Programmer" required />
+                            <x-form-error name="title" />
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+e o código do component ficou assim:
+
+
+
+
+
+
+<div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+    <input {{ $attributes->merge(['block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6'])}}>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+
+
+
+COM ISSO, LIMPAMOS AS COISAAS BSTANTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> PRECISAMOS FAZER ISSO NO outro input field, label e error...
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR DECIDE CRIAR UM COMPONENT QUE VAI ENVELOPPAR 
+    O 'form-input.blade.php'....
+
+
+
+
+
+
+
+--> ELE ESCREVE TIPO ASSIM:
+
+
+
+
+
+
+<div class="sm:col-span-4">
+    {{ $slot }}
+</div>
+
+
+
+
+
+
+
+
+
+E FICA TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+                   <x-form-field>
+                        <x-form-label for="title">Title</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input name="title" id="title" placeholder="Programmer" required />
+                            <x-form-error name="title" />
+                        </div>
+                    </x-form-field>
+
+
+
+
+
+
+
+
+
+
+
+
+OK, AGORA PRECISAMOS FAZER A MESMA COISA, MAS COM O SEGUNDO FIELD, DE 'salary'...
+
+
+
+
+
+
+
+
+FICOU TIPO ALGO ASSIM:
+
+
+
+
+
+
+
+
+
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="title">Title</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input name="title" id="title" placeholder="Programmer" required />
+                            <x-form-error name="title" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="salary">Salary</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input name="salary" id="salary" placeholder="$100,000" required />
+                            <x-form-error name="salary" />
+                        </div>
+                    </x-form-field>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+ 
+
+O PROFESSOR QUER FAZER EXTRACT DO BUTTON DE SUBMIT, TAMBÉM, EM 1 DEDICATED BLADE COMPONENT...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+
+
+
+
+
+
+
+
+
+
+
+E FICA TIPO ASSIM:
+
+
+
+
+
+
+
+
+<button {{ $attributes->merge(['class' => 'rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600', 
+                                'type' => 'submit']) }}>{{ $slot }}</button>
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS TANTO COM ESSAS CLASSES,
+
+
+COMO COM ESSE TYPE DEFAULT DE 'submit'...
+
+
+
+
+
+
+
+
+E O RESULTADO FICOU ASSIM:
+
+
+
+
+
+
+
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+            <x-form-button>Save</x-form-button>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> certo.... o professor então copia toda essa view,
+
+
+e aí vai até o arquivo de 'web.php',
+
+
+EM QUE 
+
+PREPARA ALGUMAS ROUTES...
+
+
+
+
+
+
+
+
+
+
+
+
+
+_> ELE FAZ 1 ROUTE DE GET PARA A ROUTE DE REGISTER,
+    PARA PEGAR A VIEW...
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+// Auth
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO ESSA É A PAGE QUE SERÁ USADA PARA 'CREATE A NEW REGISTERED USER (the view for that)',
+
+DEVEMOS USAR O METHOD DE 'create', nesse controller...
+
+
+
+
+
+
+
+
+
+
+
+PODEMOS COMEÇAR ASSIM:
+
+
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display the registration page.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('auth.register');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> MAS O PROFESSOR ESCREVEU DE FORMA DIFERENTE,
+
+ELE ESCREVEU 
+
+
+
+
+
+php artisan make:controller 
+
+
+
+
+
+
+
+
+
+
+
+
+-> mas n faz diferença, na verdade...
+
+
+
+
+
+
+LÁ NAS NOSSAS VIEWS, CRIAMOS UMA NOVA VIEW,
+
+CHAMADA DE 
+'register.blade.php',
+
+dentro da pasta 'auth'..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... COPIAMOS E COLAMOS TODO O CÓDIGO DE 'create.blade.php',
+
+para adaptarmos nessa form de register...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E, SE O USER QUER REGISTER, ELE PRECISA PROVIDENCIAR ALGUNS VALUES:
+
+
+
+
+
+
+
+1) first_name  
+
+2) last_name 
+
+3) email 
+
+4) password 
+
+5) talvez o 'confirm password'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="first_name">First Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="first_name" id="first_name" placeholder="John" required />
+                            <x-form-error name="first_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="last_name">Last Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="last_name" id="last_name" placeholder="Doe" required />
+                            <x-form-error name="last_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    E ASSIM:
+
+
+
+
+
+
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="first_name">First Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="first_name" id="first_name" placeholder="John" required />
+                            <x-form-error name="first_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="last_name">Last Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="last_name" id="last_name" placeholder="Doe" required />
+                            <x-form-error name="last_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR DIZ QUE É BEM MAIS COMUM ERRAR O EMAIL DO QUE 
+
+O PASSWORD...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS VAMOS MANTER A TRADIÇÃO, POR ISSO 1 FIELD DE 'CONFIRM PASSWORD'....
+
+
+
+
+
+
+
+
+
+
+
+-> a convention, para passwords, é escrever 'password_confirmation',
+
+tipo assim:
+
+
+
+
+
+
+
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="first_name">First Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="first_name" id="first_name" placeholder="John" required />
+                            <x-form-error name="first_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="last_name">Last Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="last_name" id="last_name" placeholder="Doe" required />
+                            <x-form-error name="last_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password_confirmation">Confirm Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" required />
+                            <x-form-error name="password_confirmation" />
+                        </div>
+                    </x-form-field>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+FICOU TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Register
+    </x-slot:heading>
+    <form method="POST" action="/jobs">
+        @csrf
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="first_name">First Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="first_name" id="first_name" placeholder="John" required />
+                            <x-form-error name="first_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="last_name">Last Name</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="text" name="last_name" id="last_name" placeholder="Doe" required />
+                            <x-form-error name="last_name" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password_confirmation">Confirm Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" required />
+                            <x-form-error name="password_confirmation" />
+                        </div>
+                    </x-form-field>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <a href="/" type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+            <x-form-button>Register</x-form-button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- DEVEMOS DEIXAR TODOS OS FIELDS COMO REQUIRED...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+ISSO FEITO,
+
+
+DEVEMOS COPIAR TUDO ISSO,
+
+
+
+
+E CRIAR OUTRO TEMPLATE, AGORA PARA LOGIN...
+
+
+
+login.blade.php
+
+
+
+
+--> SERÁ TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Log In
+    </x-slot:heading>
+    <form method="POST" action="/jobs">
+        @csrf
+        <div class="space-y-12">
+            <div class="border-b border-gray-900/10 pb-12">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Job</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">we just need a handful of details from you.</p>
+
+                <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <x-form-field>
+                        <x-form-label for="email">Email</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="email" name="email" id="email" placeholder="example@example.com" required />
+                            <x-form-error name="email" />
+                        </div>
+                    </x-form-field>
+
+                    <x-form-field>
+                        <x-form-label for="password">Password</x-form-label>
+                        <div class="mt-2">
+                            <x-form-input type="password" name="password" id="password" placeholder="Your Password" required />
+                            <x-form-error name="password" />
+                        </div>
+                    </x-form-field>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <a href="/" type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+            <x-form-button>Log In</x-form-button>
+        </div>
+    </form>
+
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... O PRÓXIMO PASSO É DECIDIR 
+
+
+'''TO WHAT SHOULD THESE FORMS SUBMIT TO..'''
+
+
+
+
+
+
+
+
+
+
+
+
+-> TEMOS ALGUMAS CHOICES:
+
+
+
+
+
+
+
+''WE CAN FOLLOW A RESTFUL APPROACH,
+    OR WE CAN CHANGE IT UP''...
+
+
+
+
+
+
+
+
+
+''RARELY ARE THERE HARD RULES''..
+
+
+
+
+
+
+
+--> A FORM DE 'register.blade.php'
+
+
+
+VAI TER 1 ACTION PARA '/register', de tipo 'POST'...
+
+
+
+
+
+
+
+
+
+
+
+e a outra será 'login', de tipo POST..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Register
+    </x-slot:heading>
+    <form method="POST" action="/register">
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-slot:heading>
+        Log In
+    </x-slot:heading>
+    <form method="POST" action="/login">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LÁ NA FILE DE ROUTES,
+
+
+COLOCAMOS A ROUTE CORRESPONDENTE, TIPO ASSIM:
+
+
+
+
+
+
+// Auth
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+AÍ CRIAMOS A ACTION/METHOD,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display the registration page.
+     */
+    public function create()
+    {
+        return view('auth.register');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request->all());
+
+        return redirect()->route('home');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+COM ISSO, PODEMOS VISUALIZAR TODOS OS ATTRIBUTES DE ESSA FORM QUE É ENVIADA..
+
+
+
+
+
+
+
+
+
+
+-> DEPOIS DISSO, COLOCAMOS 1 ROUTE PARA LOGIN...
+
+
+
+
+
+
+
+MAS FAREMOS OUTRO CONTROLLER PARA ISSO, 1 LOGIN CONTROLLER,
+
+
+OU ALGO ASSIM...
+
+
+
+
+
+
+
+
+-> O PROFESSOR GERALMENTE USA 'SessionController',
+
+
+
+PQ FAZ SENTIDO...
+
+
+
+
+''WE ARE CREATING A NEW SESSION, WE ARE 
+STORING A NEW SESSION, DESTROYING A SESSION,
+
+ETC ETC''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE FICA ASSIM:
+
+
+
+
+
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SessionController extends Controller
+{
+    /**
+     * Display the registration page.
+     */
+    public function create()
+    {
+        return view('auth.login');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request->all());
+
+        return redirect()->route('home');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E AS ROUTES FICAM ASSIM:
+
+
+
+
+
+
+
+// Login (session management)
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store'])->name('login');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+aí testamos isso, no browser...
+
+
+e funciona...
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+
+
+
+PARA ACABAR A PARTE 1,
+
+DEVEMOS FAZER DISPLAY DE ALGUNS LINKS DE LOGIN, NO LAYOUT.BLADE.PHP...
+
+
+
+
+
+
+
+--> TEMOS A PARTE DA NAVBAR:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full">
+
+    <div class="min-h-full">
+        <nav class="bg-gray-800">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                alt="Your Company">
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                                <x-navlink href="/" type="link" :active="request()->is('/')"
+                                    id="asdasdsadsaidhsaidai">Home</x-navlink>
+                                <x-navlink href="/about" type="link" :active="request()->is('about')">About</x-navlink>
+                                <x-navlink href="/jobs" type="link" :active="request()->is('jobs')">Jobs</x-navlink>
+                                <x-navlink href="/contact" type="link" :active="request()->is('contact')">Contact</x-navlink>
+                                <!-- ':' prefix, in your prop name, makes it so that the value is interpreted as an EXPRESSION, and not a pure string (we will get bool(false/true), instead of the strings "false"/"true", in this case, the case of the 'active' prop) -->
+                                <x-navlink type="button">Button</x-navlink>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <button type="button"
+                                class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                <span class="absolute -inset-1.5"></span>
+                                <span class="sr-only">View notifications</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                                </svg>
+                            </button>
+
+                            <!-- Profile dropdown -->
+                            <div class="relative ml-3">
+                                <div>
+                                    <button type="button"
+                                        class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                        id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        <span class="absolute -inset-1.5"></span>
+                                        <span class="sr-only">Open user menu</span>
+                                        <img class="h-8 w-8 rounded-full"
+                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                            alt="">
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="-mr-2 flex md:hidden">
+                        <!-- Mobile menu button -->
+                        <button type="button"
+                            class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                            aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="absolute -inset-0.5"></span>
+                            <span class="sr-only">Open main menu</span>
+                            <!-- Menu open: "hidden", Menu closed: "block" -->
+                            <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                            <!-- Menu open: "block", Menu closed: "hidden" -->
+                            <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="md:hidden" id="mobile-menu">
+                <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                    <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                    <a href="/" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
+                        aria-current="page">Home</a>
+                    <a href="/about"
+                        class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</a>
+                    <a href="/contact"
+                        class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Contact</a>
+                </div>
+                <div class="border-t border-gray-700 pb-3 pt-4">
+                    <div class="flex items-center px-5">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full"
+                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                alt="">
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-base font-medium leading-none text-white">Tom Cook</div>
+                            <div class="text-sm font-medium leading-none text-gray-400">tom@example.com</div>
+                        </div>
+                        <button type="button"
+                            class="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                            <span class="absolute -inset-1.5"></span>
+                            <span class="sr-only">View notifications</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 sm:flex sm:justify-between">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $heading }}</h1>
+                {{-- <a href="/jobs/create" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">Create a Job</a> --}}
+                <x-button href="/jobs/create">Create a Job</x-button>
+            </div>
+        </header>
+        <main>
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                {{ $slot }}
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS ADICIONAR OS LINKS NA PARTE DA DIREITA...
+
+
+
+
+
+
+
+
+REMOVEMOS 1 BOM TRECHO....
+
+
+
+E, ENTÃO, COLOCAMOS ESTES 2 NAV LINKS:
+
+
+
+
+
+
+
+
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <x-nav-link href="/login">Log In</x-nav-link>
+                            <x-nav-link href="/register">Register</x-nav-link>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+            --> CERTO...
+
+
+
+
+
+--> MAS É CLARO QUE SE O USER 
+
+ENXERGAR ESSES 2 BUTTONS/LINKS 
+
+
+DEPOIS QUE ELE ESTIVER LOGGED IN,
+
+NÃO VAI SER MT LEGAL... (não vai fazer sentido)....
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ELES JÁ ESTÃO LOGGED IN...
+
+
+
+
+
+--> 'IN THESE SITUATIONS, 
+    IT'S HELPFUL TO __CHECK_  THE AUTHENTICATION STATUS,
+    TO DETERMINE WHAT MARKUP WE CREATE''...
+
+
+
+
+
+
+
+
+
+--> PODEMOS OBTER ESSA INFO, SOBRE O AUTH STATUS,
+
+COM O OBJECT DE 
+'Auth::',
+
+
+e com o method de 'user()'...
+
+
+
+
+
+
+
+--> MAS O PROFESSOR QUER QUE UTILIZEMOS OUTRAS COISAS...
+
+
+
+
+
+
+
+
+-> NO CASO, ELE QUER QUE UTILIZEMOS 2 NOVAS BLADE DIRECTIVES...
+
+
+
+
+
+
+
+SÃO ELAS:
+
+
+
+
+
+1) @auth
+
+
+
+
+        --> '@auth'
+            
+            FAZ EXATAMENTE 
+
+            O QUE VC IMAGINA...
+
+
+
+            '''IF USER IS AUTHENTICATED,
+                DISPLAY WHATEVER MARKUP IS BETWEEN 
+
+                @auth and @endauth''.....
+
+
+
+
+2) @guest
+
+
+
+
+        --> É O _ OPOSTO DE '@auth'...
+
+
+
+        --> 'IF USER IS A GUEST (not auth()),
+                DISPLAY WHATEVER MARKUP 
+                IS BETWEEN @guest() and @endguest()
+
+
+
+
+
+
+
+
+
+
+
+
+    --> PARA ISSO, ESCREVEMOS ASSIM:
+
+
+
+
+
+
+               <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <!-- GUEST is a custom directive that checks if the user is logged in or not (if it is a GUEST or not) -->
+                            @guest
+                            <x-nav-link href="/login">Log In</x-nav-link>
+                            <x-nav-link href="/register">Register</x-nav-link>
+                            @endguest
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+    OU SEJA,
+
+    ESSES LINKS SERÃO MOSTRADOS __ APENAS_ QUANDO O USER FOR 1 GUEST... quando 
+    ele não estiver auth...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> A ÚLTIMA COISA QUE QUEREMOS FAZER, AQUI,
+
+É VER O CÓDIGO DE 'x-nav-link':
+
+
+
+
+
+
+@props(['active' => false, 'type' => 'link'])
+<!-- This is how we declare props, in laravel. This 'active' prop's default value will be 'false', in this case.  -->
+
+
+@if($type === 'link')
+
+<a {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</a>
+
+
+@else
+
+
+<button {{ $attributes }} aria-current="{{ $active ? 'page' : 'false'}}"
+    class="{{ $active ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} rounded-md px-3 py-2 text-sm font-medium">{{ $slot }}</button>
+
+
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+NÓS PODEMOS PASSAR 1 status de 'active'...
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS ADICIONAR 1 CONDITIONAL STYLING,
+    PARA QUE ESSES LINKS SEJAM HIGHLIGHTED 
+
+    SEMPRE QUE ESTIVERMOS NESSAS ROUTES...
+
+
+
+
+
+
+
+
+--> FAZEMOS ISSO COM ''request()->is('login)''
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+               <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <!-- GUEST is a custom directive that checks if the user is logged in or not (if it is a GUEST or not) -->
+                            @guest
+                            <x-nav-link href="/login" :active="request()->is('login')">Log In</x-nav-link>
+                            <x-nav-link href="/register" :active="request()->is('register')">Register</x-nav-link>
+                            @endguest
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+TIVEMOS BASTANTE PROGRESSO...
+
+
+
+
+
+
+
+
+código de forms sempre é boring...
+
+
+
+
+
+--> teremos lógica mais interessante no próximo epísodio...
