@@ -1,0 +1,1595 @@
+
+
+
+
+
+
+
+
+
+
+--> ESTE É UM EPISODE IMPORTANTE...
+
+
+
+
+
+
+--> AUTHORIZATION PODE SER HANDLADA DE 1 MONTE DE MANEIRAS DIFERENTES, EM UM LARAVEL APP...
+    E ISSO PODE SER 1 POUCO CONFUSO, PARA NEWCOMERS...
+
+
+
+
+
+
+
+
+--> PARA FACILITAR AS COISAS, O PROFESSOR ORGANIZOU O PROCESSO INTEIRO 
+    EM 6 STEPS, INCREMENTAL STEPS..
+
+
+
+
+
+
+
+
+
+--> E O PROFESSOR IMPRIMIU UMA AULA DE PHP...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ANTES DE COMEÇARMOS,
+
+
+    ''IF WE WANT TO PERFORM USER AUTHORIZATION FOR 
+    JOBS,
+
+    THERE SHOULD BE A RELATIONSHIP BETWEEN 
+
+
+    JOBS AND USERS...''
+
+
+
+
+
+
+
+
+
+
+--> E, NO MOMENTO, NÃO TEMOS 
+    RELATION ENTRE JOBS E USERS...
+
+
+
+
+
+
+
+-> NÓS TAMBÉM NÃO TEMOS CONNECTION NENHUMA ENTRE O MODEL DE 'EMPLOYER' 
+
+E O  MODEL DE 'USER'...
+
+
+
+
+
+
+
+
+
+
+--> DEVEMOS CONSERTAR ISSO, AGORA...
+
+
+
+
+
+
+
+
+
+--> VAMOS ATÉ A MIGRATION QUE CRIA A TABLE DE EMPLOYERS,
+
+
+E AÍ ADICIONAMOS 1 FOREIGN KEY PARA A TABLE DE USERS,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\User;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId(User::class);
+            $table->string('name');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, VAMOS ATÉ A FACTORY DE EMPLOYER,
+
+
+E AÍ ESCREVEMOS ASSIM:
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\employers>
+ */
+class EmployerFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->company(),
+            'user_id' => User::factory(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+OK... QUER DIZER QUE AGORA CADA EMPLOYER 
+
+VAI 
+
+
+TER 1 'NAME' E 1 'USER_ID',
+
+
+que será o user a que estará 
+
+
+relacionado...
+
+
+
+
+
+
+
+
+
+
+CERTO... ISSO FEITO,
+
+PODEMOS COMEÇAR....
+
+
+
+
+
+
+
+
+
+HOJE FOCAREMOS NA ACTION DE 'EDIT',
+
+LÁ NO 'JobController'...
+
+
+
+
+
+
+
+
+
+
+--> certo...
+
+
+
+
+
+
+
+
+
+
+'STEP 1:''
+
+
+
+
+
+
+
+
+
+
+1) 'INLINE AUTHORIZATION''...
+
+
+
+
+
+
+
+
+--> ATUALMENTE, NO NOSSO APP,
+    PODEMOS FAZER EDIT 
+
+    DE __ qUALQUER __ 
+
+    JOB,
+
+
+    MESMO SE NÃO ESTAMOS LOGGED IN... E ISSO NÃO FAZ SENTIDO...
+
+
+
+
+
+
+
+
+
+
+
+-> NOSSO METHOD COMEÇA ASSIM:
+
+
+
+
+    public function edit(JobListing $job) {
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+ESSE METHOD ATUALMENTE RETORNA A VIEW DE 'EDIT'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> QUEREMOS, NO ENTANTO,
+
+QUE O USER SEJA REDIRECIONADO PARA OUTRA PAGE,
+
+
+CASO ELE FOR 1 GUEST...
+
+
+
+
+
+
+
+
+--> PODEMOS FAZER ISSO COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+NÓS BASICAMENTE UTILIZAMOS ESSE STATIC METHOD, 
+
+
+
+de '::guest()'...
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS E SE VC ESTIVER LOGGED IN...
+
+
+
+
+
+
+ELE PODE FAZER EDIT DE 1 JOB QUE ELE NÃO CRIOU?
+
+
+
+
+
+SIM, ELE PODE...
+
+
+
+
+
+
+
+
+
+
+
+ISSO É PQ AINDA NÃO IMPLEMENTAMOS ESSA PARTE DA AUTHORIZATION..
+
+
+
+
+
+
+
+
+
+'''WE NEED A SECOND LAYER OF AUTHORIZATION''...
+
+
+
+
+
+
+
+
+
+
+
+FIRST LAYER --> 'YOU NEED TO BE LOGGED IN''...
+
+
+
+SECOND LAYER --> 'YOU NEED TO BE THE OWNER ('employer') of the edited job''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PENSAMOS SOBRE ISSO...
+
+
+
+
+
+LÁ EM 'Employer', estamos com este código:
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Employer extends Model
+{
+    use HasFactory;
+
+    public function jobs(): HasMany
+    {
+        return $this->hasMany(JobListing::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR EXPLICA:
+
+
+
+
+'''A JOB BELONGS TO AN EMPLOYER,
+    AND AN EMPLOYER BELONGS TO A USER''...
+
+
+
+
+
+
+
+
+
+CERTO..
+
+
+
+
+E CADA USER TERÁ APENAS 1 ÚNICO 
+EMPLOYER...
+
+
+
+
+
+quer dizer que a relation é 'hasOne'...
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS ESCREVER ESSA RELATION, NO MODEL,
+ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Employer extends Model
+{
+    use HasFactory;
+
+    public function jobs(): HasMany
+    {
+        return $this->hasMany(JobListing::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UM EMPLOYER BELONGS TO A USER...
+
+
+
+
+
+
+
+
+
+
+
+
+-> NO JOB CONTROLLER,
+
+
+PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+'''IF THE USER WHO CREATED THIS JOB __ IS NOT THE _ PERSON 
+  THAT IS CURRENTLY LOGGED IN, THIS PERSON __ DOES NOT HAVE THE 
+  AUTHORIZATION TO EDIT THIS JOB...''''
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, EDITAREMOS ESTA LÓGICA:
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COLOCAMOS UM OUTRO IF STATEMENT, LOGO ABAIXO,
+
+
+CHECANDO 
+
+
+
+
+
+'if ($job->employer->user->is(Auth::user())) {
+
+}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR USA O METHOD DE 'is()',
+
+
+que ainda não tinha sido usado,
+
+nesse object...
+
+
+
+
+--> SE ENTRAMOS NESSE IF STATEMENT, ESTAREMOS AUTHORIZED..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> '->is()' --> É UM METHOD QUE ESTÁ SEMPRE 
+                    DISPONÍVEL NOS SEUS __ MODELS_...
+
+
+
+
+
+
+
+
+
+'is()' --> ''DETERMINES IF TWO MODELS 
+            HAVE _ THE SAME ID AND _ BELONG TO THE SAME 
+            TABLE...''
+
+
+
+
+
+
+
+
+
+        RESUMINDO:
+
+    
+
+    '''IS THIS USER INSTANCE THE _ SAME __ 
+        INSTANCE AS THE USER THAT IS CURRENTLY SIGNED IN??'''
+
+
+
+
+
+
+
+
+-> escrevemos uma guard clause,
+
+para bloquear o user, com este check:
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        // 1st layer: check if the user is logged in
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+        // 2nd layer: check if the user is the owner of the job
+        if ($job->employer->user->isNot(Auth::user())) {
+           abort(403);
+        }
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, SE ELE N FOR O RESPONSÁVEL,
+
+
+
+FAZEMOS O ABORT... e isso será handlado pelo laravel...
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO..
+
+
+
+
+
+MAS, AGORA, VOLTAMOS AOS JOBS..
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR CRIA 1 CENÁRIO, MANUALMENTE,
+
+EM QUE ELE ESTÁ AUTORIZADO PARA EDIT ESSE JOB...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> E, SE ELE É AUTORIZADO, 
+    FUNCIONA...
+
+
+
+
+
+
+
+
+
+--> SE ELE NÃO É AUTORIZADO A EDITAR ESSE JOB,
+    ELE NÃO CONSEGUE...
+
+
+
+
+
+
+
+COM ISSO, TERMINAMOS A PRIMEIRA STEP DE AUTHORIZATION...
+
+
+
+
+primeira step, de 6...
+
+
+
+
+
+
+
+
+
+
+
+
+a segunda step é 'GATES':
+
+
+
+
+
+
+
+
+
+
+
+
+2) GATES:
+
+
+
+
+
+
+
+
+
+
+'''AT THE MOMENT, 
+    WE ARE STILL DISPLAYING THIS 
+    "edit job" button,
+
+    EVEN THOUGH YOU ARE NOT AUTHORIZED TO SEE IT...
+
+
+
+    AND THIS DOES NOT MAKE SENSE'''....
+
+
+
+
+
+
+
+
+
+
+
+
+--> O ÚNICO PROBLEMA, AQUI,
+
+É QUE 
+
+A LÓGICA 
+
+
+
+QUE ESTAMOS USANDO PARA 'DETERMINE IF YOU ARE AUTHORIZED OR NOT'
+
+ESTÁ 
+
+
+
+__ PRESA__ DENTRO __ DO METHOD DE 'edit()',
+
+
+
+
+vinculado à route de 'POST',
+
+e não À route de 'GET' (que é a route que faz o actual 
+ display de esse button aos users, no template)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PARA CONSERTAR ISSO, O PROFESSOR 
+
+
+USARÁ UMA FACADE CHAMDA DE 'GATE',
+
+PROVIDENCIADA PELO LARAVEL...
+
+
+
+
+
+
+'Illuminate\Support\Facades\Gate'... 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UM GATE É COMO 1 BARRIER...
+
+
+
+
+
+
+
+
+
+
+-> E ELE PERMITE A ENTRADA APENAS SE VC SATISFAZ 
+CERTOS CRITÉRIOS...
+
+
+
+SE VC ESTÁ AUTHORIZED,
+
+
+O GATE ABRE....
+
+
+
+
+
+
+
+
+
+-> PODEMOS DEFINIR UM GATE COM 
+
+
+
+''''''
+
+
+Gate::define('<your_gate_name>');
+
+
+
+
+
+'''''''
+
+
+
+
+
+
+
+
+
+
+
+
+COLOCAMOS UM NAME DE 'edit-job', para esse gate...
+
+
+
+
+
+
+
+
+-> COMO SEGUNDO PARAMETER,
+
+PASSAMOS UMA CLOSURE (function)
+
+
+QUE 
+
+
+VAI 
+
+ACCEPT O 'CURRENTLY SIGNED-IN USER',
+
+
+
+E TAMBÉM O __ JOB _ QUE ESTAMOS AUTHORIZING...
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+Gate::define('edit-job', function(User $user, Job $job) {
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> DENTRO DE ESSA FUNCTION,
+
+DEVEMOS RETORNAR 1 BOOLEAN... ESSA BOOLEAN 
+
+VAI DETERMINAR SE ESSE USER TEM PERMISSÃO (ou não) para 
+
+
+
+EDITAR AQUELE GIVEN JOB...
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO,
+
+
+    PODEMOS PEGAR AQUELE CÓDIGO
+
+
+    DO IF() {},
+
+
+    MAS COM O RETURN DE UM BOOLEAN (false, no caso),
+
+    E NÃO O RUN DE 'abort()'..
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        Gate::define('edit-job', function ($user, $job) {
+        // 2nd layer: check if the user is the owner of the job
+        return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+        });
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO FEITO, MAIS ABAIXO,
+
+DEPOIS 
+
+
+
+DO CHECK PELO 'SIGN-IN' STATE DO USER,
+
+
+PODEMOS 
+
+
+
+
+RODAR 
+
+
+
+
+Gate::authorize('edit-job', $job);
+
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, PASSAMOS:
+
+
+
+
+
+1) O NAME DO GATE 
+
+
+
+
+2) O 'job' a que nos referimos....
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function edit(JobListing $job) {
+
+        Gate::define('edit-job', function ($user, $job) {
+        // 2nd layer: check if the user is the owner of the job
+        return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+        });
+
+        // *1st layer: check if the user is logged in
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+        Gate::authorize('edit-job',  $job);
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A VANTAGEM É QUE, SE ESSE AUTHORIZE RETORNA FAIL,
+
+O LARAVEL AUTOMATICAMENTE faz 'abort()" com um status de 403...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> EXISTIRÃO CASES EM QUE 
+    VC NAO VAI QUERER DEIXAR ESSE ABORT AUTOMÁTICO...
+
+
+
+
+    EM CASES COMO ESSES, VC PODE RODAR CONDITIONALS MANUALMENTE,
+
+    COM 'Gate::denies()"
+
+
+    ou 
+
+
+
+    'Gate::allows()'...
+
+
+
+
+
+
+    EX:
+
+
+
+    ''IF GATE DENIES returns true,
+
+    I WILL PERSONALLY HANDLE THAT RESPONSE''..
+
+
+
+
+
+
+
+    EX:
+
+
+
+
+
+
+    if (Gate::denies(), 'edit-job', $job ) {
+
+        // HANDLE THE RESPONSE YOURSELF....
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, 
+
+
+VAMOS PARA A ETAPA 3 DE AUTHORIZATION MASTERY...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3)  STEP 3 -> 'DEFINE GATES INSIDE 
+                OF THE __ APP SERVICE PROVIDER,
+                INSTEAD OF IN THE WHOLE APP,
+                IN EACH CONTROLLER METHOD''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+            ISSO PQ ESSE GATE ESTARÁ 
+            SENDO APLICADO  APENAS_ 
+
+            À ROUTE DE 'EDIT'..
+
+
+
+
+
+
+
+
+
+
+
+
+-> E É CLARO QUE ISSO NAO FAZ SENTIDO....
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA FAZER ISSO FUNCIONAR MELHOR,
+
+
+
+
+''WE NEED TO TAKE OUR GATE DEFINITION 
+
+AND TAKE IT TO A PLACE WHERE IT WILL BE AVAILABLE FOR 
+
+
+__EVERY SINGLE __ REQUEST...''..
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, COLOCAMOS O CÓDIGO DE 
+
+
+
+DEFINITION DA GATE E COLOCAMOS NO METHOD 'boot()'
+
+do AppServiceProvider.php,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        Gate::define('edit-job', function ($user, $job) {
+        // 2nd layer: check if the user is the owner of the job
+        return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+ELE É COLOCADO ASSIM:
+
+
+
+
+
+
+
+    public function boot(): void
+    {
+
+        // * Disables lazy loading entirely, as a safety measure:
+        Model::preventLazyLoading();
+
+        // * Switch the type of view that is being used for the paginator (the default is tailwind, but you can use bootstrap, for example):
+        // Paginator::useBootstrapFive();
+
+        Gate::define('edit-job', function ($user, $job) {
+            // 2nd layer: check if the user is the owner of the job
+            return $job->employer->user->is($user); // will return a boolean, which is what the Gate needs/wants.
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    O PROFESSOR APONTA QUE 
+
+
+
+    ''THE $user variable 
+    WILL ALWAYS REFERENCE THE _+_CURRENTLY_ AUTHENTICATED USER...'''
+
+
+
+
+
+
+
+
+
+
+--> OK... MAS DIGAMOS QUE VC 
+    TEM 1 SITUATION EM QUE VC É UM GUEST...
+
+
+
+
+
+
+
+
+--> BEM, NESSES CASOS,
+VC VAI __ SEMPRE FAIL_,
+ 
+
+ BEM, AÍ O FALSE SERÁ RETORNAOD IMEDIATAMENTE..
+
+ (mas, em alguns cases, vc 
+ 
+ não vai querer fazer isso...)
+
+
+
+
+
+
+
+ -> PARA CASES COMO ESSES, 
+    ISSO NÕA SERÁ BOM..
+
+
+
+
+
+    -> VC PODE CONSERTAR ISSO COM O SET DO USER COMO '=null',
+
+
+    ou por meio do set como nullable,
+
+    com '$User'...
