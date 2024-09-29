@@ -9,6 +9,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
+    // * the 'auth' middleware requires users to be logged in, and the 'verified' middleware requires the user to have a verified email
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

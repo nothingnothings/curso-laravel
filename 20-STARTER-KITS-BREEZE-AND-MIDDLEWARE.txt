@@ -697,32 +697,7 @@ E AÍ TENTAMOS VISITAR
 
 
 
-
-
--> ISSO QUER DIZER, EM OUTRAS PALAVRAS,
-
-QUE 
-
-
-
-FOI 'MEIO CAMINHO ANDADO',
-
-
-PQ 
-
-
-
-
-TEMOS 'A CERTAIN LEVEL OF AUTHENTICATION IN PLACE',
-
-
-
-MAS AINDA FALTAM VÁRIAS COISAS...
-
-
-
-
-
+--> quer dizer que funcionou a feature de logout também...
 
 
 
@@ -1165,4 +1140,600 @@ FAZEMOS O REDIRECT DO USER, AO DASHBOARD:
 
 
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS COMO A 'CORE TEAM' DO LARAVEL 
+
+CONSEGUIU IMPLEMENTAR A FEATURE DE 
+
+
+''IF YOU ARE NOT LOGGED IN, YOU CANNOT VIEW THE DASHBOARD''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> BEM, NÓS ABRIMOS O ARQUIVO 'web.php',
+
+
+E AÍ 
+
+
+
+É POSSÍVEL ANALISAR A MANEIRA PELA QUAL ISSO FOI IMPLEMENTADO...
+
+
+
+
+O ARQUIVO FICOU ASSIM:
+
+
+
+
+
+
+
+<?php
+
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, as routes são protegidas pelo middleware de 'auth'...
+
+
+
+
+
+especificamente, o middleware de auth 
+
+com 
+
+
+'middleware(['auth', 'verified'])'....
+
+
+
+
+
+
+VISTO LÁ NA ROUTE DO DASHBOARD..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ANALISA ESTA ROUTE:
+
+
+
+
+
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+
+
+
+
+
+
+
+
+
+
+
+
+''WHEN THE USER VISITS /dashboard,
+we load a VIEW... THEN 
+
+WE HAVE THE AUTH MIDDLEWARE, AND KEYS FOR 'auth' and 'verified'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO ADICIONA PROTECTION, BASICAMENT...
+
+
+
+
+
+
+
+
+-> PARA CONSEGUIRMOS ACESSAR A PAGE DE 'DASHBOARD',
+
+    é necessário 
+
+    ESTAR AUTHENTICATED (signed in),
+
+
+    E TAMBÉM É NECESSÁRIO QUE VC TENHA 
+
+    CONFIRMED/VERIFIED O SEU EMAIL ADDRESS...
+
+
+
+
+
+
+
+
+
+
+É POR ISSO QUE TEMOS 
+
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> 'MIDDLEWARE' --> É UM NOME MEIO 
+
+                        MISLEADING.. --> ELE PARECE 
+                                        LOW-LEVEL, TECHNICAL, SERIOUS...
+
+
+
+
+
+
+
+
+
+
+--> AGORA VAMOS IMPLEMENTAR UM MIDDLEWARE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MIDDLEWARES SÃO COMO 
+    LAYERS DE 1 CEBOLA...
+
+
+
+
+
+
+
+
+    -> LAYERS QUE LEVAM AO CORE DO SEU APP...
+
+    E CADA 1 DE ESSES LAYERS TEM A OPORTUNIDADE DE 'DO SOMETHING'...
+
+
+
+
+
+
+
+
+EX: 'RECORD SOMETHING IN THE DATABASE' 
+
+
+
+
+EX: ''CHECK FOR A HEADER''
+
+
+''CHECK IN THE SESSION, TO MAKE SURE YOU ARE LOGGED IN''..
+
+
+
+
+
+
+
+
+''IT CAN DO THE OPPOSITE, CHECK IF YOU ARE A GUEST..'''
+
+
+
+
+
+
+
+
+TODAS ESSAS COISAS PODEM SER REALIZADAS,
+
+DENTRO DE MIDDLEWARE...
+
+
+
+
+
+
+
+
+
+
+-> SE REMOVEMOS aquele middleware de 'middleware(['auth', 'verified'])
+
+E TENTAMOS ACESSAR A ROUTE DE 'dashboard',
+
+
+
+
+
+
+
+nós conseguimos acessá-la... mas AÍ FICAMOS COM ERRORS 
+                            (
+                                isso acontece pq,
+
+                                em algum trecho da view de dashboard,
+
+                                temos 
+
+
+                                'Auth::user()->name'...
+
+
+                                como o user NÃO PODE SER ENCONTRADO,
+                                POR FALTA DE SESSION/COOKIE,
+
+                                NÓS FICAMOS COM 1 ERROR...
+
+
+                                --> ESTAMOS TENTANDO PEGAR 1 PROPRERTY A PARTIR DE 
+                                'NULL', O QUE RESULTA EM 1 ERROR...
+                            )
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+--> MAS ISSO NOS MOSTRA 
+
+
+'''HOW YOU CAN GET THE AUTHENTICATED USER,
+    AFTER YOU SIGNED/LOGGED IN...''
+
+
+    (basta usar esse 'Auth::user()'...)
+
+
+
+
+
+
+
+
+
+
+
+
+-> TEMOS UMA CLASS/FACADE DE NOME 'Auth',
+
+COM 1 METHOD DE NOME 'user()',
+
+
+
+QUE VAI RETORNAR __ 
+
+
+O 'CURRENT USER, THAT IS SIGNED IN''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO...
+
+
+
+
+
+
+
+
+REVERTEMOS O CÓDIGO AO FORMATO ORIGINAL....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OBS:
+
+
+SE VC TEM APENAS 1 MIDDLEWARE LEVANDO AO CORE DO SEU APP,
+
+
+
+vc pode escrever só 1 string,
+
+tipo assim:
+
+
+
+
+
+middleware('auth')
+
+
+
+
+
+
+
+
+
+--> MAS SE VC TEM MAIS DE 1,
+
+VC DEVE ESCREVER NO FORMATO DE ARRAY,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+middleware(['auth', 'verified'])
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+SE VOLTAMOS AO BROWSER,
+
+
+REFRESHAMOS, E AÍ 
+
+
+
+SOMOS REDIRECIONADOS À PAGE DE LOGIN...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SE NÓS NÃO ESTAMOS AUTH,
+
+ESSE MIDDLEWARE FAZ COM QUE SEJAMOS REDIRECIONADOS A OUTRO LUGAR... (no caso, a login page)...
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR QUER QUE ENTREMOS EM 'Controllers > Auth',
+
+
+E AÍ 
+
+
+
+ESTUDEMOS O CÓDIGO...
+
+
+
+
+
+
+
+
+
+-> EM RESOURCES,
+
+
+TEMOS 1 PASTA DEDICADA PARA 'layout' views...
+
+
+
+
+
+
+-> 1 layout para o app, outro para guest, e outro para navigation...
+
+
+
+
+
+
+
+
+
+
+
+
+
+RECAPITULANDO:
+
+
+
+
+''STARTER KITS ARE MEANT TO BE USED 
+AT THE START OF A NEW PROJECT...''
+
+
+
+
+
+
+
+
+
+
+
+
+NO PRÓXIMO VIDEO,
+
+VEREMOS O EXEMPLO DE JOBS MAIS UMA VEZ...
+
+
+
+
+AÍ O PROFESSOR NOS MOSTRARÁ COMO 
+PODEMOS 
+
+HANDLAR AUTHENTICATION QUANDO _ NÃO ESTAMOS USANDO 1 STARTER KIT...
