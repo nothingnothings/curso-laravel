@@ -1,0 +1,1828 @@
+
+
+
+
+
+
+
+
+
+
+OK... AGORA VEREMOS O FRONTEND...
+
+
+
+
+
+
+
+
+
+
+--> OS TÓPICOS SERÃO 'ASSET BUNDLING' E VITE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ASSET BUNDLING --> PEGAR TODOS ASSETS DO APP,
+                        IMAGES, STYLESHEETS, JS,
+
+                        ETC...
+
+
+
+
+-> TODOS ESSES ASSETS FICAM READY E BUNDLED FOR PRODUCTION...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- VITE -> É UM DOS BUNDLERS MAIS FAMOSOS DO MARKET..
+
+
+
+
+
+
+
+
+
+
+
+
+-> E O LARAVEL TEM SUPORTE A ISSO, OUT OF THE BOX...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PACKAGE.JSON --> É AQUI QUE VC DECLARA AS DEPENDENCIES PARA SEU FRONTEND...
+
+
+
+
+
+
+
+
+
+
+-> O LARAVEL, OUT OF THE BOX, SUGERE:
+
+
+
+
+1) axios 
+
+
+2) laravel-vite-plugin 
+
+
+3) vite...
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS INSTALAR ESSES 3...
+
+
+
+
+
+
+
+
+
+
+-> PRECISAMOS TER NODEJS E NPM INSTALADOS...
+
+
+
+
+
+
+
+
+
+
+npm install...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PRÓXIMO PASSO É IR ATÉ vite.config.js...
+
+
+
+
+
+
+
+TEMOS ESTE CÓDIGO:
+
+
+
+
+
+
+
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, ESTAMOS PULLANDO O PLUGIN 'laravel',
+
+
+lá do 'laravel-vite-plugin'...
+
+
+
+
+
+
+
+
+OS INPUTS DE NOSSO APP ESTÃO EM 'app.css' e 'app.js'...
+
+
+
+
+coisa bem simples...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESTÃO DENTRO DO FOLDER DE 'resources'..
+
+
+
+
+
+
+
+
+
+
+
+
+-> QUANTO AO CSS, NÃO TEMOS COISA ALGUMA....
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR TROCA O BACKGROUND COLOR PARA RED,
+
+    PARA VER SE TUDO VAI MUDAR DE VERDADE...
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+body {
+    background: "red";
+}
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+
+
+
+
+
+MAS, AQUI, TEMOS 1 DETALHE:
+
+
+
+
+
+
+
+''THIS CSS FILE IS NOT ACESSIBLE IN PUBLIC,
+    WHICH WOULD MAKE IT ACCESSIBLE TO THE USERS/WEB... INSTEAD,
+    IT IS IN THE RESOURCES DIRECTORY...
+
+    _THIS _ MEANS_ THAT WE NEED TO COMPILE IT, SOMEHOW...''
+
+
+
+
+
+
+
+
+
+--> para fazer isso, devemos rodar npm run build...
+
+
+
+
+
+
+
+
+
+
+
+
+--> npm install 
+
+
+npm run build
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AÍ RODAMOS 'npm run dev'...
+
+
+
+
+
+E FICAMOS COM ESTE OUTPUT:
+
+
+
+
+
+  VITE v5.4.8  ready in 178 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+  LARAVEL v11.24.0  plugin v1.0.5
+
+  ➜  APP_URL: http://localhost
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+
+ISSO ABRIU O LOCAL DEV ENVIRONMENT, PARA ESSE FRONTEND...
+
+
+
+
+
+
+
+
+
+-> MAS O ESTRANHO É AQUELA PARTE DE BAIXO:
+
+
+
+
+
+  LARAVEL v11.24.0  plugin v1.0.5
+
+  ➜  APP_URL: http://localhost
+
+
+
+
+
+
+
+
+
+
+
+  ESSE ENDEREÇO, 'APP_URL',
+
+
+
+  ESTÁ 
+
+
+
+
+  COMO 'localhost'...
+
+
+
+
+
+  --> ESSE VALUE ESTÁ SENDO TIRADO LÁ DO 
+    SEU ARQUIVO '.env'...
+
+
+
+
+
+
+
+
+
+
+
+
+-- VAMOS ATÉ O '.env'...
+
+
+
+
+
+
+
+
+
+--> LÁ EM CIMA,
+
+
+TEMOS ISTO:
+
+
+
+
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:Ni9+2PD6B783oyZLJMlOj5k4mKvMK3KpNownPOCVMcA=
+APP_DEBUG=true
+APP_TIMEZONE=UTC
+APP_URL=http://localhost
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ENTÃO TROCA ESSE 'localhost'',
+
+
+
+SUBSTITUI POR NOSSO 'LOCAL APP URL',
+
+que, nesse caso,
+
+é 
+
+'http://example-26.test
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:Ni9+2PD6B783oyZLJMlOj5k4mKvMK3KpNownPOCVMcA=
+APP_DEBUG=true
+APP_TIMEZONE=UTC
+# APP_URL=http://localhost
+APP_URL=http://example-26.test
+
+
+
+
+
+
+
+
+
+OK... AGORA A APP_URL ESTÁ CORRETA, COM ESSA MUDANÇA...
+
+
+
+
+
+
+
+
+
+
+--> OK... 
+
+
+
+
+MAS SE VOLTAMOS AO BROWSER, NÃO ENCONTRAMOS NENHUMA MUDANÇA...
+
+
+
+
+
+
+
+RAZÃO:
+
+
+''WE HAVE DEFINED IT IN THE STYLE SHEET, BUT WE HAVEN'T IMPORTED THIS STYLESHEET,
+IN OUR BLADE FILES'...
+
+
+
+
+
+
+
+-> podemos fazer isso lá no layout.blade.php,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTERNATIVAMENTE,
+
+
+O PROFESSOR DIZ QUE PODEMOS USAR UMA VITE DIRECTIVE, QUE DEIXA ISSO 
+
+BEM MAIS FÁCIL,
+
+
+QUE É 
+
+ESTA:
+
+
+
+
+
+
+
+@vite(['resources/css/app.css']);
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- This is how you import a CSS file from the resources/css folder --}}
+    @vite(['resources/css/app.css']);
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA VEREMOS 'HOT RELOADING'...
+
+
+
+
+
+
+
+
+
+
+
+
+HOT RELOADING (HMR)
+
+
+
+
+
+
+
+
+
+''INSTANT UPDATES WITHOUT RELOADING THE PAGE 
+OR LOSING APPLICATION STATE'''...
+
+
+
+
+
+
+
+-> ISSO FUNCIONA COM SUAS STYLYESHEETS,
+
+E FUNCIONA TAMBÉM COM AS JAVASCRIPT FILES...
+
+
+
+
+
+
+
+
+
+
+
+
+o ARQUIVO DE JAVASCRIPT:
+
+
+
+
+
+import './bootstrap';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E O OUTRO, DE BOOTSTRAP:
+
+
+
+
+
+
+
+import axios from 'axios';
+window.axios = axios;
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ELE BASICAMENTE PEGA O AXIOS...
+
+
+
+
+
+
+
+---> ELE IMPORTA QUAISQUER COISAS NECESSÁRIAS PARA 
+    BOOTSTRAP SUAS FRONTEND DEPENDENCIES...
+
+
+
+
+
+
+
+---> COMO AJAX REQUESTS SÃO SUPER COMUNS,
+    O LARAVEL ASSUME QUE VC VAI PRECISAR DO AXIOS,
+
+    E QUE VAI PRECISAR 
+
+
+    DAQUELE HEADER DE 'X-Requested-With',
+
+
+    com value de 'XMLHttpRequest'...
+
+
+
+
+EX:
+
+
+
+
+
+
+import axios from 'axios';
+window.axios = axios;
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK..
+
+
+
+
+
+
+O PROFESSOR ESCREVE UM POUCO DE JS,
+
+TIPO ASSIM:
+
+
+
+
+
+import './bootstrap';
+
+
+alert('Hello from the app.js file');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... E, PARA CONSEGUIRMOS IMPORTAR ESSE ARQUIVO 'app.js',
+
+
+
+
+BASTA ESCREVER, TAMBÉM,
+
+
+NA DIRECTIVE DO '@vite()',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- This is how you import a CSS file from the resources/css folder --}}
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, O BROWSER DEVE ATUALIZAR...
+
+E FUNCIONA..
+
+
+
+
+
+
+AGORA ESTAMOS BUNDLANDO OS ARQUIVOS JS E ARQUIVOS CSS, portanto..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... O PROFESSOR ENTÃO FALA SOBRE O TAILWIND...
+
+
+
+
+
+
+
+
+
+
+-> TEMOS ESTA LINHA, NO ARQUIVO BLADE:
+
+
+
+
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ESTAMOS USANDO O CDN PARA CARREGAR O TAILWIND...
+
+
+
+ISSO É BOM PARA DEMOS, 
+
+
+MAS PARA PRODUCTION ENVIRONMENTS, VC NAO QUER FAZER ISSO...
+
+
+
+
+
+
+
+
+
+
+-> agora que entendemos vite,
+
+devemos resolver esse problema...
+
+
+
+
+
+
+
+
+-> BAIXAMOS O ARQUIVO CSS.MIN DO TAILWIND,
+
+E AÍ 
+
+
+DEIXAMOS NO NOSSO FOLDER DE 'resources>css'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS O PROFESSOR QUER USAR O NPM PARA INSTALAR O TAILWIND...
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, DEVEMOS RODAR npm install -D tailwindcss postcss autoprefixer
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO,
+
+DEVEMOS RODAR 
+
+
+'npx tailwindcss init -p'...
+
+
+
+
+
+
+
+
+ESSE COMANDO VAI CRIAR OUTRA CONFIG FILE, QUE PODEMOS UTILIZAR 
+
+
+PARA CONFIGURAR AINDA MAIS NOSSO TAILWIND...
+
+(é a file 'tailwind.config.js')...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+O FORMATO DA FILE:
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> isso feito, ENTRAMOS NOS DOCS DO TAILWIND....
+
+
+
+
+https://tailwindcss.com/docs/guides/laravel
+
+
+
+-> LÁ, PRECISAMOS CONFIGURAR OS 'TEMPLATE PATHS'...
+
+
+
+
+
+--> PRECISAMOS 'TELL TAILWIND ABOUT WHERE IT CAN FIND OUR TAILWIND 
+                UTILITY CLASSES'...
+
+
+
+
+
+
+
+            COM ALGO TIPO ASSIM:
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./resources/**/*.blade.php",
+    "./resources/**/*.js",
+    "./resources/**/*.vue",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... O PROFESSOR COPIA ESSE CÓDIGO AÍ...
+
+
+
+
+
+
+
+
+
+-> DEPOIS DISSO, O PROFESSOR ADICIONA AS TAILWIND DIRECTIVES NO CSS,
+
+AQUELES CÓDIGOS CLÁSSICOS DE
+
+
+''
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+'',
+
+
+
+LÁ NO ARQUIVO DE 'app.css'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FINALMENTE, PODEMOS RODAR O 'npm run dev',
+
+
+
+E AÍ O TAILWIND JÁ ESTARÁ SENDO USADO NOS NOSSOS PROJECTS...
+
+
+
+(agora com o npm/node, e não mais com o CDN)... 
+
+
+
+
+
+
+
+
+
+FICOU TIPO ASSIM, PORTANTO:
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+    {{-- This is how you import a CSS file from the resources/css folder --}}
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
+</head>
+
+<body class="h-full">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO FEITO, PODEMOS CONFIGURAR O TAILWIND DO JEITO QUE QUISERMOS...
+
+
+
+
+
+
+
+
+
+
+-> ESTE NÃO É UM CURSO DE TAILWIND...
+
+
+
+
+
+
+
+
+
+
+-> MAS DIGAMOS QUE O USER TEM 1 COLOR ESPECIAL PARA O LARACAST...
+
+
+
+
+
+
+-> PARA ISSO, ELE PODE ESCREVER ASSIM,
+
+LÁ NO 'tailwind.config.js':
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+PODEMOS ENTÃO ENTRAR NOS NOSSOS BLADE COMPONENTS/PAGES,
+
+E AÍ 
+
+
+
+
+ADICIONAR NOSSA CLASS CUSTOMIZADA, TIPO ASSIM:
+
+
+
+
+
+
+                <strong class="text-laracasts">{{ $job->title }}: Pays {{ $job->salary }} per year.</strong>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo... funcionou...
+
+
+
+
+
+
+
+
+
+
+
+
+OK... OUTRA COISA QUE PODEMOS ALTERAR:
+
+
+
+
+
+(vite.config.js):
+
+
+
+
+
+
+
+
+
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+
+
+
+NO MOMENTO, ESTAMOS PROVIDENCIANDO 2 INPUTS...
+
+
+
+
+(um input para css, outro para js)...
+
+
+
+
+
+
+
+
+
+
+E ISSO FUNCIONA, SIM...
+
+
+
+
+
+
+-> PORÉM, SE VC ESTÁ BUILDANDO UM 'SPA', UMA SINGLE-PAGE APPLICATION,
+    O QUE VC PODE QUERER FAZER, EM VEZ DISSO,
+
+    É __ OMITIR__ OS ARQUIVOS CSS,
+
+    E ENTÃO IMPORTAR OS ARQUIVOS '.css'
+
+
+    DIRETAMENTE 
+
+    DO INTERIOR 
+
+
+    DOS SEUS ARQUIVOS '.js'...
+
+
+
+
+
+
+
+
+
+
+-> BASTA DEIXAR ASSIM:
+
+
+
+
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ["resources/js/app.js"],
+            refresh: true,
+        }),
+    ],
+});
+
+
+
+
+
+
+
+
+
+
+
+
+E, NO JAVASCRIPT (app.js), IMPORTAR ASSIM:
+
+
+
+
+
+
+
+import './bootstrap';
+import "../css/app.css";
+
+
+alert('Hello from the app.js file');
+
+
+
+
+
+
+
+
+
+FINALMENTE, LÁ NA BLADE FILE, PODEMOS REMOVER A REFERÊNCIA AO CSS DIRETO,
+TIPO ASSIM:
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel</title>
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+    {{-- This is how you import a CSS file from the resources/css folder --}}
+    @vite(['resources/js/app.js'])
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+''WITH THIS, WE ARE EXCLUSIVELY IMPORTING THE CSS FILE,
+    WHICH WILL THEN IMPORT THE CSS''..
+
+
+
+
+( e esse é um APPROACH MT COMUM, QUANDO O ASSUNTO É O BUILD DE 
+UM SINGLE-PAGE APP...)
+
+
+
+
+
+
+
+--> É CLARO QUE FICAMOS COM O MESMO RESULTADO...
+
+
+
+
+
+
+
+
+''ONE IS NOT NECESSARILY BETTER THAN THE OTHER,
+    IT ALL SORT OF DEPENDS ON WHAT SORT OF APP 
+    YOU ARE BUILDING''..
+
+
+
+
+
+
+''IF YOU ARE BUILDING A TRADITIONAL SERVERSIDE APP
+WITH BLADE FILES, I WOULD KEEP THOSE TWO SEPARATE ENDPOINTS...''
+
+
+
+
+
+''BUT IF YOU ARE BUILDING A SPA,
+    KEEP IT ALL IN A SINGLE JAVASCRIPT FILE,
+    THE CSS IMPORTS AND JS LOGIC''...
+
+
+
+
+
+
+
+
+
+
+
+CERTO... AGORA, PARA ACABAR,
+
+TEMOS, LÁ NO PACKAGE.JSON,
+
+
+OUTRO SCRIPT, CHAMADO DE 'npm run build'...
+
+
+
+
+
+
+
+
+-> ESSE É O SCRIPT QUE VAI PRODUZIR OS 
+    ARQUIVOS DE PRODUCTION, QUE VC VAI UPLOADAR JUNTO COM O FRAMEWORK LARAVEL...
+
+
+
+
+
+
+--> FICAMOS COM 1 COMPILED JS FILE E 1 COMPILED CSS FILE:
+
+
+
+
+
+
+vite v5.4.8 building for production...
+✓ 53 modules transformed.
+public/build/manifest.json             0.27 kB │ gzip:  0.15 kB
+public/build/assets/app-DW6X4WzT.css   0.02 kB │ gzip:  0.04 kB
+public/build/assets/app-z-Rg4TxU.js   35.05 kB │ gzip: 14.08 kB
+✓ built in 228ms
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-26> npm run dev
+
+> dev
+> vite
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> A PARTE LEGAL DISSO TUDO É QUE NAO PRECISAMOS MUDAR COISA ALGUMA...
+
+
+
+
+''THE @vite() directive is SMART ENOUGH TO DETECT IF WE ARE 
+    IN A LOCAL/DEV (with hot reloading) OR PRODUCTION ENVIRONMENT...''
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... REFRESHAMOS... NADA MUDOU,
+MAS AGORA 
+
+NOSSO APP ESTÁ 'PRIMED AND READY FOR PRODUCTION'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ASSET BUNDLING --> É UM TÓPICO BEM COMPLICADO...
+
+                        VIMOS APENAS A SURFACE...
+
+
+
+
+
+                    
+            
+
+
+        
+
+O QUE VIMOS, NESSE VIDEO,
+
+COBRE 85% DE TUDO QUE VC PRECISA SABER...
+
+
+
+
+
+
+
+
+-> A LARAVEL TEAM E O PLUGIN DE '@vite' são super úteis...
+
+
+
+
+
+
+
+--> JÁ VIMOS 1 BOA PARTE DO FRAMEWORK LARAVEL...
+
+
+
+
+
+
+
+--> O PRÓXIMO PÁSSO É O 'FINAL PROJECT'...
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI IR 1 POUCO MAIS RÁPIDO... 
+TEMOS QUE ENTENDER OS CONCEPTS BÁSICOS...
+
+
+
+
+
+
+
+
+
+
