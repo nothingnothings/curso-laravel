@@ -1,0 +1,2469 @@
+
+
+
+
+
+
+
+DENTRO DO JOB CONTROLLER,
+
+ESTAMOS NA ACTION DE 'STORE'...
+
+
+
+
+
+
+--> CONSEGUIMOS FAZER O SEND DE 1 EMAIL...
+
+
+
+
+
+-> O PROBLEMA, AQUI, É QUE 
+    O SEND DE NOSSO EMAIL OCORRE DE MANEIRA SÍNCRONA...
+
+
+
+
+    ISSO QUER DIZER QUE DEIXAMOS O USER ESPERANDO 'FOR HOW LONG 
+    THE EMAIL TAKES TO BE SENT''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> SERIA LEGAL SE PUDÉSSEMOS 'TAKE THAT JOB',
+
+o job de enviar 1 email,
+
+
+
+e 
+COLOCÁ-LO NO BACKGROUND,
+
+EM UMA QUEUE...
+
+
+
+
+
+
+
+
+
+
+
+
+'''PUT THE JOB IN A QUEUE,
+    WHILE WE INSTANTLY RESPOND TO THE USER''...
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS COMO PODEMOS FAZER ISSO, COM O LARAVEL?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA FAZER ISSO, A PRIMEIRA COISA QUE FAZEMOS É IR ATÉ A PASTA DE 'config'...
+
+
+
+
+
+
+
+LÁ DENTRO, temos o arquivo de 'queue.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''THERE ARE A VARIETY OF SERVICES 
+    AND BACKENDS THAT CAN ASSIST WITH YOUR QUEUES''...
+
+
+
+
+
+
+
+-> PODEMOS VISUALIZÁ-LOS, AQUI:
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Connections
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the connection options for every queue backend
+    | used by your application. An example configuration is provided for
+    | each backend supported by Laravel. You're also free to add more.
+    |
+    | Drivers: "sync", "database", "beanstalkd", "sqs", "redis", "null"
+    |
+    */
+
+
+
+
+
+
+
+
+
+
+
+
+
+    AS OPTIONS DE DRIVERS SÃO:
+
+
+
+
+1) sync --> synchronous, 'RUN THE JOB AS PART OF THE CURRENT REQUEST''...
+
+
+
+            --> É ISSO QUE FIZEMOS, ATÉ AGORA..
+
+            --> PODE SER ÚTIL PARA TESTING, E PARA O LOCAL ENVIRONMENT....
+
+
+
+
+
+2) 'database' -->  ''RUN YOUR QUEUES USING THE __ DATABASE DRIVER'...
+
+
+
+                --> O PROFESSOR ACHA QUE ESSA OPTION É BOA 
+                    'FOR A LONG TIME'...
+
+
+                --> MAS, CASO CONTRÁRIO, SE VC PRECISA 
+                    DE ALGUMAS OPTIONS MAIS ROBUSTAS,
+                    VC DEVE ESCOLHER ALGUMA DAS PRÓXIMAS 
+                    OPTIONS:
+
+
+3) ''beanstalkd''
+
+
+
+
+
+
+4) ''sqs''  (simple query service)
+
+
+
+
+
+5) ''redis''
+
+
+
+
+
+
+
+
+6) ''null'...
+
+
+
+
+
+
+
+
+
+
+-> CERTO... LÁ EM CIMA, TEMOS QUE A QUEUE_CONNECTION DEFAULT 
+
+É, DE FATO, 'database':
+
+
+
+
+
+    'default' => env('QUEUE_CONNECTION', 'database'),
+
+
+
+
+
+
+
+
+-> OU SEJA, O DATABASE DRIVER É REALMENTE O DEFAULT...
+
+
+
+
+
+
+
+
+-> MESMO ASSIM, PERCEBA QUE 
+
+    O PRIMEIRO PARAMETER, 
+
+    'QUEUE_CONNECTION',
+
+
+    VAI PROCURAR ESSE VALUE LÁ NO SEU .env file...
+
+
+
+
+
+--> lá no .env file,
+
+temos isto:
+
+
+
+
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+
+
+
+
+
+
+
+
+
+
+
+
+--> COMO VC PDE VER,
+
+
+    ELE ESTÁ COMO 'database'...
+
+
+
+
+
+
+
+
+
+
+
+-> SE VC TROCAR ESSE VALUE PARA OUTRO VALUE,
+    VC VAI ACABAR UTILIZANDO OUTRO DRIVER...
+
+
+
+
+
+EX:
+
+
+
+
+
+QUEUE_CONNECTION=redis 
+
+
+
+
+
+
+--> VAI HABILITAR O REDIS...
+
+
+
+
+
+
+QUEUE_CONNECTION=sqs 
+
+
+
+
+
+--> VAI HABILITAR O SQS...
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+POR ENQUANTO, NO ENTANTO,
+
+O PROFESSOR VAI MANTER COMO 'database'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> NO MESMO ARQUIVO 'queue.php',
+
+mais para baixo, temos isto;
+
+
+
+
+
+
+
+    'connections' => [
+
+        'sync' => [
+            'driver' => 'sync',
+        ],
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+        'beanstalkd' => [
+            'driver' => 'beanstalkd',
+            'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
+            'queue' => env('BEANSTALKD_QUEUE', 'default'),
+            'retry_after' => (int) env('BEANSTALKD_QUEUE_RETRY_AFTER', 90),
+            'block_for' => 0,
+            'after_commit' => false,
+        ],
+
+        'sqs' => [
+            'driver' => 'sqs',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'prefix' => env('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => env('SQS_QUEUE', 'default'),
+            'suffix' => env('SQS_SUFFIX'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'after_commit' => false,
+        ],
+
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
+    ],
+
+
+
+
+
+
+
+
+
+
+
+ESSAS SÃO AS DIVERSAS 'CONNECTION SETTINGS' PARA 
+CADA DRIVER DE NOSSA ESCOLHA...
+
+
+
+
+
+
+
+
+--> no de 'database', temos isto:
+
+
+
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+
+
+
+
+
+
+
+
+
+
+--> REPARE A PARTE DE 'table':
+
+
+
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+
+
+
+
+
+
+
+
+--> ISSO É PQ, SE VC VAI USAR O DRIVER DE 'database',
+    É CLARO QUE VC 
+
+    VAI PRECISAR DE 1 LUGAR PARA CONSEGUIR 'HOUSE'/'CONTAIN'
+
+    TODOS OS SEUS JOBS, ENQUANTO ELES SÃO PROCESSED...
+
+
+
+
+
+
+
+
+-> E, POR ENQUANTO, O NOME DE ESSA TABLE É JUSTAMENTE 'jobs'...
+
+
+
+
+
+--> E A MIGRATION PARA A CREATION DE ESSA TABLE, de 'jobs',
+    VEM COM O LARAVEL, OUT OF THE BOX...
+
+
+
+
+
+
+
+--> JÁ VISUALIZAMOS ESSA TABLE, DENTRO DO TABLEPLUS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... TEMOS MAIS ALGUNS TRECHOS AQUI,
+
+RELATIVOS A 'QUEUE BATCHING' E OUTRAS COISAS:
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Job Batching
+    |--------------------------------------------------------------------------
+    |
+    | The following options configure the database and table that store job
+    | batching information. These options can be updated to any database
+    | connection and table which has been defined by your application.
+    |
+    */
+
+    'batching' => [
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'job_batches',
+    ],
+
+
+
+
+
+
+
+
+
+
+
+-> TAMBÉM O HANDLE DE FAILED JOBS:
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Failed Queue Jobs
+    |--------------------------------------------------------------------------
+    |
+    | These options configure the behavior of failed queue job logging so you
+    | can control how and where failed jobs are stored. Laravel ships with
+    | support for storing failed jobs in a simple file or in a database.
+    |
+    | Supported drivers: "database-uuids", "dynamodb", "file", "null"
+    |
+    */
+
+    'failed' => [
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'failed_jobs',
+    ],
+
+
+
+
+
+
+
+
+
+
+
+NO CASO DO DRIVER DE 'database',
+
+
+o laravel vai procurar pela table chamada de 'failed_jobs',
+
+e vai inserir os jobs dentro dela...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> A MIGRATION QUE CRIA ESSAS TABLES É 
+
+
+'create_jobs_table':
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS PQ O PROFESSOR NOS MOSTROU TUDO ISSO?
+
+
+
+
+
+
+
+
+
+-> SE VOLTAMOS AO JOBCONTROLLER,
+
+''WHEN IT COMES TO MAIL, IT IS __ VERY EASY TO __ USE QUEUES''...
+
+
+
+
+
+
+
+
+
+
+
+
+--> para usar uma QUEUE,
+
+BASTA VC 
+
+
+
+SUBSTITUIR O METHOD DE '->send()'
+
+
+
+por 
+
+
+'->queue()'...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+ANTES:
+
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+   $job = JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+    Mail::to($job->employer->user)->send(new JobPosted($job));
+
+    return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS:
+
+
+
+
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+   $job = JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+    Mail::to($job->employer->user)->queue(new JobPosted($job)); // ! With queues
+
+    return redirect('/jobs');
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+com isso, dizemos 
+
+
+
+
+''DON'T DELIVER THIS EMAIL AS PART OF THE CURRENT REQUEST... INSTEAD,
+ I WANT YOU TO THROW IT INTO A QUEUE''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ISSO FEITO, CRIAMOS 1 NOVO JOBLISTING...
+
+
+
+MAS, ENTÃO, O QUE ACONTECEU COM NOSSO EMAIL...?
+
+ELE FOI ENVIADO,
+FOI COLOCADO NA QUEUE, O QUE ACONTECEU, DE FATO?
+
+
+
+
+
+
+
+
+
+
+
+-> SE ENTRAMOS NO 'MAILTRAP',
+
+
+PERCEBEMOS QUE _ NOSSA INBOX ESTARÁ __ VAZIA...
+
+
+
+
+
+
+
+
+
+-> NENHUM EMAIL FOI ENVIADO...
+
+
+
+
+
+
+
+
+
+--> OK, MAS QUAL É O PROBLEMA, AQUI...?
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR VAI TENTAR EXPLICAR DE 1 FORMA SIMPLES...
+
+
+
+
+
+
+
+
+
+
+
+-> MAS ANTES DISSO, ELE TEM QUE CONTAR 1 HISTÓRIA...
+
+
+
+
+
+
+
+
+-> HÁ MT TEMPO, ELE TRABALHAVA EM 1 XEROX...
+
+
+
+
+
+
+
+
+
+
+
+--> LÁ, O TRABALHO DELE ERA CAIXA...
+
+
+
+
+
+
+
+
+-> O CUSTOMER CHEGAVA E PEDIA  300 CÓPIAS DE 1 PANFLETO...
+
+
+
+
+
+
+
+-> O PROFESSOR ERA RESPONSÁVEL POR ESSAS 300 CÓPIAS....
+
+
+
+
+
+
+
+
+
+-> CADA COISA ERA UM 'JOB'... 
+
+
+
+
+
+
+
+-> E O PROFESSOR PODERIA ''WALK TO THE COPY MACHINE AND DO THE COPIES''...
+
+
+
+
+    MAS O CUSTOMER TERIA DE ESPERAR ATÉ O PROFESSOR TERMINAR O JOB...
+
+    E ISSO PODERIA LEVAR UM TEMPÃO...
+
+
+
+
+
+
+
+
+
+--> A ALTERNATIVA A ISSO É 
+
+DELEGAR A FUNÇÃO A UMA OUTRA PESSOA.... 
+
+
+
+
+
+''HAND IT TO A PERSON WHOSE ONLY JOB IS TO MAKE COPIES''...
+
+
+
+
+
+
+
+
+--> IMEDIATAMENTE APÓS O PROFESSOR FAZER ISSO,
+    ELE VOLTA AO CUSTOMER, E 'COMPLETES THE ORDER'...
+
+
+
+
+
+
+
+
+
+
+
+--> E ISSO É UMA QUEUE NA VIDA REAL...
+
+
+
+
+'' A JOB 
+    CAME ON, AND I THREW IT TO A QUEUE'' 
+
+
+    (
+        A QUEUE, NO CASO, ERA UMA MESA 
+        LOGO ATRÁS DO PROFESSOR, EM QUE O 'STAN',
+        UM OUTRO WORKER, FICA EXCLUSIVAMENTE RESPONSÁVEL 
+        POR REALIZAR ESSES JOBS...
+    )
+
+
+
+
+
+
+
+
+
+
+
+''WORKER'' --> É OUTRA PALAVRA-CHAVE,
+                QUANDO O ASSUNTO É 'QUEUES'...
+
+
+
+
+
+
+
+
+
+
+--> QUER DIZER QUE JÁ SABEMOS O QUE É UM JOB,
+    JÁ SABEMOS O QUE É UMA QUEUE, E JÁ SABEMOS O QUE É UM 
+    WORKER... 
+
+    ISSO PQ JÁ TEMOS ISSO, EM TODOS DIAS DE NOSSAS VIDAS..
+
+
+
+
+
+
+
+
+
+
+
+--> OK... O PROBLEMA, AQUI, PORTANTO,
+
+
+É QUE:
+
+
+
+''WE HAVE THROWN A NEW JOB INTO THIS QUEUE,
+    BUT WE HAVE __ NO WORKERS_ TO DO THIS JOB..''.
+
+
+
+
+
+
+
+
+
+
+
+--> AINDA NÃO TEMOS WORKER ALGUM..
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DEVEMOS CONSERTAR ISSO...
+
+
+
+
+
+
+
+
+
+
+-> ABRIMOS O TERMINAL,
+
+    E AÍ RODAMOS 
+
+    'php artisan queue:work'...
+
+
+
+
+
+
+
+
+--> COM ISSO, FICAMOS COM UMA MENSAGEM DE 'Processing jobs from the [default] queue'...
+
+
+
+
+
+
+
+
+
+e, então:
+
+
+
+
+App\Mail\JobPosted
+App\Mail\JobPosted 
+
+
+
+
+
+
+
+
+
+
+--> OK... O JOB DE 'DELIVER EMAIL' FOI CONCLUÍDO...
+
+
+
+
+
+
+
+
+
+COM ISSO, ESSE JOB FOI CONCLUÍDO... O EMAIL FOI ENTREGUE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> 'IF YOU INTEND TO USE QUEUES,
+    YOU _ REALLY__ NEED __ TO HAVE ONE 
+    OR MORE WORKERS, THAT WILL _ WORK__ ON THE QUEUE''..
+
+
+
+
+
+
+
+
+E É EXATAMENTE ISSO QUE ESSE COMANDO DE 'php artisan queue:work' FAZ...
+
+
+
+
+
+
+
+
+
+
+
+--> E ISSO QUER DIZER QUE, QUANDO VC FIZER PUSH DE SEU APP à PRODUCTION,
+    VC VAI PRECISAR RODAR ESSE COMANDO,
+
+    'php artisan queue:work',
+
+
+    'BEHIND THE SCENES'...
+
+
+
+
+
+
+
+--> PODE PARECER RUIM.... MAS HÁ 
+    TOOLS E SERVICES DEDICADOS, QUE AJUDAM COM ISSO...
+
+
+
+
+
+
+
+
+--> EXISTE UMA TOOL, POR EXEMPLO, CHAMADA DE 'SUPERVISOR',
+    QUE VAI __ GARANTIR QUE, NO MATTER WHAT, ESSE 
+    COMANDO DE 
+
+    'php artisan queue:work' NUNCA 'FALLS OVER',
+
+    FIQUE SEMPRE RODANDO NO BACKGROUND...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> LÁ NO ARQUIVO web.php,
+
+    PARA TESTAR ISSO, O PROFESSOR CRIA UMA ROUTE DE TEST,
+
+    TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/test', function() {
+
+    return 'Done';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... ISSO FEITO, O PROFESSOR 
+
+
+
+QUER 'PLAY AROND' 
+
+COM O 'DISPATCH' DE JOBS...
+
+
+
+
+
+
+
+
+
+
+-> ISSO PQ, NA VIDA REAL, VC FARÁ MT MAIS DO QUE  
+
+SIMPLES 'DISPATCH OF EMAILS'...
+
+
+
+
+-> EXISTIRÃO VARIEDADES DE PROCESSOS 
+    E ACTIONS QUE SERÃO PERFORMED,
+
+    TODAS ELAS 'TAKING A BIT OF TIME'...
+
+
+
+
+
+    --> ESPECIALMENTE HOJE EM DIA,
+        COM TANTA INTERAÇÃO COM AI...
+
+
+
+
+
+
+
+    --> O PRIMEIRO PASSO É A FUNCTION DE 'dispatch()'...
+
+
+
+
+
+
+
+
+-> a function de dispatch é chamada de 
+
+'QUEUED CLOSURE'...
+
+
+
+
+
+
+
+-> pq ela recebe esse nome?
+
+
+
+
+
+--> é pq seu formato é tipo assim:
+
+
+
+
+    dispatch(function() {
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+ESCREVEMOS TIPO ASSIM:
+
+
+
+
+
+
+Route::get('/test', function() {
+
+    dispatch(function() {
+        logger('Hello from the queue');
+    }); 
+
+    return 'Done';
+}); 
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+e, conforme aprendemos em 1 episodio anterior,
+
+
+
+todos os logs do laravel são dumpados no arquivo 
+
+
+>storage>logs>laravel.log
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+vamos até a route de '/test',
+
+
+e aí este código é executado:
+
+
+
+
+
+
+
+
+// This is a way to test if the queue is working.
+Route::get('/test', function() {
+
+    dispatch(function() {
+        logger('Hello from the queue');
+    });
+
+    return 'Done';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> FICAMOS COM 'Done',
+
+SINAL DE QUE 
+
+
+''WE HAVE DISPATCHED THIS JOB''....
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... MAS SE ABRIMOS O ARQUIVO DE 'laravel.log',
+
+
+FICAMOS SEM NADA... COMO ANTES...
+
+
+
+
+
+
+
+
+-> QUER DIZER QUE 
+
+AINDA PRECISAMOS RODAR O 
+
+
+'php artisan queue:work'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> BASTA PENSAR, PORTANTO, NA QUEUE COMO 1 STACK DE PAPER,
+
+E CADA PAPER É 1 JOB... 
+
+
+
+O ÚNICO PROBLEMA, AQUI, É QUE NÃO TEMOS NENHUM WORKER PARA HANDLAR 
+ESSES JOBS,
+
+ POR ISSO NADA ACONTECE...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA FAZER ISSO FUNCIONAR, ESSES JOBS SEREM 'WORKED',
+
+    PRECISAMOS DE 'php artisan queue:work'...
+
+
+
+
+
+
+
+
+
+-> SE RODAMOS O 'php artisan queue:work',
+
+
+
+
+NOSSO ARQUIVO 'laravel.log' é preenchido 
+
+
+
+
+com 
+
+
+
+[2024-04-23 16:17:10] local.DEBUG: hello from the queue!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... QUER DIZER QUE ISSO É SUPER ÚTIL...
+
+
+
+
+
+
+
+
+
+'''SOMETIMES, YOU WANNA TRIGGER A BIT OF LOGIC THAT 
+HAPPENS _ OUTSIDE OF THE REQUEST'''...
+
+
+
+
+
+''''BUT THIS LOGIC IS FAIRLY BASIC,
+    IT IS INLINE, AND YOU DON'T WANNA COMPLICATE THINGS...''
+
+
+
+'''IN SITUATIONS LIKE THAT, THE 'dispach()' function 
+    is A GOOD WAY TO GO''...
+
+
+
+
+
+
+
+
+-> PODEMOS ATÉ MESMO FAZER COOL THINGS,
+
+    COMO rodar '->delay(5)',
+
+
+
+
+PARA FAZER COM QUE A EXECUTION SEJA ATRASADA EM X SEGUNDOS...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+// This is a way to test if the queue is working.
+Route::get('/test', function() {
+
+    dispatch(function() {
+        logger('Hello from the queue');
+    })->delay(5); // * This is the delay, in seconds, for the execution (optional).
+
+    return 'Done';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, DISPATCHEAMOS 1 JOB, QUE FOI 'DELAYED' EM 5 SEGUNDOS...
+
+
+
+
+
+ISSO PODE SER ÚTIL PARA CASES EM QUE 
+
+
+
+'''I WANNA SEND A WELCOME EMAIL, BUT ONLY 15 MINUTES AFTER THE 
+    USER SIGNS UP...'''
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS VOLTAMOS AO NOSSO ARQUIVO 'web.php',
+
+E AÍ 
+
+
+
+ENTRAMOS NO TÓPICO DE 'DEDICATED JOB CLASSES'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+'''ONE THING I CAN IMAGINE DOING IS:
+WHAT IF, AFTER AN EMPLOYER PUBLISHES A NEW  JOBLISTING,
+WE TAKE CARE OF _ TRANSLATING IT TO __ A DOZEN __ DIFFERENT 
+LANGUAGES..''
+
+
+
+
+
+
+
+''FOR THAT, WE MIGHT WANT TO USE AI, TO HANDLE THAT TASK...'''
+
+
+
+
+
+
+''WE CAN DEFINITELY DO THAT,
+    BUT THAT WILL ALWAYS TAKE SOME TIME''... 
+
+
+
+
+
+
+
+
+
+
+-> PARA COMEÇAR, DEVEMOS RODAR 
+
+'php artisan make:job',
+
+
+
+PARA CRIAR ESSA JOB CLASS....
+
+
+
+
+
+
+
+
+
+
+-> ESCOLHEMOS O NOME DE 'TranslateJob'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- OK... ISSO FOI CRIADO NO FOLDER DE 'Jobs'...
+
+
+
+
+
+
+
+ESSE NOVO ARQUIVO FICOU LÁ, em 'Jobs'...
+
+
+
+
+
+O ARQUIVO FICOU TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+
+class TranslateJob implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+ESSA CLASS TEM ESSE TRAIT, DE 'Queueable'...
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR FICOU COM ALGUNS TRAITS ADICIONAIS,
+
+
+COMO 'Dispatcheable',
+
+'interactsWithQueue' 
+
+
+e 'SerializesModels'...
+
+
+
+
+
+
+
+
+-> CADA UM DELES MODIFICA 1 POUCO O COMPORTAMENTO  
+DESSE NOSSO JOB, COM A QUEUE...
+
+
+
+
+
+
+
+''SerializesModels'' --> FAZ A SERIALIZATION (converte em string)   
+                        DOS SEUS MODELS,
+
+                        QUANDO ELES SÃO ADDED E RETRIEVED DE SUA QUEUE...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS TUDO QUE VC TEM QUE SABER, AQUI,
+É 
+
+
+QUE É 
+
+
+
+EM 'handle()'
+
+
+
+    QUE SUA LÓGICA DE JOB SERÁ TRIGGADA...
+
+
+
+
+
+
+
+
+
+
+
+-> por exemplo, 
+    DENTRO DE ESSE METHOD, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+
+class TranslateJob implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        //
+        logger('Hello from the TranslateJob');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... 
+
+    COM ISSO, LÁ NA NOSSA ROUTE DE TEST,
+
+    NÃO FAREMOS O DISPATCH DE 1 'QUEUED CLOSURE',
+
+
+
+    E SIM FAREMOS O DISPATCH DE _ UMA CLASS DE 'JOB'
+
+
+    DEDICADA, ESSA CLASS DE 'TranslateJob',
+
+    que recém criamos...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+// This is a way to test if the queue is working.
+Route::get('/test', function() {
+
+    // * This is how you dispatch a class-based job:
+    TranslateJob::dispatch()->delay(5); // * This is the delay, in seconds, for the execution (optional).
+
+    return 'Done';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BASICAMENTE, EXISTE UM STATIC METHOD CHAMADO DE '::dispatch()',
+
+dentro de cada JOB object...
+
+
+
+
+podemos utilizá-lo para FAZER DISPATCH DE ESSE JOB...
+
+
+
+
+
+
+--> PARA 'WORK' NESSE JOB AÍ,
+
+BASTA ESCREVER 
+
+
+
+'php artisan queue:work'...
+
+
+
+
+
+
+
+
+
+
+--> LÁ NA NOSSO ARQUIVO 'laravel.log',
+
+
+    ficamos com esse log de 
+
+
+    ''         logger('Hello from the TranslateJob'); ''
+
+
+
+
+
+
+
+
+
+
+
+-> NO NOSSO APP,
+    POR CONTA DOS NAMES QUE O PROFESSOR PROPORCIONOU, TEMOS 2 TIPOS DE JOBS:
+
+
+
+
+
+    1) O 'JobListing' model...
+
+
+    2) JOBS, como em 'queued jobs', como esse 'TranslateJob'...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR VAI FAZER O TRACK DE 1 JOB LISTING...
+
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+
+$job = JobListing::first();
+
+
+TranslateJob::dispatch($job);
+
+
+
+return 'Done';
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> COM ISSO, ESTAMOS 'PASSING OUR INSTANCED MODEL 
+                        TO THE DISPATCH METHOD,
+                        INSIDE OF  THE 'TranslateJob' ''...
+
+
+
+
+
+
+// This is a way to test if the queue is working.
+Route::get('/test', function() {
+
+    // * This is how you dispatch a class-based job, and pass a instanced model to it, as a parameter:
+    $jobListing = JobListing::first();
+    dispatch(new TranslateJob($jobListing))->delay(5); // * This is the delay, in seconds, for the execution (optional).
+
+    return 'Done';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... AÍ, DENTRO DO 'handle()',
+
+
+vc pode ESCREVER 1 LÓGICA ESPECIAL, USANDO UMA CLASS DE 'AI' (por exemplo),
+
+que 
+
+pode ter 1 method de '::translate',
+
+
+QUE VAI ACEITAR O 'title' de seu JobListing, ou então a description,
+
+tipo assim:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Jobs;
+
+use App\Models\JobListing;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+
+class TranslateJob implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(public JobListing $jobListing)
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        //
+        // logger('Hello from the TranslateJob');
+
+        AI::translate($this->jobListing->description, 'spanish');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+ISSO FUNCIONARIA, SE TIVÉSSEMOS ESSA CLASS DE 'AI',
+
+
+
+com esses parameters..
+
+
+
+
+
+
+
+
+-> MAS O QUE INTERESSA, AQUI,
+É QUE 
+
+
+
+''THIS COULD BE A POTENTIALLY LONG-RUNNING PROCESS'',
+
+
+
+um processo que 
+
+
+NÃO DEVE 'TAKE PLACE AS PART OF THE CURRENT REQUEST',
+
+
+E É EXATAMENTE 
+
+
+POR ISSO QUE DEIXAMOS ESSA LÓGICA DENTRO DO 'handle()' de um JOB,
+
+E ENTÃO FAZEMOS __ DISPATCH_ DE ESSE JOB,
+
+A UMA QUEUE...
+
+
+
+
+
+
+
+
+
+
+
+--> podemos simular isso com 
+
+
+
+logger('Translating' . $this->jobListing->title . ' to Spanish');
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+    public function handle(): void
+    {
+
+        // logger('Translating' . $this->jobListing->title . ' to Spanish');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+OK... MAS AO APLICARMOS ESSA MUDANÇA,
+
+
+
+AINDA NÃO HÁ EFEITOS,
+
+
+O WORKER AINDA EXECUTOU O JOB ANTIGO,
+
+
+QUE tinha outra mensagem... QUAL É O PROBLEMA, AQUI?
+
+
+
+
+
+
+
+
+
+
+-> bem, o problema é que, quando rodamos esse command 
+
+de 
+
+
+''php artisan queue:work'',
+
+
+ELE 'LOADS EVERYTHING INTO MEMORY' (mesma coisa que php artisan tinker)...
+
+
+
+
+
+
+
+
+
+
+
+''SINCE WE LOADED EVERYTHING INTO MEMORY, 
+    WE HAVE CHANGED THE LOGIC FOR THE JOB,
+    BUT THIS WON'T HAVE BEEN APPLIED INTO THE CODE THAT 
+    WAS LOADED INTO THE MEMORY''..
+
+
+
+
+
+
+
+
+-> quer dizer que, sempre que fizermos 1 change significativa 
+    NOS NOSSOS JOBS,
+
+
+    NÓS DEVEMOS __ RESTARTAR OS 'QUEUE WORKERS'... tudo para que 
+
+    eles entendam que a lógica dos jobs MUDOU...
+
+
+
+
+
+
+
+
+''ONCE YOU PUSH YOUR CODE TO PRODUCTION, YOU WILL SET 
+THAT UP AS PART OF YOUR DEPLOY/BUILD SCRIPT'' 
+
+
+('''MAKE SURE THAT YOU RESTART YOUR WORKER, 
+AS PART OF THE BUILD/DEPLOY SCRIPT, IN PRODUCTION...''')
+
+
+
+
+
+
+
+
+
+TIP:
+
+
+'''ALWAYS RESTART THE WORKER AFTER MAKING A CODE CHANGE''..
+
+
+
+
+
+
+
+
+
+OK... AGORA ABRIMOS O 'laravel.log',
+
+e a mudança foi APLICADA...
+
+
+
+
+
+
+
+
+
+
+
+-> ESTA FOI A NOSSA INTRODUCTION A QUEUES...
+
+
+
+
+
+
+AGORA, TERMOS COMO:
+
+
+
+
+1) QUEUE 
+
+2) JOB 
+
+3) WORKER 
+
+
+
+JÁ NÃO SÃO TÃO ASSUSTADORES...
+
+
+
+
