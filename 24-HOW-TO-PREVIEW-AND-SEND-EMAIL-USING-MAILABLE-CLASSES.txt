@@ -1,0 +1,2381 @@
+
+
+
+
+
+
+
+
+
+VEREMOS COMO ENVIAR EMAIL, USANDO O LARAVEL...
+
+
+
+
+
+
+
+
+
+-> A PRIMEIRA COISA QUE PRECISAMOS FAZER, NO CASO,
+
+É O GENERATE DAQUILO QUE O LARAVEL CHAMA DE 'Mailable'...
+
+
+
+
+
+
+
+
+-> BASTA ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+php artisan make:mail
+
+
+
+
+
+
+
+BEM, MAS QUAL DEVE SER O NAME DESSE 'MAILABLE'?
+
+
+
+
+
+
+
+-> IMAGINE QUE VC É UM EMPLOYER...
+
+    DEPOIS QUE VC CRIAR 1 JOB NO NOSSO SITE,
+
+
+    VC VAI QUERER QUE SEJA ENVIADO 1 EMAIL DE CONFIRMATION, A VOCÊ...
+
+
+
+
+
+
+
+
+
+
+
+-> um bom nome para o mailable seria 'JobPosted'...
+
+
+
+
+
+
+
+
+
+ok... escolhemos esse nome, e aceitamos...
+
+
+
+
+
+
+
+
+
+-> ESSE NOVO 'MAILABLE' SERÁ CRIADO 
+
+
+
+na pasta 
+
+
+app>Mail>
+
+
+
+SOB O NOME 'JobPosted.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... ABRIMOS ESSE ARQUIVO....
+
+
+
+
+
+
+
+
+FICAMOS COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class JobPosted extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Job Posted',
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'view.name',
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+-> É BEM INTUITIVO..
+
+
+
+
+
+
+--> PARA ENVIAR 1 EMAIL, O QUE PRECISAMOS FAZER?
+
+
+
+
+
+
+
+
+
+
+
+first step -> 'FILL THE ENVELOPE'...
+
+                --> para isso, temos o primeiro method,
+
+                que é 'envelope()'...
+
+
+
+
+
+
+
+
+
+É TIPO ASSIM:
+
+
+
+
+
+
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Job Posted',
+        );
+    }
+
+
+
+
+
+
+
+
+
+É DENTRO DO ENVELOPE QUE VC PROVIDENCIA:
+
+
+
+A) THE EMAIL'S SUBJECT 
+
+
+
+B) TO 
+
+
+
+
+C) FROM 
+
+
+
+D) REPLY TO 
+
+
+
+
+E) TAGS (PODEM SER ASSOCIADAS COM O EMAIL PROVIDER)...
+
+
+
+
+
+
+
+
+
+
+
+-> e temos 1 lista de parameters...
+
+
+
+
+
+
+mas geralmente será subject,
+                to e from...
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO, TEMOS 'content()':
+
+
+
+
+
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'view.name',
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+-> BASICAMENTE  TEMOS ESSA CLASS DE 'Content',
+
+
+que é retornada, e que wrappa uma view... colocamos o nome de essa view...
+
+
+
+
+
+
+
+
+--> PARA ISSO, CRIAMOS UMA NOVA VIEW, DENTRO 
+
+DO FOLDER 
+
+
+
+resources>views>mail 
+
+
+
+
+
+
+ 
+certo...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DENTRO DISSO, O PROFESSOR CRIA UMA SIMPLES VIEW, 
+
+    de nome 
+
+    'job-posted.blade.php'...
+
+
+
+
+
+
+
+''
+
+Congrats! Your jor is now live on our website!
+
+
+
+''
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+AÍ, LÁ NA NOSSA CLASS 'JobPosted',
+
+
+
+
+escrevemos a view como 'mail.job-posted':
+
+
+
+
+
+
+
+
+
+
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'mail.job-posted',
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+FINALMENTE, SE TEMOS ALGUM ATTACHMENT,
+
+
+PROVIDENCIAMOS ELE NO METHOD DE 'attachments()':
+
+
+
+
+
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+MAS TUDO ISSO JÁ TEM 1 BOA ESTRUTURA...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS QUEREMOS TESTAR ESSE EMAIL, VER COMO ELE SE PARECE...
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, VOLTAMOS 
+
+AO ARQUIVO DE ROUTES,
+
+web.php...
+
+
+
+
+
+
+
+-> O PROFESSOR CRIA UMA NOVA ROUTE, ROUTE DE TESTE,
+
+
+
+
+ASSIM:
+
+
+
+
+
+
+
+
+
+
+Route::get('/test', function() {
+
+
+});
+
+
+
+
+
+
+
+
+
+O QUE É LEGAL, AQUI, É QUE BASTA FAZER O RETURN DE NOSSA CLASS DE 'MAILABLE',
+
+tipo assim:
+
+
+
+
+
+
+// * This is a way to TEST if the mail is working
+Route::get('/test', function() {
+    return new JobPosted();
+});
+
+
+
+
+
+
+
+
+
+
+SE RETORNARMOS ESSE OBJECT ASSIM,
+
+
+VAI FUNCIONAR...
+
+
+
+
+
+
+
+
+
+
+
+SE ENTRAMOS NESSE PATH, NO BROWSER,
+
+
+
+FICAMOS COM O BODY DE NOSSO EMAIL,
+
+O QUE QUER DIZER QUE ESTÁ FUNCIONANDO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A PRÓXIMA ETAPA, NO CASO,
+
+É __ ENVIAR__ ESSE EMAIL...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS USAR A FACADE DE 
+
+
+'Mail',
+
+
+
+e então o method de '::to()',
+
+
+dentro de essa facade...
+
+
+
+-> DENTRO DE '::to()',
+
+especificamos 'TO WHAT EMAIL ADDRESS SHOULD THE EMAIL BE SENT''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> podemos escrever assim:
+
+
+
+
+
+
+
+// * This is a way to TEST if the mail is working
+Route::get('/test', function() {
+    Mail::to('example@example.com')->send(new JobPosted());
+});
+
+
+
+
+
+
+
+
+
+
+
+
+ESSE MAIL, NO CASO, É DA PACKAGE 
+
+
+\Illuminate\Support\Facades\Mail
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... POR FIM, PODEMOS FAZER UM RETURN DE 'return 'Done';' '
+
+
+
+
+
+Ex:
+
+
+
+
+// * This is a way to TEST if the mail is working
+Route::get('/test', function() {
+    Mail::to('example@example.com')->send(new JobPosted());
+
+    return 'Done'; 
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS É CLARO QUE ESSE EMAIL NÃO SERÁ ACTUALLY ENVIADO...
+
+
+
+
+
+
+
+
+NÃO SERÁ ACTUALLY ENVIADO 
+
+
+''BECAUSE WE ARE IN A LOCAL DEV ENVIRONMENT''...
+
+
+
+''WE ARE IN A LOCAL ENVIRONMENT, AND WE HAVEN'T YET 
+SET SOME KIND OF EMAIL PROVIDER OR SMTP SERVER''...
+
+
+
+
+
+
+
+
+
+
+
+-> isso quer dizer que, quando enviarmos esse email, nesse contexto,
+
+    ELE NÃO VAI _ aCTUALLY _ SEGUIR O CAMINHO 
+    ATÉ 
+
+
+    'example@example.com'...
+
+
+
+
+    -> EM VEZ DISSO, ESSE EMAIL ''IS JUST GOING TO BE ___ LOGGED INTO A FILE''...
+
+
+
+
+
+
+
+-> VISITAMOS O ENDPOINT DE 'test',
+
+    E ISSO FAZ O SEND 'FAKE' DO EMAIL...
+
+
+
+
+
+
+
+
+
+-> PARA CHECAR SE O EMAIL FOI ACTUALLY ENVIADO,
+
+    BASTA 
+
+
+    ABRIR O FOLDER DE 'storage',
+
+    depois 'logs',
+
+
+    e  então 
+
+
+
+    a file chamada de 'laravel.log'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER, O FORMATO FICOU ASSIM:
+
+
+
+
+
+
+
+
+
+
+[2024-09-30 04:44:48] local.DEBUG: From: Laravel <hello@example.com>
+To: example@example.com
+Subject: Job Posted
+MIME-Version: 1.0
+Date: Mon, 30 Sep 2024 04:44:48 +0000
+Message-ID: <0352282735393147e6a6158fb9274641@example.com>
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Congrats! Your job is now live on our website!
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> TEMOS O FROM, TEMOS O TO...
+
+
+
+TEMOS O SUBJECT,
+E AÍ TEMOS O 
+BODY DO EMAIL...
+
+
+
+
+
+
+
+
+PODEMOS CONFIGURAR ESSE 'FROM' TAMBÉM,
+
+COMO O PROFESSOR LOGO NOS MOSTRARÁ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONFIGURAR O 'from' do email, e outras coisas,
+
+
+devemos ir até o folder de 'config',
+
+e então 'mail.php'...
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Mailer
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the default mailer that is used to send all email
+    | messages unless another mailer is explicitly specified when sending
+    | the message. All additional mailers can be configured within the
+    | "mailers" array. Examples of each type of mailer are provided.
+    |
+    */
+
+    'default' => env('MAIL_MAILER', 'log'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mailer Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure all of the mailers used by your application plus
+    | their respective settings. Several examples have been configured for
+    | you and you are free to add your own as your application requires.
+    |
+    | Laravel supports a variety of mail "transport" drivers that can be used
+    | when delivering an email. You may specify which one you're using for
+    | your mailers below. You may also add additional mailers if needed.
+    |
+    | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
+    |            "postmark", "resend", "log", "array",
+    |            "failover", "roundrobin"
+    |
+    */
+
+    'mailers' => [
+
+        'smtp' => [
+            'transport' => 'smtp',
+            'url' => env('MAIL_URL'),
+            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('MAIL_PORT', 2525),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'ses' => [
+            'transport' => 'ses',
+        ],
+
+        'postmark' => [
+            'transport' => 'postmark',
+            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
+        ],
+
+        'resend' => [
+            'transport' => 'resend',
+        ],
+
+        'sendmail' => [
+            'transport' => 'sendmail',
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+        ],
+
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
+
+        'array' => [
+            'transport' => 'array',
+        ],
+
+        'failover' => [
+            'transport' => 'failover',
+            'mailers' => [
+                'smtp',
+                'log',
+            ],
+        ],
+
+        'roundrobin' => [
+            'transport' => 'roundrobin',
+            'mailers' => [
+                'ses',
+                'postmark',
+            ],
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global "From" Address
+    |--------------------------------------------------------------------------
+    |
+    | You may wish for all emails sent by your application to be sent from
+    | the same address. Here you may specify a name and address that is
+    | used globally for all emails that are sent by your application.
+    |
+    */
+
+    'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+É AQUI QUE VAMOS CONFIGURAR AS SETTINGS DO MAIL...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS CONFIGURAR, INICIALMENTE,
+
+O MAILER QUE SERÁ USADO PARA ENVIAR O MAIL....
+
+
+
+
+
+
+
+
+
+
+AQUI:
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Mailer
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the default mailer that is used to send all email
+    | messages unless another mailer is explicitly specified when sending
+    | the message. All additional mailers can be configured within the
+    | "mailers" array. Examples of each type of mailer are provided.
+    |
+    */
+
+    'default' => env('MAIL_MAILER', 'log'),
+
+
+
+
+
+
+
+
+
+
+
+
+POR DEFAULT, É O LOG ('log into a file')...
+
+
+
+
+
+
+
+OUTRAS OPTIONS SÃO:
+
+
+1) SPECIFIC API 
+
+
+2) FTP SERVER...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DEPOIS DISSO, PODEMOS CONFIGURAR 
+    A MANEIRA PELA QUAL 
+
+
+    NOSSO EMAIL É ENVIADO..
+
+
+
+
+
+
+
+COM ESTE TRECHO:
+
+
+
+
+
+
+
+
+
+    'mailers' => [
+
+        'smtp' => [
+            'transport' => 'smtp',
+            'url' => env('MAIL_URL'),
+            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('MAIL_PORT', 2525),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'ses' => [
+            'transport' => 'ses',
+        ],
+
+        'postmark' => [
+            'transport' => 'postmark',
+            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
+        ],
+
+        'resend' => [
+            'transport' => 'resend',
+        ],
+
+        'sendmail' => [
+            'transport' => 'sendmail',
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+        ],
+
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
+
+        'array' => [
+            'transport' => 'array',
+        ],
+
+        'failover' => [
+            'transport' => 'failover',
+            'mailers' => [
+                'smtp',
+                'log',
+            ],
+        ],
+
+        'roundrobin' => [
+            'transport' => 'roundrobin',
+            'mailers' => [
+                'ses',
+                'postmark',
+            ],
+        ],
+
+    ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+    isso te dá a option de escolher diferentes services,
+
+    como simple email service,
+
+
+    postmark,
+
+
+    sendmail,
+
+
+    mailgun,
+
+
+
+    sendgrid, etc...
+
+
+
+
+
+
+
+
+
+
+-> DEPOIS DISSO, TEMOS O 'GLOBAL FROM ADDRESS':
+
+
+
+
+
+ 
+
+     /*
+    |--------------------------------------------------------------------------
+    | Global "From" Address
+    |--------------------------------------------------------------------------
+    |
+    | You may wish for all emails sent by your application to be sent from
+    | the same address. Here you may specify a name and address that is
+    | used globally for all emails that are sent by your application.
+    |
+    */
+
+    'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COMO VC PODE PERCEBER, A MAIOR PARTE DE ESSAS CONFIGS REFERENCIA 
+1 ENVIRONMENT VARIABLE... MAS, ALTERNATIVAMENTE, COMO SEGUNDO PARAMETER,
+TEMOS DEFAULT VALUES COMO 'hello@example.com' (que foi usado, anteriormente)...
+
+
+
+
+
+
+
+-> ESSES DEFAULTS SÃO UTILIZADOS SE NENHUM EMAIL ADDRESS
+    É SETTADO ('EMAIL_FROM_ADDRESS', por exemplo)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA SETTAR CONFIGS DE SUA ESCOLHA,
+
+    VC TEM 2 OPÇÕES:
+
+
+
+
+
+
+1) SUBSTITUIR OS VALUES DIRETAMENTE NO ARQUIVO 'config/mail.php',
+
+TIPO ASSIM:
+
+
+
+    'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'yourDesired@email.com'),
+        'name' => env('MAIL_FROM_NAME', 'Some Other Example'),
+    ],
+
+
+
+
+
+
+
+
+(E ISSO É FINE, MAS O PROFESSOR N GOSTA)...
+
+
+
+
+
+
+
+
+2) DEFINIR ESSES VALUES DIRETAMENTE NA '.env' file...
+
+
+
+
+
+
+
+
+
+
+
+
+-> BASTA IR ATÉ O ROOT DO PROJECT,
+
+
+E AÍ ESCREVER ASSIM:
+
+
+
+
+
+
+MAIL_MAILER=log
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="yourDesired@email.com"
+MAIL_FROM_NAME="Another Example"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AÍ VOLTAMOS AO BROWSER, E TESTAMOS SE ESSAS CHANGES FORAM APLICADAS...
+
+
+
+
+
+
+
+
+
+
+
+-> NA LOG FILE,
+
+AGORA ENCONTRAMOS ISTO:
+
+
+
+
+
+
+
+[2024-09-30 04:53:04] local.DEBUG: From: Another Example <yourDesired@email.com>
+To: example@example.com
+Subject: Job Posted
+MIME-Version: 1.0
+Date: Mon, 30 Sep 2024 04:53:04 +0000
+Message-ID: <f721ae78c157e6d08a1a52598e1cf406@email.com>
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Congrats! Your job is now live on our website!
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QUER DIZER QUE __ NÓS _ CONSEGUIMOS __ 
+
+UPDATAR O 'GLOBAL FROM ADDRESS' DE NOSSO APP...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO... 
+
+
+
+
+
+
+POR FIM, TEMOS UMA TERCEIRA MANEIRA DE ALTERAR O 'GLOBAL FROM ADDRESS' 
+
+DE NOSSO APP...
+
+
+
+
+
+
+
+3) DEFINIR O FROM DIRETAMENTE NO METHOD DE 'envelope()',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Job Posted',
+            from: 'yourDesired@email.com',
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VC PODE USAR ISSO EM SITUATIONS EM QUE VC QUER FAZER OVERRIDE DO DEFAULT VALUE 
+DE SEU APP...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Job Posted',
+            // from: 'yourDesired@email.com',
+            // replyTo: 'admin@email.com',
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A PRÓXIMA ETAPA É DEIXAR TUDO ISSO MAIS REALISTA, MAIS REAL-LIFE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR APONTA QUE 
+
+
+''THERE ARE A BUNCH OF DIFFERENT SERVICES WE CAN PLAY AROUND WITH...''
+
+
+
+
+
+
+
+
+
+
+
+-> UM SERVICE QUE O PROFESSOR GOSTA É 
+
+'MAILTRAP'...
+
+
+
+
+
+
+
+
+
+
+-> ELE CLICA EM 'START TESTING',
+
+E AÍ CRIA 1 INBOX...
+
+
+
+
+
+
+-> AÍ TEMOS 'INTEGRATIONS'..
+
+
+
+
+
+-> ESCOLHEMOS A DO LARAVEL 9+..
+
+
+
+
+
+
+
+TEMOS QUE PROVIDENCIAR AS INTEGRATION SETTINGS,
+BEM FACILMENTE...
+
+
+
+
+
+
+
+
+SÃO ENVS COMO ESTAS:
+
+
+
+# Looking to send emails in production? Check out our Email API/SMTP product!
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=78412d893abd2b
+MAIL_PASSWORD=7ade8ceb440568
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> VAMOS LÁ NO '.env',
+
+
+
+
+
+E AÍ COLAMOS ISSO...
+
+
+
+
+
+
+
+FICOU TIPO ASSIM:
+
+
+
+
+
+
+# Looking to send emails in production? Check out our Email API/SMTP product!
+MAIL_MAILER=smtp
+# MAIL_MAILER=log
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=78412d893abd2b
+MAIL_PASSWORD=7ade8ceb440568
+
+
+
+
+
+
+
+
+
+
+AÍ TESTAMOS ESSE FEATURE...
+
+
+
+
+
+
+-> E NOSSO EMAIL FOI REALMENTE ENVIADO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> CERTO.... MAS AGORA DEVEMOS 'INTEGRATE SOME REAL DATA'...
+
+
+
+
+
+
+
+
+
+
+QUEREMOS:
+
+
+
+
+1) '' HAVE REAL INFO ABOUT THE JOB THAT WAS CREATED''...
+
+
+
+
+
+2) ''HAVE A LINK, TO VIEW THE JOB''....
+
+
+
+
+
+
+
+
+
+
+-> É POR ISSO QUE REMOVEMOS ESSA ROUTE DE 'test',
+
+pq vamos usar essa class de mailable 
+
+
+
+em 1 route de verdade.. na route de 'store' do jobController...
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+
+
+    return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    escrevemos tipo assim:
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+    JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+    Mail::to('example@example.com')->send(new JobPosted());
+
+    return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS O PROBLEMA É QUE O EMAIL AINDA ESTÁ HARDCODED...
+
+
+
+
+TEMOS QUE PEGAR O EMAIL LÁ DO USER,
+
+
+PARA ENTÃO USAR COM ESSE METHOD...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+   $job = JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+    Mail::to($job->employer->user)->send(new JobPosted());
+
+    return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+usamos as relations entre esses 3 models para pegar o email 
+
+
+
+do user...
+
+
+
+
+
+
+
+''IF WE FEED THE USER TO THE METHOD,
+LARAVEL IS SMART ENOUGHT TO GET ITS EMAIL ADDRESS AND SEND THE EMAIL TO IT'''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> certo... aí passamos a job instance, '$job',
+
+COMO PARAMETER DE 'JobPosted'...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+    public function store() {
+    // * Here is how you validate the fields of the request:
+    request()->validate(
+        [
+            'title' => ['required', 'string', 'min:3'],
+            'salary' => ['required', 'numeric']
+        ],
+    );
+
+   $job = JobListing::create([
+        'title' => request('title'),
+        'salary' => request('salary'),
+        'employer_id' => 1
+    ]);
+
+    // Send the email:
+    Mail::to($job->employer->user)->send(new JobPosted($job));
+
+    return redirect('/jobs');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    LÁ NO MAILABLE,
+    PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Mail;
+
+use App\Models\JobListing;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class JobPosted extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(public JobListing $job)
+    {
+        //
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+MAS, AQUI, HÁ 1 COISA QUE VC DEVE ENTENDER, BEM IMPORTANTE...
+
+
+
+
+
+
+
+
+''INSIDE OF YOUR _ MAILABLE CLASS,
+    __ ALL __ PUBLIC PROPERTIES __ ARE INSTANTLY 
+    AVAILABLE, WITHIN YOUR VIEW'''...
+
+
+
+
+
+
+
+-> ISSO QUER DIZER QUE NEM MESMO PRECISAMOS PASSAR AS VARIABLES 
+
+A NOSSAS VIEWS DOS EMAILS,
+
+ELAS JÁ SÃO PASSADAS AUTOMATICAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+quer dizer que em 'job-posted.blade.php' 
+
+
+JÁ VAMOS TER ESSA VARIABLE...
+
+
+
+
+
+
+
+
+
+
+SE VC TIVER ALGUMA SITUAÇÃO EM QUE VC __ NÃO QUER 
+
+ESSA VARIABLE DISPONÍVEL NA SUA VIEW,
+
+
+VC 
+
+TERÁ DE ESCREVER 
+
+
+
+'protected', em vez de 'public'...
+
+
+
+
+
+
+
+
+
+LÁ NA NOSSA VIEW,
+
+ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+
+<p>
+    Congrats! Your job is now live on our website!
+</p>
+
+
+<p>
+    <a href="/jobs/{{ $job->id }}">View Your Job Listing</a>
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS AQUI TEMOS 1 ERROR....
+
+
+
+
+
+-> PRECISAMOS QUE A URL DA ANCHOR TAG SEJA 
+
+
+__ A FULL URL _ DE NOSSO WEBSITE... 
+
+
+
+
+ISSO PQ _ O USER NÃO VAI LER ESSE EMAIL DE DENTRO DE NOSSO WEBSITE...
+
+ELE VAI LER ESSE EMAIL DO LADO DE FORA,
+
+
+
+
+POR ISSO PRECISAMOS DE ALGO COMO 
+
+
+
+'url('/jobs/' . $job->id) '
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO PQ 'url()'
+
+VAI GERAR 1 URL PARA O NOSSO APP...
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<h2>
+    {{ $job->title }}
+</h2>
+
+<p>
+    Congrats! Your job is now live on our website!
+</p>
+
+
+<p>
+    <a href="{{ url('/jobs/' . $job->id) }}">View Your Job Listing</a>
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.. PARA TESTAR ISSO, FAZEMOS O CREATE DE 1 NOVO JOB...
+
+
+
+
+
+
+
+
+NO MAILTRAP,
+
+FICAMOS COM ESSE EMAIL...
+
+
+
+
+
+
+
+
+
+
+
+
+-> 'VIEW YOUR JOB LISTING' -> SE CLICAMOS NISSO,
+
+
+                                SOMOS LEVADOS à 'FULL URL TO OUR PROJECT'...
+
+
+
+
+                            --> E A PARTE LEGAL DISSO É QUE 
+
+
+                            ''THE FULL URL WILL WORK FOR BOTH 
+                            YOUR LOCAL AND PRODUCTION ENVIRONMENTS''...
+
+
+
+
+
+
+
+
+
+
+
+-> ACABAMOS...
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS O PROFESSOR 
+
+FALOU QUE 'DEMORA PARA ENVIAR 1 EMAIL... AINDA MAIS EM AMBIENTES DE PRODUCTION'....
+
+
+
+
+
+
+
+
+
+
+
+-> NÃO É PRÁTICO FORÇAR O USER A ESPERAR 4-5 SEGUNDOS PARA 
+O EMAIL SER ENVIADO...
+
+
+
+
+
+
+
+
+
+-> O USER NEM MESMO SABE QUE VC ESTÁ ENVIANDO 1 EMAIL...
+
+
+
+
+
+
+
+-> NÃO QUEREMOS FAZER O USER ESPERAR..
+
+
+
+
+
+
+
+
+-> E PODEMOS MELHORAR A PERFORMANCE,
+    POR MEIO DE, EM VEZ DISSO,
+
+
+
+
+    ''THROWING THE EMAIL INTO A __ QUEUE''' ( coisas como o redis)...
