@@ -1,0 +1,3089 @@
+
+
+
+
+
+
+
+
+VAMOS COMEÇAR A TRABALHAR NO FINAL PROJECT...
+
+
+
+
+
+
+
+
+
+
+--> ANTES DE COMÇARMOS, ALGUMAS REGRAS:
+
+
+
+
+
+
+1) WE ARE GOING TO GO FASTER 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- COMEÇAMOS COM 
+
+
+
+'laravel new <project-name>'...
+
+
+
+
+
+
+
+
+--> O NOME DO PROJECT SERÁ 'pixel-positions'...
+
+
+
+
+
+
+
+
+
+
+example-28-pixel-positions...
+
+
+
+
+
+
+
+
+
+
+
+
+-> NÃO USAREMOS UM STARTER KIT... O BREEZE 
+    NOS DARIA 1 AJUDA,
+    
+    MAS APRENDERÍAMOS MENOS...
+
+
+
+
+
+
+
+-> NO STARTER KIT ...
+
+
+
+
+
+--> PEST 
+
+
+
+-> o professor vai initialize git..
+
+
+
+
+
+-> vai usar SQLITE...
+
+
+
+
+
+
+
+
+
+OK... COMEÇAMOS...
+
+
+
+
+
+
+
+-> VAMOS ATÉ O 'zpl.io'...
+
+
+
+
+https://zeplin.io/
+
+
+
+
+
+
+
+
+
+
+-> TEMOS 1 LAYOUT SIMPLES, QUE NÃO DEVE SER TÃO DIFÍCIL DE IMPLEMENTAR...
+
+
+
+
+
+
+
+
+NÃO TEMOS O LOGO, AINDA...
+
+
+
+
+
+
+
+
+TEMOS 2 OPTIONS DE ONDE COLOCAR O NOSSO LOGO...
+
+
+
+
+
+
+SÃO ELAS:
+
+
+
+
+1) PUT THE LOGO IN 
+A IMAGE FOLDER, INSIDE OF 'public'...
+
+
+
+
+
+
+2) IF I WANT VITE TO AUTOMATICALLY VERSION AND HASH 
+    ANY IMAGES WITH HAVE (helps with caching), 
+    WE SHOULD PUT THE IMAGES 
+    INSIDE OF 
+
+    resources>images... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... CRIAMOS ESSE FOLDER, COLOCAMOS UMA IMAGE LÁ DENTRO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> depois disso, o professor adiciona a estrutura geral de views do project..
+
+
+
+
+
+
+-> ele vai até resources>views,
+
+e aí cria 1 novo folder, de nome 'components'...
+
+
+
+
+
+
+
+
+
+-> DENTRO DELE, ELE CRIA 'layout.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+fica tipo assim:
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+title de Pixel Positions...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+</head>
+<body>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+TEREMOS:
+
+
+
+UM WRAPPER,
+
+
+
+E AÍ A SECTION DE 'MAIN',
+
+LOGO ABAIXO...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+</head>
+<body>
+    <nav>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... TEREMOS 3 DIVS DENTRO DO NAV...
+
+
+
+
+
+
+
+1 DIV PARA O LOGO,
+
+
+OUTRA PARA  OS LINKS,
+
+
+E 1 PARA 'POST A JOB'...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+</head>
+<body>
+    <nav>
+        <div>Logo</div>
+        <div>Links</div>
+        <div>Post a Job</div>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+QUEREMOS REFERENCIAR AQUELE 'logo.svg'...
+
+
+
+
+---> MAS PARA CONSEGUIRMOS REFERENCIÁ-LO,
+
+QUE ESTÁ NO FOLDER DE 
+
+'resources>images',
+
+
+
+VAMOS PRECISAR USAR ALGO DIFERENTE...
+
+
+
+
+
+-> PROVAVELMENTE UMA BLADE DIRECTIVE...
+
+
+
+
+
+
+
+
+-> mas, antes de mais nada, esse logo deve ser clickable,
+deve ser 1 link...
+
+
+ESCREVEMOS ASSIM:
+
+
+
+
+
+
+        <div>
+            <a href="/">
+                <img src="{{}}" />
+            </a>
+        </div>
+
+
+
+
+
+
+
+
+
+-> DENTRO DE ESSE '{{}}',
+
+VAMOS REFERENCIAR A FACADE DO 'Vite'...
+
+
+
+
+
+
+
+--> O ALIAS É apenas 'Vite'...
+
+
+
+
+
+-> AÍ USAMOS O METHOD DE '::asset()'...
+
+
+
+
+
+-> COMO PARAMETER, PASSAMOS O PATH ATÉ A IMAGE, TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">
+                <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+            </a>
+        </div>
+        <div>Links</div>
+        <div>Post a Job</div>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+DEPOIS DISSO RODAMOS 'npm install'
+
+
+
+
+
+
+
+
+e rodamos npm run dev...
+
+
+
+
+
+---> NA PARTE SUPERIOR DO ARQUIVO, REFERENCIAMOS 
+
+o arquivo app.js,
+
+com a directive 
+
+'@vite()',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">
+                <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+            </a>
+        </div>
+        <div>Links</div>
+        <div>Post a Job</div>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+DEPOIS, ACESSAMOS ISSO NO BROWSER...
+
+
+
+
+
+
+
+
+--> ABRIMOS O ARQUIVO 'welcome.blade.php',
+
+E COLOCAMOS NOSSO NOVO COMPONENT LAYOUT,
+
+TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    HELLO
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO FUNCIONA,
+
+FICAMOS COM UM 
+
+
+HTML COM ESSE 'HELLO' EMBAIXO...
+
+
+
+
+
+
+
+
+-> CERTO... MAS SE TENTARMOS BUILDAR ISSO PARA PRODUCTION,
+
+
+COM 'npm run build',
+
+
+FICAMOS COM UM ERROR,
+
+
+ERROR DE 
+
+
+
+
+'Unable to locate file in Vite manifest: resources/images/logo.svg'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONSERTAR ISSO, FAÇA:
+
+
+
+1) GO TO YOUR 'app.js' file, in the resources folder...
+
+
+
+
+
+
+2) IMPORT OUR IMAGES DIRECTORY, 
+
+''TELL VITE ABOUT OUR IMAGES DIRECTORY''...
+
+
+
+
+
+-> para isso, devemos rodar o código de 
+
+
+
+
+''
+ import.meta.glob(
+    [
+        '../images/***'
+    ]
+)
+
+''
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+import "./bootstrap";
+
+import.meta.glob(["../images/***"]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.... AGORA VOLTAMOS AO BROWSER E REFRESHAMOS, E ISSO FUNCIONA...
+
+
+
+
+
+
+
+
+
+vc só precisa fazer isso se quiser VERSIONING E 'CACHE BUSTING'...
+
+
+
+''''
+
+Cache busting is a technique used by web developers to force 
+the browser to load the most recent version of a file, 
+rather than a previously loaded version.
+
+
+'''''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> SE INSPECIONAMOS O ELEMENTO, PERCEBEMOS QUE 
+
+UMA UNIQUE URL É APPENDED AO LOGO...
+
+
+(''THIS IS FOR CACHE BUSTING.... IT'S TO MAKE SURE 
+ASSETS LIVE FOR AS LONG OR AS LITTLE AS YOU WANT...'')
+
+
+
+
+
+
+
+
+
+
+CERTO... ISSO FEITO, VOLTAMOS AO ARQUIVO DE 'layout.blade.php'...
+
+
+
+
+
+
+
+
+-> PRECISAMOS DE 4 LINKS, NAQUELA OUTRA DIV..
+
+
+
+--> TAMBÉM PRECISAMOS DE UM LINK PARA 'POST A JOB'...
+
+
+
+
+
+
+POR ISSO ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">
+                <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+            </a>
+        </div>
+        <div>
+            <a href="#">Jobs</a>
+            <a href="#">Careers</a>
+            <a href="#">Salaries</a>
+            <a href="#">Companies</a>
+        </div>
+        <a href="#">Post a Job</a>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+REFRESHAMOS...
+
+
+
+
+
+
+
+MAS VAMOS QUERER ALINHAR ESSES 4 ELEMENTS, COM FLEXBOX...
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR VAI QUERER O TAILWIND, PARA ISSO....
+
+
+
+
+
+
+
+
+
+POR ISSO ELE VAI RODAR AQUELES COMMANDS DE INSTALLATION,
+
+TIPO ASSIM:
+
+
+
+ npm install -D tailwindcss postcss autoprefixer
+
+
+ e 
+
+ isto:
+
+
+
+
+
+
+npx tailwindcss 
+init -p
+
+
+
+
+
+
+
+
+DEPOIS,
+
+
+
+ATUALIZAMOS NOSSA FILE DE TAILWIND.CONFIG.JS:
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM PATHS A FILES QUE QUEREMOS QUE 
+
+O TAILWIND INSPECIONE E ENCONTRE UTILITY CLASSES...
+
+
+
+
+
+
+
+
+
+
+--> ''THIS WAY, THE COMPILED CSS FILE GETS AS SMALL AS IT CAN BE...''
+
+
+
+
+
+
+
+
+
+
+COMO NÃO ESTAMOS USANDO VUE,
+PODEMOS REMOVER ESSE TRECHO, TIPO ASSIM:
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+DEPOIS, ADICIONAMOS O CÓDIGO DO TAILWIND NO APP.CSS,
+
+
+tipo assim:
+
+
+
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> LÁ NO layout.blade.php,
+
+
+
+    PODEMOS IMPORTAR O JS, QUE POR SUA VEZ, VAI IMPORTAR O ARQUIVO 'app.css'
+
+    que está com esse código tailwind já setuppado...
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+
+
+
+
+
+
+
+
+
+
+
+E ASSIm:
+
+
+
+
+
+
+
+
+import "./bootstrap";
+import "../css/app.css";
+
+import.meta.glob(["../images/***"]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+com 'npm run dev',
+
+
+percebemos que o tailwind 
+
+estará disponível a nós...
+
+
+
+
+
+
+
+
+-> NO NAV,
+COLOCAMOS CLASSES FLEXBOX,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body>
+    <nav class="flex justify-between">
+        <div>
+            <a href="/">
+                <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+            </a>
+        </div>
+        <div>
+            <a href="#">Jobs</a>
+            <a href="#">Careers</a>
+            <a href="#">Salaries</a>
+            <a href="#">Companies</a>
+        </div>
+        <a href="#">Post a Job</a>
+    </nav>
+
+    <main>
+        {{ $slot }}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> AÍ ALINHAMOS OS ITEMS NO CENTER, COM 'items-center'...
+
+
+
+
+
+
+
+
+
+
+DEPOIS, WRAPPAMOS TUDO COM 1 DIV,
+
+
+
+E AÍ COLOCAMOS 1 CLASS DE 'PX-10',
+
+para ter 
+
+um padding no left e right...
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body>
+    <div class="px-10">
+        <nav class="flex justify-between items-center">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div>
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, NO NAV EM SI,
+
+
+
+DEIXAMOS O BACKGROUND COMO RED,
+
+E AÍ COLOCAMOS PADDING NO Y AXIS, 4...
+
+
+EX:
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body>
+    <div class="px-10">
+        <nav class="flex justify-between items-center bg-red-500 py-4">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div>
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> DEPOIS DISSO, NO BODY EM SI, QUEREMOS 
+
+DEIXAR ELE BLACK...
+
+
+
+--> FAZEMOS ISSO COM 'bg-black'...
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black">
+    <div class="px-10">
+        <nav class="flex justify-between items-center bg-red-500 py-4">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div>
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+AÍ DEIXAMOS O TEXT COMO WHITE,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center bg-red-500 py-4">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div>
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+-> O PROFESSOR ADICIONA 1 CLASS ESPECIAL PARA BLACK,
+LÁ NO 'tailwind.config.js',
+
+
+lá no 'extend'..
+
+
+
+
+
+
+
+-> ELE COLOCA 'black': 'value-especial'...
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+                black: "#060606",
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, O TAILWIND VAI UPDATAR, BEHIND THE SCENES...
+
+
+
+
+
+
+
+
+-> FICAREMOS COM ESSE BLACK LEVEMENTE CLARO...
+
+
+
+
+--> Colocamos então uma border,
+
+
+tipo assim:
+
+
+
+
+
+
+border-b border-white
+
+
+
+
+
+
+
+
+
+--> MAS ESSA BORDER É MT FORTE...
+
+
+
+
+
+
+-> POR ISSO O PROFESSOR REDUZ A OPACITY,
+
+COM 'border-white/10'...
+
+
+
+COM ISSO, DEFINIMOS O ALPHA COMO 10%,
+
+
+o que deixa essa border bem mais cinza...
+
+
+
+EX:
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+                black: "#060606",
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, NOS NAV LINKS,
+
+COLOCAMOS 'space-x-6',
+
+
+PARA ADICIONAR SPACE ENTRE OS ITEMS...
+
+
+EX:
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center bg-red-500 py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+        <div class="space-x-6">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+-> DEIXAMOS A FONT COMO BOLD,
+
+tipo assim:
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center bg-red-500 py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+        <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+Ex:
+
+
+http://example-27-pixel-positions.test/
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+        <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main class="mt-10">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA O PROFESSOR QUER ESTILIZAR O MAIN, a parte do meio...
+
+
+
+
+A MAX WIDTH DEVE SER algo como '986px'...
+
+
+
+
+
+
+--> ELE ESCREVE ASSIM:
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+        <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main class="mt-10 max-w-[986px]">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA PODEMOS IR ATÉ A VIEW DE 'welcome.blade.php',
+
+E PENSAR EM ALGUNS DOS COMPONENTS QUE PRECISAMOS CREATE...
+
+
+
+
+
+
+
+
+
+-> TEMOS 1 COMPONENT QUE É 
+
+    REUTILIZADO, QUE É UM 'LITTLE SQUARE + HEADING'...
+
+
+
+
+
+
+
+
+
+--> temos várias tags, com 1 mesmo styling...
+
+
+
+
+
+
+
+
+--> TEMOS 1 CARD PARA 'JOB'...
+
+
+
+
+
+-> TEMOS 1 ALTERNATE CARD, 
+TIPO UM 'EXPANDED JOB CARD'...
+
+
+
+
+
+
+
+
+
+
+--> VAMOS COMEÇAR COM 1 SECTION POR VEZ...
+
+
+
+
+
+
+-> VAMOS COMEÇAR COM 'TOP JOBS'...
+
+
+
+
+
+
+
+
+
+-> LÁ NA VIEW DE WELCOME.BLADE.Php,
+
+
+
+PODEMOS COMEÇAR ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3>Top jobs</h3>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, DO H3, TEREMOS 3 JOB CARDS...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3>Top jobs</h3>
+
+        <div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+E, DENTRO DE 1 CARD,
+
+TEREMOS 3 DIFERENTES SECTIONS, APARENTEMENTE...
+
+
+SERÃO ELAS:
+
+
+
+
+1) EMPLOYER NAME 
+
+
+2) TITLE OF THE JOB AND SALARY 
+
+
+3) SOME TAGS AND AN IMAGE...
+
+
+  
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+            <div>
+                <div>Laracasts</div>
+                <div>
+                    <h3>Video Producer</h3>
+                    <p>Full Time - from $100,000</p>
+                </div>
+                <div>
+                    <div>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                    </div>
+
+                    <img src="" alt="">
+                </div>
+           </div>
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK... POR ENQUANTO, O PROFESSOR COLOCA 1 PLACEHOLDER 
+
+NESSA IMAGE,
+
+COM ESTE LINK:
+
+
+
+src="https://placehold.it/42/42"
+
+
+
+
+
+
+
+(esse link é bem útil)...
+
+
+
+
+
+
+
+
+
+FICA TIPO ASSIm:
+
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3>Top jobs</h3>
+
+        <div>
+
+            <div>
+                <div>Laracasts</div>
+                <div>
+                    <h3>Video Producer</h3>
+                    <p>Full Time - from $100,000</p>
+                </div>
+                <div>
+                    <div>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                    </div>
+
+                    <img src="https://placehold.it/42/42" alt="placeholder">
+                </div>
+            </div>
+
+            <div></div>
+            <div></div>
+
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR ADICIONA PADDING, E AÍ 
+
+BACKGROUND COLOR, PARA VER O QUE ESTAMOS FAZENDO...
+
+
+
+
+ex:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3>Top jobs</h3>
+
+            <div class="p-4 bg-white/5 rounded-xl flex">
+                <div>Laracasts</div>
+                <div>
+                    <h3>Video Producer</h3>
+                    <p>Full Time - from $100,000</p>
+                </div>
+
+                <div>
+                    <div>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                        <a href="#">Tag</a>
+                    </div>
+
+                    <img src="https://placehold.it/42/42" alt="placeholder">
+                </div>
+            </div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+AÍ O PROFESSOR COLOCA 'flex-col',
+
+para que eles fiquem stacked corretamente...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3>Top jobs</h3>
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <a href="#">Tag</a>
+                    <a href="#">Tag</a>
+                    <a href="#">Tag</a>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder">
+            </div>
+        </div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+COLOCAMOS MAIS 1 MARGIN:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3 class="mb-6">Top jobs</h3>
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <a href="#">Tag</a>
+                    <a href="#">Tag</a>
+                    <a href="#">Tag</a>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder">
+            </div>
+        </div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+-> ESTILIZAMOS AS TAGS TAMBÉM:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3 class="mb-6">Top jobs</h3>
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder">
+            </div>
+        </div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+O LOGO 
+
+TAMBÉM DEVERÁ FICAR ROUNDED:
+
+
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3 class="mb-6">Top jobs</h3>
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+            </div>
+        </div>
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+ISSO FEITO, ADICIONAMOS UM NOVO COMPONENT,
+DE NOME 
+
+
+
+'job-card.blade.php'...
+
+
+
+
+
+
+
+
+--> PEGAMOS TODO O CÓDIGO DESSE CARD, QUE CRIAMOS AGORA, E COLOCAMOS DENTRO DE 
+
+ESSE BLADE COMPONNET,
+TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3 class="mb-6">Top jobs</h3>
+
+        <x-job-card />
+    </section>
+</x-layout>
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                    <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+AÍ PRECISAMOS INSERIR CONTENT 
+
+
+NESSE CARD....
+
+
+
+
+
+
+
+
+
+MAS, ANTES DISSO, PRECISAMOS ADICIONAR 1 GAP ENTRE CARDS,
+
+
+
+PARA QUE EXISTA 1 ESPAÇO....
+
+
+
+
+
+
+
+-> WRAPPAMOS TUDO EM 1 DIV,
+E AÍ USAMOS 'grid'..
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <h3 class="mb-6">Top jobs</h3>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <x-job-card />
+            <x-job-card />
+            <x-job-card />
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+CONSERTAMOS O SPACING, COM 'mx-auto' NA SECTION DO 'MAIN',
+
+tipo assim:
+
+
+
+
+
+
+
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VAMOS PASSAR A JOB DATA MAIS TARDE...
+
+
+
+
+
+
+
+--> CERTO... A PRÓXIMA COISA QUE FAREMOS É 
+
+
+
+CRIAR 1 COMPONENT COM ESTE CÓDIGO:
+
+
+
+
+
+'''
+
+        <h3 class="mb-6">Top jobs</h3>
+
+
+'''
+
+
+
+
+
+
+-> ESSE SERÁ O COMPONENT 'section-heading.blade.php'...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<h3 class="mb-6">{{ $slot }}</h3>
+
+
+
+
+
+
+
+
+
+
+AÍ ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+<x-layout>
+    <section>
+        <x-section-heading>Featured Jobs</x-section-heading>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <x-job-card />
+            <x-job-card />
+            <x-job-card />
+        </div>
+    </section>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA DEVEMOS ADICIONAR AQUELE SMALL SQUARE...
+
+
+
+
+
+
+
+
+-> PARA ISSO,
+
+
+O PROFESSOR ADICIONA 1 SPAN LÁ NO 'section-heading',
+
+TIPO ASSIM:
+
+
+
+
+<h3 class="mb-6">
+    <span class="w-2 h-2 bg-white inline-block"></span>{{ $slot }}</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO FICA OK... MAS...
+
+
+
+
+
+
+
+
+-> O PROFESSOR ACHA MELHOR WRAPPAR TUDO EM 1 DIV,
+
+E AÍ USAR FLEXBOX...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+<div class="inline-flex items-center gap-x-2">
+    <span class="w-2 h-2 bg-white inline-block"></span>
+    <h3 class="mb-6">{{ $slot }}
+    </h3>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+--> O HEADING PODE SER BOLD, E 1 POUCO MAIOR..
+
+
+
+ex:
+
+
+
+
+<div class="inline-flex items-center gap-x-2">
+    <span class="w-2 h-2 bg-white inline-block"></span>
+    <h3 class="mb-6 font-bold text-lg">{{ $slot }}
+    </h3>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+TEMOS 1 SECTION PARA OS FEATURED JOBS...
+
+
+
+
+
+E OUTRA PARA AS 'TAGS'...
+
+
+
+
+
+
+E OUTRA PARA 'RECENT JOBS'..
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+        <section>
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <x-job-card />
+                <x-job-card />
+                <x-job-card />
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+DEPOIS TEMOS AS TAGS...
+
+
+
+
+
+
+
+
+BASTA OUTSOURCEAR ISTO:
+
+
+
+
+
+  <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-xs transition-colors duration-300" href="#">Tag</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  -> SERÁ o 'tag.blade.php'...
+
+
+
+
+
+
+
+  EX:
+
+
+
+
+
+
+
+          <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+-> aí, lá em 'tags',
+
+escrevemos assim:
+
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+        <section>
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <x-job-card />
+                <x-job-card />
+                <x-job-card />
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+            <div class="mt-6 space-x-1">
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag4</x-tag>
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+NA PRÓXIMA AULA, VEREMOS O 'EXPANDED JOB CARD'...
+
+
+
+
+
+
+VEREMOS A ARCHITECTURE EM SI, TAMBÉM...
