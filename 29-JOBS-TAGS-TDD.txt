@@ -1,0 +1,4599 @@
+
+
+
+
+
+
+
+
+
+
+--> terminamos a parte do frontend...
+
+
+
+
+
+
+
+
+
+--> nesse video, focaremos na arquitetura do app...
+
+
+
+
+
+
+--> SABEMOS QUE SERÁ 1 'EMPLOYER' QUE VAI CRIAR 
+
+
+
+O JOB,
+
+POR ISSO O PROFESSOR JÁ COMEÇA COM 
+
+
+UM 'php artisan make:model Employer -m -f',
+
+
+
+para criar o model a factory e a migration do employer...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Employer extends Model
+{
+    use HasFactory;
+}
+
+
+
+
+
+
+
+
+
+-> TEMOS A MIGRATION DE CREATE EMPLOYERS TABLE:
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+AÍ, CADA EMPLOYER TERÁ:
+
+
+
+1) um name, string 
+
+2) um logo, string, path ao logo
+
+3) ''employer belongs to an user'' --> foreignId 
+
+4) TIMESTAMPS:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\User;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class);
+            $table->string('name');
+            $table->string('logo');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+-> PARA RODAR ESSA MIGRATION,
+
+RODAMOS 
+
+'php artisan migrate'...
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+AS TABLES FORAM CRIADAS..
+
+SÃO ELAS:
+
+
+
+users 
+
+cache 
+
+jobs 
+
+employers
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... ABRIMOS A DATABASE,
+
+E AÍ ENCONTRAMOS:
+
+
+
+
+
+'failed_jobs'
+
+
+''job_batches''
+
+
+
+''jobs''...
+
+
+
+
+
+
+
+--> AO LONGO DO CURSO,
+    O CONCEITO DE 'QUEUED JOBS'
+
+
+
+    ficou conflitando com nosso conceito de jobs ('JobListings')...
+
+
+
+
+
+
+--> NÃO QUEREMOS INTERFERENCES...
+
+
+
+--> É POR ISSO QUE O PROFESSOR VAI ALTERAR 
+ESSES TABLE NAMES DEFAULTS...
+
+
+
+
+
+
+--> VAI QUERER QUE OS NOMES NÃO SEJAM
+
+
+'failed_jobs' 
+
+
+'jobs' 
+
+'job_batches'...
+
+
+
+
+
+
+
+--> A PRIMEIRA COISA QUE DEVEMOS FAZER, AQUI,
+
+É ABRIR O ARQUIVO 'queue.php',
+
+
+E AÍ 
+
+ALTERAR A PARTE DE 'table', 
+
+no driver de 'database',
+
+TIPO ASSIM:
+
+
+
+
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+
+
+
+
+
+
+
+
+O DEFAULT TABLE_NAME É 'jobs'...
+
+
+
+--> PODEMOS MUDAR ISSO PARA 
+
+'queued_jobs'...
+
+
+
+
+
+
+EX:
+
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'queued_jobs'),
+            'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+
+
+
+
+
+
+
+
+FAZEMOS A MESMA COISA NA PARTE DE BATCHING,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Job Batching
+    |--------------------------------------------------------------------------
+    |
+    | The following options configure the database and table that store job
+    | batching information. These options can be updated to any database
+    | connection and table which has been defined by your application.
+    |
+    */
+
+    'batching' => [
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'queued_job_batches',
+    ],
+
+
+
+
+
+
+
+
+
+
+
+--> TAMBÉM O FAILED:
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Failed Queue Jobs
+    |--------------------------------------------------------------------------
+    |
+    | These options configure the behavior of failed queue job logging so you
+    | can control how and where failed jobs are stored. Laravel ships with
+    | support for storing failed jobs in a simple file or in a database.
+    |
+    | Supported drivers: "database-uuids", "dynamodb", "file", "null"
+    |
+    */
+
+    'failed' => [
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'queued_failed_jobs',
+    ],
+
+
+
+
+
+
+
+
+
+
+
+
+--> VAMOS ATÉ A MIGRATION 
+
+
+
+DO 'create_jobs_table',
+
+
+e aí trocamos o nome para 'create_queued_jobs_table'..
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+E AÍ ATUALIZAMOS OS TABLE NAMES,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('queued_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('queued_job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('queued_failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+aí atualizamos nossas tables,
+
+
+com 
+
+
+
+php artisan migrate:fresh
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... COM ISSO, ACABAMOS COM A INTERFERENCIA 
+
+ENTRE OS TABLE NAMES...
+
+
+
+
+
+deveríamos ter criado o controller de Employer,
+
+também,
+
+mas acabei não colocando o '-c'
+
+
+no comando...
+
+
+também não usei '-s',
+
+para ter 1 database seeder junto...
+
+
+
+também '-p',
+
+para ter uma policy...
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\User;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class);
+            $table->string('name');
+            $table->string('logo');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('employers');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, CONSEGUIMOS 5 ARQUIVOS COM 1 ÚNICO COMMAND:
+
+
+1) MODEL 
+
+2) FACTORY 
+
+3) SEEDER 
+
+4) CONTROLLER 
+
+5) POLICY...
+
+
+--> isso é bem impressionante...
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, FOCAMOS NOS 'JOBS'...
+
+
+
+
+
+
+O PROFESSOR RODA 
+
+
+
+php artisan make:model Job --all
+
+
+
+
+
+
+
+
+
+--> FAZEMOS ISSO PARA PEGAR 
+    TODOS ARQUIVOS POSSÍVEIS,
+
+
+    PARA O JOB...
+
+    (factory, seeder, controller,
+    model, migration, request, policy, etc etc...)
+
+
+EX:
+
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-29> php artisan make:model --all
+
+  What should the model be named?
+❯ Job
+
+   INFO  Model [D:\curso laravel\curso-laravel\code\example-29\app\Models\Job.php] created successfully.
+
+   INFO  Factory [D:\curso laravel\curso-laravel\code\example-29\database\factories\JobFactory.php] created successfully.
+
+   INFO  Migration [D:\curso laravel\curso-laravel\code\example-29\database\migrations/2024_10_01_165216_create_jobs_table.php] created successfully. 
+
+
+   INFO  Seeder [D:\curso laravel\curso-laravel\code\example-29\database\seeders\JobSeeder.php] created successfully.   
+
+   INFO  Request [D:\curso laravel\curso-laravel\code\example-29\app\Http\Requests\StoreJobRequest.php] created successfully.
+
+   INFO  Request [D:\curso laravel\curso-laravel\code\example-29\app\Http\Requests\UpdateJobRequest.php] created successfully.
+
+   INFO  Controller [D:\curso 
+laravel\curso-laravel\code\example-29\app\Http\Controllers\JobController.php] created successfully.
+
+   INFO  Policy [D:\curso laravel\curso-laravel\code\example-29\app\Policies\JobPolicy.php] created successfully.       
+
+PS D:\curso laravel\curso-laravel\code\example-29>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+--> SE TEMOS ALGO QUE NÃO QUEREMOS 
+USAR,
+ 
+ É SÓ DELETAR...
+
+
+
+
+
+-> VAMOS ATÉ 
+    a migration que cria os jobs...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+    }
+};
+
+
+
+
+
+
+
+
+
+PRECISAMOS:
+
+
+
+
+
+
+1) DO TITLE DE UM JOB 
+
+
+2) DO SALARY PARA UM JOB (string)
+
+
+
+3) QUAL É A LOCATION, PARA ESSE JOB...  
+
+        (se é remoto, se é na flórida, etc)...
+
+
+
+4) SCHEDULE --> QUAL É 
+            O TIPO DE TRABALHO...
+
+            FULL-TIME, PART-TIME, ETC...
+
+
+
+        -> o schedule poderia ser 
+        1 enum, mas isso às vezes 
+        é meio annoying de work with,
+        no database level...
+
+
+        -> O DEFAULT SERÁ 'FULL-TIME'...
+
+
+5) CERTO... 
+
+    DEPOIS DISSO, QUANDO VC PUBLISH 1 
+    JOB, 
+    VC VAI QUERER TER 1 LINK ATÉ 
+    A PAGE DE 
+
+    'JOB DETAILS'''...
+
+
+    --> SERÁ UM FIELD DE 'url'...
+
+
+
+
+6) 'FEATURED' --> BOOLEAN FIELD...
+
+-> O DEFAULT SERÁ 'false'....
+
+
+
+
+7) FOREIGNID --> PARA O EMPLOYER,
+                'employer_id'...
+
+
+
+
+
+
+
+    
+
+    --> É POR ISSO QUE O CÓDIGO 
+    FICA ASSIM:
+
+
+
+
+
+
+<?php
+
+use App\Models\Employer;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Employer::class);
+            $table->string('title');
+            $table->string('salary');
+            $table->string('location');
+            $table->string('schedule')->default('Full Time');
+            $table->string('url');
+            $table->boolean('featured')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, FAZEMOS O MIGRATE DA DATABASE,
+
+
+COM 
+
+
+'php artisan migrate:fresh'...
+
+
+
+
+
+
+
+
+
+
+--> LÁ NO TABLEPLUS,
+
+
+FICAMOS COM A TABLE DE 'JOBS'...
+
+
+
+
+
+
+
+
+
+
+
+--> certo... 
+
+
+isso feito, precisamos definir as relations 
+
+
+NO PHP SIDE...
+
+
+
+
+
+
+-> TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Employer extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+até aí, tudo bem...
+
+
+
+
+
+
+--> depois, fazemos o inverso,
+lá nos 'User':
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+
+    protected $guarded = [];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+
+    public function employer(): BelongsTo
+    {
+        return $this->belongsTo(Employer::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+EU TINHA COLOCADO 'belongsTo',
+
+
+MAS O PROFESSOR 
+
+
+EXPLICA QUE ISSO ESTÁ ERRADO....
+
+
+
+
+
+
+
+
+'''THE USER IS ACTUALLY
+    THE ____ REPRESENTATIVE__ 
+    FOR THE EMPLOYER''....
+
+
+
+''SO IT IS NOT A BELONGSTO,
+AND YES A 'hasOne' relationship...''
+
+
+BECAUSE A USER HAS __ ONE __ EMPLOYER...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+
+    protected $guarded = [];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+
+    public function employer(): HasOne
+    {
+        return $this->hasOne(Employer::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, CONFIGURAMOS O __ JOB_...
+
+
+
+
+
+
+
+--> LÁ NO JOB,
+
+
+QUEREMOS QUE 'A EMPLOYER HAS MANY JOBS'...
+
+
+
+
+
+
+--> POR ISSO QUE ESCREVEMOS 'belongsTo' (singular,
+
+ a apenas 1 único employer)...
+
+
+
+
+
+
+ TIPO ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Job extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+    public function employer(): BelongsTo
+    {
+        return $this->belongsTo(Employer::class);
+    }
+}
+
+
+
+
+
+
+
+
+E UM EMPLOYER TEM MANY JOBS,
+
+POR ISSO ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Employer extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function jobs(): HasMany
+    {
+        return $this->hasMany(Job::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+com isso...
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR QUER INTRODUZIR 1 POUCO DE TESTING...
+
+
+
+
+
+
+--> É 1 KEY COMPONENT... MAS PARA 1 CURSO COMO 
+ESTE, DEIXA AS COISAS BEM LENTAS...
+
+
+
+
+
+
+
+
+--> VAMOS ESCREVER ALGUNS TESTS...
+
+
+
+
+
+
+
+
+--> ANTES DE ESCREVER ALGUNS TESTS,
+
+
+O PROFESSOR QUER ESCREVER 
+
+
+
+AS FACTORIES 
+
+
+DE NOSSA DATABASE...
+
+
+
+
+VAMOS EM 'factories',
+
+
+E AÍ ESCREVEMOS ELAS, COMEÇANDO 
+
+
+POR 'EmployerFactory'...
+
+
+
+
+
+
+
+
+ALGO ASSIM:
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employer>
+ */
+class EmployerFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+
+        return [
+            'name' => $this->faker->name(),
+            'logo' => $this->faker->imageUrl(),
+            'user_id' => User::factory(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO, LÁ EM 'JobFactory':
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Job>
+ */
+class JobFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'title' => $this->faker->jobTitle(),
+            'salary' => $this->faker->randomElement(['$100,000', '$200,000', '$300,000', '$400,000', '$500,000', '$600,000', '$700,000', '$800,000', '$900,000', '$1,000,000']),
+            'location' => 'Remote',
+            'schedule' => 'Full Time',
+            'url' => $this->faker->url(),
+            'featured' => 'false',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO, PODEMOS ESCREVER ALGUNS TESTS PARA ISSO...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA ISSO, VAMOS ATÉ O ARQUIVO 'phpunit.xml'...
+
+
+
+
+
+
+
+
+
+
+''EVEN IF WE ARE USING 
+    A TESTING FRAMEWORK CALLED 'PEST',
+    PEST IS _ A __WRAPPER__ AROUND PHPUNIT...''
+
+
+
+
+
+''THAT IS WHY WE CAN VISIT PHPUNIT.XML 
+TO CONFIGURE HOW PEST WILL BEHAVE''...
+
+
+
+
+
+
+
+
+-> TEMOS ALGUMAS ENVIRONMENT VARIABLES, AO FINAL:
+
+
+
+
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_STORE" value="array"/>
+        <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
+        <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+    </php>
+
+
+
+
+
+
+ESSES SÃO BASICAMENTE 'OVERRIDES',
+
+QUE SÃO ATIVADOS SEMPRE QUE VC 
+
+ESTIVER EM 1 TESTING ENVIRONMENT...
+
+
+
+SE DESCOMENTAMOS AQUELAS 2 LINHAS,
+
+FAZEMOS COM QUE:
+
+
+
+1) A DATABASE DE TESTING REALMENTE SEJA 'SQLITE'...
+
+
+2) MAS, EM VEZ DE FAZER O WRITE NA DATABASE EM SI,
+    FAREMOS O WRITE DA DATA _ NA MEMORY __
+    DA DATABASE,
+
+    COM 
+
+    ESTA LINHA:
+
+
+
+        <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+
+
+
+EX:
+
+
+
+
+
+
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+    </php>
+
+
+
+
+
+
+
+
+E VC NEM SEMPRE VAI USAR COISAS ASSIM PARA TESTAR,
+
+
+USAR A MEMORY, MAS É 
+ALGO PERFEITO PARA 1 PROJETO PEQUENO QUE NEM ESTE...
+
+e é super rápido...
+
+
+
+
+
+
+
+--> É CLARO QUE O SEND DE MAILS
+
+    FICA DESLIGADO, QUANDO ESTAMOS 
+
+
+    RODANDO TESTS... APENAS QUEREMOS 'ASSERT' 
+
+
+    QUE ESTAMOS ENVIANDO O EMAIL, EM VEZ DE ACTUALLY 
+    ENVIAR...
+
+
+    -> É POR ISSO QUE O DRIVER DE 'array' 
+
+    é utilizado, em vez de 'smtp' ou 'postmark',
+
+    ou qualquer outra coisa...
+
+
+
+
+
+--> O PROFESSOR ENTÃO CRIA 1 TEST,
+
+COM 
+
+
+'php artisan make:test'...
+
+
+
+
+
+--> COLOCA UM NOME DE 'JobTest'...
+
+
+
+
+
+
+-> qual tipo de test?
+
+
+
+''Feature'' 
+
+
+ou 
+
+
+''Unit''...
+
+
+
+
+
+
+
+-> E ESSA DISTINÇÃO PODE SER CONFUSA...
+
+
+
+
+
+
+
+feature --> serve para 'TEST A WIDE-SPECTRUM 
+                        OF YOUR APP'....
+
+
+EX:
+
+''when I visit such and such page,
+    I expect to see X''...
+
+
+
+''when I make a post request to this controller,
+    validation should occur, and I should see 
+    x and y in the database''...
+
+
+
+
+
+
+
+
+
+
+UNIT TEST --> MORE NARROW...
+
+            ''WHEN I INSTANTIATE THIS CLASS 
+            AND I CALL THAT METHOD, I INSPECT 
+            RESPONSE X AND Y''....
+
+
+
+
+            HOW NARROW, THAT DEPENDS ON THE COMMUNITY...
+
+
+
+
+
+
+
+
+
+
+VAMOS TRABALHAR COM UNIT TESTS, POR ISSO ESCOLHEMOS 
+'UNIT'....
+
+
+
+
+
+
+
+
+
+--> tests>Unit>JobTest.php...
+
+
+
+
+
+--> JÁ TEMOS 1 EXAMPLE:
+
+
+
+<?php
+
+test('example', function () {
+    expect(true)->toBeTrue();
+});
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+para rodar isso,
+
+basta escrever 
+
+
+php artisan test
+
+
+
+
+
+
+
+
+PS D:\curso laravel\curso-laravel\code\example-29> php artisan test     
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true                 1.10s  
+
+   PASS  Tests\Unit\JobTest
+  ✓ example                           0.24s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ it returns a successful response  7.10s  
+
+  Tests:    3 passed (3 assertions)
+  Duration: 15.03s
+
+
+
+
+--> PODEMOS DELETAR O TEST DO ARTISAN...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS DEIXAR 1 TEST QUE VAI FAIL,
+
+TIPO 
+
+
+expect(true)->toBeFalse();
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+<?php
+
+test('example', function () {
+    expect(true)->toBeTrue(); // PASS
+});
+
+test('example', function () {
+    expect(true)->toBeFalse(); // ! FAIL
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS TESTAR 
+
+
+ISTO:
+
+
+
+<?php
+
+test('it belongs to an employer', function () {
+    expect(true) ...
+});
+
+
+
+
+
+
+
+
+
+
+-> COMO ESTAMOS USANDO 'pest',
+
+podemos escolher entre 
+
+
+'test()'
+
+
+e 
+
+
+UMA ALTERNATIVA,
+
+QUE É 
+
+'it()'...
+
+
+
+
+
+
+se escolhemos o 'it',
+
+
+PODEMOS FAZER ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+test('example', function () {
+    expect(true)->toBeTrue(); // PASS
+});
+
+test('example', function () {
+    expect(true)->toBeFalse(); // ! FAIL
+});
+
+// it() is the SAME as test().
+it('belongs to an employer', function () {
+    expect(true)->toBeFalse(); // ! FAIL
+});
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+MAS COMO FAZEMOS ESSE TEST?
+
+
+
+
+
+
+
+
+BEM, TIPICAMENTE É UM 3-STEP PROCESS:
+
+
+
+
+1) ARRANGE 
+
+2) ACT 
+
+3) ASSERT 
+
+
+
+
+
+
+// it() is the SAME as test().
+it('belongs to an employer', function () {
+
+    // AAA -> Arrange, Act, Assert
+
+
+    // Arrange the world:
+});
+
+
+
+
+
+
+
+
+
+
+COMEÇAMOS PELO 'ARRANGE OF THE WORLD'...
+
+
+
+
+
+
+
+PREPARAMOS O MUNDO PARA NOSSO TEST...
+
+
+
+
+
+
+
+
+DEPOIS, AGIMOS, REALIZAMOS ALGUMA ACTION....
+
+
+
+
+
+
+
+
+FINALMNETE, ASSERT, NÓS ANALISAMOS O RESULTADO....
+
+
+
+
+
+''IF IT BELONGS TO AN EMPLOYER,
+I PROBABLY NEED AN EMPLOYER TO PERFORM THIS ACTION''...
+
+
+
+
+
+
+
+
+para isso, criamos 1 employer, com 1 factory...
+
+
+
+
+
+--> depois disso, CRIAMOS 
+
+1 JOB, E AÍ COLOCAMOS SEU EMPLOYER_ID 
+
+COMO SENDO O DO EMPLOYER que foi recém criado,
+
+
+
+TIPO ASSIM:
+
+
+
+
+// it() is the SAME as test().
+it('belongs to an employer', function () {
+
+    // AAA -> Arrange, Act, Assert
+
+
+    // Arrange the world:
+    $employer = Employer::factory()->create();
+    $job = Job::factory()->create(['employer_id' => $employer->id]);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+esse array, passado dentro do 'create()',
+
+
+FAZ O __ OVERRIDE__ dos values definidos lá na factory de 'Job'....
+
+
+
+
+
+
+
+
+
+
+
+CERTO... COM ISSO, O 'ARRANGE' ESTÁ PRONTO...
+
+
+
+-> A PRÓXIMA ETAPA É 'PERFORM AN ACTION'...
+
+
+
+
+
+
+
+
+
+
+
+--> FREQUENTEMENTE, NOSSA 
+    ACTION E ASSERTION SERÃO SEPARADAS...
+
+
+
+
+
+    ENTRETANTO, NESTE CASO,
+     
+     PODEMOS AGRUPAR OS 2 EM 1 ÚNICO CASE,
+
+     TIPO ASSIM:
+
+
+
+
+
+
+// it() is the SAME as test().
+it('belongs to an employer', function () {
+
+    // * AAA -> Arrange, Act, Assert
+
+
+    // Arrange the world:
+    $employer = Employer::factory()->create();
+    $job = Job::factory()->create(['employer_id' => $employer->id]);
+
+    // Act and Assert:
+    expect($job->employer)->toBeInstanceOf(Employer::class);
+});
+
+
+
+
+
+MAS O TEST DO PROFESSOR FALHA,
+
+POR UMA RAZÃO ESTRANHA:
+
+
+
+
+
+
+
+
+''A facade root has not been set''...
+
+
+
+
+
+
+
+
+
+
+
+
+O PROBLEMA, AQUI, É 
+
+QUE 
+
+''LARAVEL HASN'T REALLY BEEN LOADED, INTO THIS TEST''...
+
+
+
+
+
+--> ESSE TEST ESTÁ TESTANDO, PORTANTO, A LÓGICA CRUA,
+
+SEM O LARAVEL...
+
+
+
+
+
+
+
+''RAW, NAKED UNIT TEST''...
+
+
+
+
+
+
+
+
+--> PARA CONSERTAR ISSO,
+    TEMOS QUE 
+
+    IR ATÉ O ARQUIVO 'Pest.php'...
+
+
+
+
+
+
+
+
+-> ESSA É BASICAMENTE A NOSSA CONFIG FILE,
+PARA NOSSO PROJECT...
+
+
+
+
+
+
+ELA TEM ESTE FORMATO:
+
+
+
+
+
+
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Test Case
+|--------------------------------------------------------------------------
+|
+| The closure you provide to your test functions is always bound to a specific PHPUnit test
+| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
+| need to change it using the "pest()" function to bind a different classes or traits.
+|
+*/
+
+pest()->extend(Tests\TestCase::class)
+ // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Expectations
+|--------------------------------------------------------------------------
+|
+| When you're writing tests, you often need to check that values meet certain conditions. The
+| "expect()" function gives you access to a set of "expectations" methods that you can use
+| to assert different things. Of course, you may extend the Expectation API at any time.
+|
+*/
+
+expect()->extend('toBeOne', function () {
+    return $this->toBe(1);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Functions
+|--------------------------------------------------------------------------
+|
+| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
+| project that you don't want to repeat in every file. Here you can also expose helpers as
+| global functions to help you to reduce the number of lines of code in your test files.
+|
+*/
+
+function something()
+{
+    // ..
+}
+
+
+
+
+
+
+
+
+
+
+
+
+TEMOS ESTE CÓDIGO:
+
+
+
+
+
+pest()->extend(Tests\TestCase::class)
+ // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature');
+
+
+ELE BASICAMENTE FAZ EXTEND DE ESSA CLASS ROOT 
+
+DE 'TestCase::class',
+
+NO DIRECTORY DE 'Feature'...
+
+
+
+
+
+
+
+
+-> também temos aquela linha de 'RefreshDatabase'...
+
+
+-> se descomentada, o que essa linha faz é 
+
+
+''AFTER EVERY TEST COMPLETES, LARAVEL 
+    WILL REFRESH AND RESET THE DATABASE, SO YOU 
+    CAN START WITH A CLEAN SLATE''...
+
+
+
+
+
+
+--> ISSO, NOVAMENTE, MOSTRA QUE 
+    AS PESSOAS DISCORDAM SOBRE O VERDADEIRO 
+    SIGNIFICADO DE 'UNIT TEST'...
+
+
+    o professor acha que isso pode ser usado com 
+    unit tests, por isso ele 
+    declara essas 2 classes/traits com 
+
+    o folder de 'Feature' e 'Unit'...
+
+
+
+
+-> FICA
+TIPO ASSIM:
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Test Case
+|--------------------------------------------------------------------------
+|
+| The closure you provide to your test functions is always bound to a specific PHPUnit test
+| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
+| need to change it using the "pest()" function to bind a different classes or traits.
+|
+*/
+
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature', 'Unit');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... AGORA FUNCIONOU....
+
+
+
+
+
+
+
+
+
+
+
+--> esse test passou pq 
+
+NÓS 
+
+JÁ TÍNHAMOS SETTADO ESSAS RELATIONS...
+
+
+
+
+
+
+---> SE NÃO TIVÉSSEMOS ESCRITO ESSAS RELATIONS,
+RODARÍAMOS ESSE CÓDIGO,
+
+ELE FALHARIA,
+
+E AÍ 
+
+ESCREVERÍAMOS O CÓDIGO PARA FAZER 
+
+
+ESSA LÓGICA, ESSE TEST, FUNCIONAR...
+
+
+
+
+
+
+
+
+
+
+
+E ISSO É CHAMADO DE 'TDD',
+
+
+TEST-DRIVEN DEVELOPMENT...
+
+
+
+
+
+
+
+
+--> VC COMEÇA COM O WRITE DE 1 TEST 
+
+EM QUE VC INTERAGE COM O MUNDO DE 1 MANEIRA 
+
+QUE É 
+
+
+IDEAL A VOCÊ... AÍ VC RODA 
+
+
+O TEST, E É CLARO QUE 
+
+
+O TEST FALHA.....
+
+
+
+
+
+
+
+
+
+--> A ETAPA FINAL É 'WRITE THE CODE TO MAKE THE TEST PASS'...
+
+
+
+
+
+
+
+
+
+
+-> É UMA BOA MANEIRA DE ESCREVER APPS...
+
+
+
+
+
+-> EM ALGUNS SCENARIOS, FUNCIONA...
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR NOS MOSTRARÁ 1 EXEMPLO DE TDD...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ''HOW ABOUT,
+
+A JOB CAN HAVE TAGS''...
+
+
+
+
+podemos escrever UM ESBOÇO, ASSIM:
+
+
+
+
+
+
+// * A JOB can have tags:
+it('can have tags', function() {
+
+    // ARRANGE:
+    $job = Job::factory()->create();
+
+    // ACT:
+    $job->tags()->attach(Tag::factory()->create());
+
+    // ASSERT:
+    expect($job->tags)->toHaveCount(1);
+
+});
+
+
+
+
+
+
+
+-> dentro de 'job',
+
+podemos ter 1 method como 'tag()',
+
+
+
+QUE PODE FAZER O ATTACH DE UMA TAG A 1 DE NOSSOS JOBS...
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+// * A JOB can have tags:
+it('can have tags', function() {
+
+    // ARRANGE:
+    $job = Job::factory()->create();
+
+    // ACT:
+    $job->tag('Frontend');
+
+    // ASSERT:
+    expect($job->tags)->toHaveCount(1);
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+COM ISSO, ESCREVEMOS 1 TEST...
+
+
+
+
+
+
+SE RODAMOS ESSE TEST, ELE FALHA....
+
+
+
+
+
+
+
+
+
+
+--> AGORA PRECISAMOS ESCREVER A LÓGICA ,
+
+
+ESCREVER O METHOD 'tag'...
+
+
+
+
+
+
+
+
+
+
+-> PRECISAMOS TAMBÉM CRIAR 1 MODEL PARA 'Tag',
+
+
+e também criar 1 factory e 1 migration....
+
+
+
+O MODEL PODE FICAR ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+    public function jobs(): BelongsToMany
+    {
+        return $this->belongsToMany(Job::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+JÁ A MIGRATION PODE FICAR ASSIM:
+
+
+
+
+
+
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lá na factory, escrevemos assim:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tag>
+ */
+class TagFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->word(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+''DOES A JOB BELONG TO A TAG...
+
+
+NO, TAGS BELONG TO MANY JOBS...''
+
+
+
+
+
+
+
+
+
+--> A JOB BELONGS TO MANY TAGS...
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... COM ISSO, TEMOS 2 TABLES,
+
+
+
+JOB E TAGS,
+
+
+
+
+E VAMOS PRECISAR DE 1 INTERMEDIATE TABLE...
+
+
+
+
+
+
+--> POR ISSO VAMOS ESCREVER ESSA PIVOT TABLE,
+
+LÁ NA MIGRATION DE 'TAGS',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+use App\Models\Job;
+use App\Models\Tag;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
+
+        // Create Pivot table between tags and jobs:
+        Schema::create('job_tag', function (Blueprint $table) {
+            $table->foreignIdFor(Job::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Tag::class)->constrained()->cascadeOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tags');
+    }
+};
+
+
+
+
+
+
+
+
+quer dizer que 1 mesmo job pode ter 
+
+centenas de tags... se isso for preciso...
+
+
+
+
+
+
+
+
+-> o professor também coloca uma constraint de 'cascadeOnDelete()'...
+
+
+
+
+
+
+
+
+
+
+OK... DEPOIS DISSO, VOLTAMOS AO NOSSO TEST,
+
+
+E 
+
+RODAMOS ELE...
+
+
+
+
+
+FUNCIONOU...
+
+
+
+
+
+
+
+
+MINHA LÓGICA TINHA FICADO ASSIM:
+
+
+
+
+
+// * A JOB can have tags:
+it('can have tags', function () {
+
+    // ARRANGE:
+    $job = Job::factory()->create([
+        'employer_id' => Employer::factory()->create()->id,
+    ]);
+
+    // ACT:
+    $job->tag('Frontend');
+
+    // ASSERT:
+    expect($job->tags)->toHaveCount(1);
+});
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Job extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+    public function employer(): BelongsTo
+    {
+        return $this->belongsTo(Employer::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    // This will create and attach a tag to our job:
+    public function tag(string $tagName)
+    {
+        $tag = Tag::firstOrCreate(['name' => $tagName]);
+
+        $this->tags()->attach($tag);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+--> QUANDO SEGUIMOS ESSE APPROACH, É QUASE 
+
+COMO SE OS TESTS TE DIZEM 'PARA ONDE IR'...
+
+
+E ESSA É UMA DAS GRANDES VANTAGENS
+
+DO TDD.....
+
+
+
+
+
+
+
+
+
+
+--> ACABAMOS COM OS TESTS...
+
+
+
+
+
+
+
+
+
+
+-> NO ARQUIVO DE 'web.php',
+
+TEMOS APENAS A ROUTE PRINCIPAL...
+
+
+
+
+--> O PROFESSOR COLOCA UMA ROUTE 
+
+PARA TER A PAGE PRINCIPAL, DE JOBS,
+
+COM ISTO:
+
+
+
+
+
+
+
+
+<?php
+
+use App\Http\Controllers\JobController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [JobController::class, 'index'])->name('home');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ok... 
+
+
+FAREMOS ESSE INDEX 
+
+
+CARREGAR 
+
+
+
+o arquivo 'index.blade.php',
+
+
+dentro da 
+
+pasta 
+
+resources>views>jobs..
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use App\Http\Requests\StoreJobRequest;
+use App\Http\Requests\UpdateJobRequest;
+
+class JobController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return view('jobs.index');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreJobRequest $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Job $job)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Job $job)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateJobRequest $request, Job $job)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Job $job)
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS É CLARO QUE PRECISAMOS PASSAR 
+
+'JOBS'
+
+
+A NOSSA JOB LISTING PAGE...
+
+
+
+
+
+
+--> E PRECISAMOS DE TAGS, TAMBÉM...
+
+
+
+
+
+-> PARA ISSO,
+
+
+PRECISAMOS CRIAR ALGUNS JOBS,
+
+COM 1 FACTORY,
+
+
+E TAMBÉM TAGS...
+
+
+
+
+
+
+
+-> PROVAVELMENTE FAREMOS ISSO 
+
+COM 1 SERVICE CLASS,
+
+
+
+ALGUMA ABSTRAÇÃO...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+
+        $jobs = Job::with('employer')->get();
+        $tags = Tag::with('jobs')->get();
+
+
+        return view(
+            'jobs.index',
+            [
+                'jobs' => $jobs,
+                'tags' => $tags,
+            ]
+        );
+    }
+
+
+
+
+
+    podemos fazer algo assim, por enquanto...
+
+
+
+
+
+
+
+-> MAS AS TAGS PRECISAM SER TODAS, 
+
+com '::all()'...
+
+
+
+
+
+EX:
+
+
+
+
+
+    public function index()
+    {
+
+        $jobs = Job::with('employer')->get();
+        $tags = Tag::all();
+
+
+        return view(
+            'jobs.index',
+            [
+                'jobs' => $jobs,
+                'tags' => $tags,
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> CERTO... ENTÃO,
+
+LÁ NO BLADE COMPONENT,
+
+PRECISAMOS FAZER PASS DE ESSA TAG...
+
+
+
+
+
+
+PODEMOS FAZER ISSO COM 1 FOREACH,
+
+
+TIPO ASSIM:
+
+
+
+
+
+            <div class="mt-6 space-x-1">
+                @foreach ($tags as $tag)
+                <x-tag  :tag="$tag" />
+                @endforeach
+            </div>
+
+
+
+
+
+
+
+
+
+
+COM ISSO, CONSEGUIMOS PASSASR A TAG INTEIRA,
+
+COMO PROP,
+
+
+
+A ESSE COMPONENT 'x-tag'...
+
+
+
+
+
+
+
+DENTRO DE ESSE COMPONENT, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+@props(['size' => 'base', 'tag'])
+
+
+@php
+
+$classes = 'bg-white/10 hover:bg-white/25 px-3 py-1 rounded-xl transition-colors duration-300';
+
+if ($size === 'base') {
+$classes .= ' px-5 py-1 text-sm';
+}
+
+if ($size === 'small') {
+$classes .= ' px-3 py-1 text-2xs';
+}
+
+@endphp
+
+
+<a href="#" class="{{ $classes }}">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+-- COM ISSO, PODEMOS TROCAR OS VALUES, ALI EMBAIXO,
+
+PELA UTILIZAÇÃO DE '$tag',
+tipo assim:
+
+
+
+
+
+
+
+@props(['size' => 'base', 'tag'])
+
+
+@php
+
+    $classes = 'bg-white/10 hover:bg-white/25 px-3 py-1 rounded-xl transition-colors duration-300';
+
+    if ($size === 'base') {
+        $classes .= ' px-5 py-1 text-sm';
+    }
+
+    if ($size === 'small') {
+        $classes .= ' px-3 py-1 text-2xs';
+    }
+
+@endphp
+
+
+<a href="/tags/{{ strtolower($tag->name) }}" class="{{ $classes }}">{{ $tag->name }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+--> MAS AS TAGS TAMBÉM SÃO USADAS DENTRO DOS JOB CARDS,
+
+TIPO ASSIM:
+
+
+
+
+
+    <x-panel class="flex gap-x-6">
+        <div>
+            <x-employer-logo :width="100" />
+        </div>
+
+        <div class="flex-1 flex flex-col">
+            <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+            <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">Video Producer</h3>
+            <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+        </div>
+
+        <div class="">
+            @foreach ($tags as $tag)
+                <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+    </x-panel>
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+                <x-panel class="flex flex-col text-center">
+                    <div class="self-start text-sm">Laracasts</div>
+
+                    <div class="py-8">
+                        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">Video Producer</h3>
+                        <p class="text-sm mt-4">Full Time - from $100,000</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-auto">
+                        <div>
+                            @foreach ($tags as $tag)
+                                <x-tag size="small" :tag="$tag" />
+                            @endforeach
+                        </div>
+
+                        <x-employer-logo :width="42" />
+                    </div>
+                </x-panel>
+
+
+
+
+
+ok... 
+
+
+
+MAS FIZEMOS ALGO ERRADO.... OS CARDS 
+
+DE 'JOB'
+
+
+DEVEM, CADA 1 DELES, RECEBER O PROP DE 'job',
+
+
+E, ENTÃO,
+
+
+
+USAR AS TAGS DENTRO DE CADA JOB...
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex flex-col text-center">
+    <div class="self-start text-sm">Laracasts</div>
+
+    <div class="py-8">
+        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">Video Producer</h3>
+        <p class="text-sm mt-4">Full Time - from $100,000</p>
+    </div>
+
+    <div class="flex justify-between items-center mt-auto">
+        <div>
+            @foreach ($job->$tags as $tag)
+                <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+
+        <x-employer-logo :width="42" />
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+@props(['job'])
+   <x-panel class="flex gap-x-6">
+       <div>
+           <x-employer-logo :width="100" />
+       </div>
+
+       <div class="flex-1 flex flex-col">
+           <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+           <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">Video Producer
+           </h3>
+           <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+       </div>
+
+       <div class="">
+           @foreach ($jobs->$tags as $tag)
+               <x-tag size="small" :tag="$tag" />
+           @endforeach
+       </div>
+   </x-panel>
+
+
+
+
+
+
+
+
+
+LÁ NO INDEX.BLADE.PHP,
+
+PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+
+        <section class="text-center pt-6">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..."
+                    class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full max-w-xl">
+            </form>
+        </section>
+
+        <section class="pt-10">
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="mt-6 grid lg:grid-cols-3 gap-8">
+                @foreach ($jobs as $job)
+                    <x-job-card :job="$job" />
+                @endforeach
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+            <div class="mt-6 space-x-1">
+                @foreach ($tags as $tag)
+                    <x-tag :tag="$tag" />
+                @endforeach
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+            <div class="mt-6 space-y-6">
+                @foreach ($jobs as $job)
+                    <x-job-card-wide :job="$job" />
+                @endforeach
+            </div>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+COM ISSO, OS JOBS SÃO PASSADOS, E SÃO FORMATADOS 
+
+COMO ESSES CARDS..
+
+
+
+
+
+
+
+AINDA NÃO VEREMOS TAG OU JOB ALGUM...
+
+
+
+
+ISSO É PQ AINDA NÃO CRIAMOS ESSAS COISAS, NA DATABASE...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CRIAR ESSAS COISAS NA DATABASE,
+
+
+
+DEVEMOS ESCREVER ALGUNS SEEDERS...
+
+
+
+
+
+
+
+
+
+
+-.- VAMOS NO JOBSEEDER:
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class JobSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Job;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class JobSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        Job::factory()->count(20)->create();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+É CLARO QUE ISSO VAI FUNCIONAR, VAI CRIAR 20 JOBS,
+
+
+MAS NÃO VAI CONSIDERAR AS TAGS...
+
+
+
+
+
+
+
+-> PARA CONSIDERAR AS TAGS,
+
+
+
+
+PODEMOS CRIAR 3 RANDOM TAGS,
+
+
+E ENTÃO AS ASSIGNAR 
+
+
+A CADA 1 DE NOSSOS JOBS,
+
+
+
+COM O METHOD 'hasAttached()' (ESSE METHOD É USADO COM RELATIONS DE 'BELONGSTOMANY')...
+
+
+
+
+
+TIPO ASSIM:
+
+
+hasAttached($tags)
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Job;
+use App\Models\Tag;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class JobSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $tags = Tag::factory(3)->create();
+
+        Job::factory()->count(20)->hasAttached($tags)->create();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... ISSO FEITO, EM 'DatabaseSeeder',
+
+DEPOIS DE CRIAR O USER,
+
+
+VAMOS CHAMAR ESSE SEEDER 
+
+
+DE 'JobSeeder'...
+
+
+
+
+EX:
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
+        $this->call(JobSeeder::class);
+    }
+}
+
+
+
+
+
+
+
+PARA RODAR O DATABASE SEEDER,
+
+
+BASTA RODAR 
+
+
+
+
+
+php artisan db:seed 
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+AÍ TEREMOS 1 MONTE DE EMPLOYERS,
+
+
+JOBS
+
+
+
+E TAGS...
+
+
+
+
+
+
+
+
+
+
+RE-RODAMOS AS MIGRATIONS,
+
+
+COM 'php artisan migrate:fresh --seed',
+
+
+
+com essa flag de 'seed',
+
+PARA RE-SEEDAR A DATABASE...
+
+
+
+
+
+
+
+na nossa home page, ficamos com actual live data,
+
+vinda de nossa database...
+
+
+
+
+
+
+
+AÍ TEMOS 3 TAGS,
+
+E CADA JOB É ASSOCIADO COM ELAS...
+
+
+
+
+
+
+
+
+
+--> MAS FALTOU COLOCAR O EMPLOYER NAME,
+
+EM CADA JOB-CARD,
+
+TIPO ASSIM:
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex flex-col text-center">
+    <div class="self-start text-sm">{{ $job->employer->name }}</div>
+
+    <div class="py-8">
+        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">{{ $job->title }}</h3>
+        <p class="text-sm mt-4">{{ $job->salary }}</p>
+    </div>
+
+    <div class="flex justify-between items-center mt-auto">
+        <div>
+            @foreach ($job->$tags as $tag)
+                <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+
+        <x-employer-logo :width="42" />
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+AINDA NÃO MEXEMOS NO EMPLOYER LOGO...
+
+
+
+
+
+
+--> MEXEMOS NO OUTRO CARD DE JOB,
+
+TIPO ASSIM
+
+
+
+
+
+
+
+@props(['job'])
+   <x-panel class="flex gap-x-6">
+       <div>
+           <x-employer-logo :width="100" />
+       </div>
+
+       <div class="flex-1 flex flex-col">
+           <a href="#" class="self-start text-sm text-gray-400">{{ $job->employer->name }}</a>
+           <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">Video Producer
+           </h3>
+           <p class="text-sm text-gray-400 mt-auto">{{ $job->salary }}</p>
+       </div>
+
+       <div>
+           @foreach ($tags as $tag)
+               <x-tag size="small" :tag="$tag" />
+           @endforeach
+       </div>
+   </x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+É CLARO QUE AINDA TEMOS UM PROBLEMA 
+DE 'N+1' AQUI,
+
+DE LAZY LOADING,
+
+
+ISSO PQ NÓS AINDA NÃO IMPLEMENTAMOS 
+
+
+EAGER LOADING...
+
+
+
+
+
+--> ISSO É VISTO NESTE TRECHO:
+
+
+    <div class="self-start text-sm">{{ $job->employer->name }}</div>
+
+
+
+
+
+
+
+
+esse trecho demanda 1 monte de queries desnecessárias,
+
+o problema n+1...
+
+
+
+
+
+
+
+
+
+--> PRECISAMOS RESOLVER ISSO, NA PRÓXIMA AULA...
+
+
+
+
+
+
+
+PROVAVELMENTE RESOLVEREMOS O PROBLEMA 
+
+
+COM UMA SINTAXE COMO 
+
+
+
+'''
+        $jobsWithEmployers = $job::with('employer')->latest()->simplePaginate(3);
+
+''''
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+A ÚLTIMA COISA QUE PODEMOS FAZER, AQUI,
+
+
+
+
+É FAZER COM QUE APENAS 'FEATURED JOBS'
+
+
+APAREÇAM 
+
+NA PARTE DE 'FEATURED JOBS'...
+
+
+
+
+ou seja,
+
+apenas aqueles jobs com a flag de 'featured' 
+
+como 'true',
+
+na database...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, VAMOS FAZER O RETURN 
+
+DE OUTRA KEY,
+
+NA NOSSA VIEW...
+
+A KEY 'featured_jobs',
+
+ou algo assim....
+
+
+
+
+
+
+
+
+
+-> MAS, ANTES DISSO, NO JOBSEEDER,
+
+
+COLOCAMOS 
+
+
+'featured' como um value BOOLEAN RANDOM,
+
+COM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Job;
+use App\Models\Tag;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class JobSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $tags = Tag::factory(3)->create();
+
+        Job::factory()->count(20)->hasAttached($tags)->create([
+            'featured' => fake()->boolean(),
+        ]);
+    }
+}
+
+
+
+
+
+
+PODEMOS USAR o 'fake()->boolean()',
+
+
+OU, ALTERNATIVAMENTE,
+
+
+O PROFESSOR DIZ QUE PODEMOS USAR UM 'SEQUENCER'...
+
+
+
+
+
+
+
+
+--> para isso, usaremos 'new Sequence()'...
+
+
+
+
+
+É UM HELPER DE FACTORIES...
+
+
+
+
+
+
+
+--> COMO PARAMETER DO SEQUENCER,
+PROVIDENCIAMOS 
+
+''A SEQUENCE OF PARAMETERS THAT I WANT 
+LARAVEL TO ITERATE THROUGH''...
+
+
+
+
+
+ex:
+
+
+
+
+
+new Sequence(
+    [
+        'featured' => false,
+        'schedule' => 'Full Time'
+    ],
+
+    [
+        'featured' => true,
+        'schedule' => 'Part Time'
+    ]
+)
+
+
+
+
+
+
+
+
+COM ISSO, FICAREMOS 
+
+
+COM 
+
+
+10 VALUES IGUAIS AO PRIMEIRO,
+
+
+E 10 VALUES IGUAIS AO SEGUNDO...
+
+
+PQ ESSA SEQUENCE SERÁ REPETIDA UM MONTE DE VEZES...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+    public function run(): void
+    {
+        $tags = Tag::factory(3)->create();
+
+        Job::factory()->count(20)->hasAttached($tags)->create(
+            new Sequence(
+                [
+                    'schedule' => 'Part Time',
+                    'featured' => false
+                ],
+                [
+                    'schedule' => 'Full Time',
+                    'featured' => true
+                ]
+            )
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+AÍ, LÁ NO JOBCONTROLLER,
+
+
+
+
+
+QUEREMOS 
+
+FAZER FETCH APENAS DOS JOBS QUE SÃO 'FEATURED'...
+
+
+
+
+
+
+tipo assim:
+
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+
+        $jobs = Job::all()->groupBy('featured');
+        $tags = Tag::all();
+
+
+        return view(
+            'jobs.index',
+            [
+                'featuredJobs' => $jobs[0],
+                'jobs' => $jobs[1],
+                'tags' => $tags,
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+---> ENTÃO, NA VIEW 
+FAZEMOS LOOP POR DENTRO DE APENAS OS FEATURED JOBS,
+
+NA PRIMEIRA PARTE:
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+
+        <section class="text-center pt-6">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..."
+                    class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full max-w-xl">
+            </form>
+        </section>
+
+        <section class="pt-10">
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="mt-6 grid lg:grid-cols-3 gap-8">
+                @foreach ($featuredJobs as $job)
+                    <x-job-card :job="$job" />
+                @endforeach
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+            <div class="mt-6 space-x-1">
+                @foreach ($tags as $tag)
+                    <x-tag :tag="$tag" />
+                @endforeach
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+            <div class="mt-6 space-y-6">
+                @foreach ($jobs as $job)
+                    <x-job-card-wide :job="$job" />
+                @endforeach
+            </div>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+OS JOBS QUE APARECEM EM 'FEATURED'
+
+NÃO APARECEM 
+
+JUNTO DOS 'UNFEATURED JOBS'...
+
+
+
+(mas poderiam ficar junto,
+se vc quisesse)....
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> SÓ TEMOS MAIS 1 VIDEO...
+
+
+
