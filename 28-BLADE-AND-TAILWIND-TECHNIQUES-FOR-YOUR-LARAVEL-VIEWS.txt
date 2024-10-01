@@ -1,0 +1,3109 @@
+
+
+
+
+
+
+
+OK... VOLTAMOS AO NOSSO SITE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... ATUALMENTE TEMOS 1 ÚNICO TIPO DE 'JOB CARD'...
+
+
+
+
+
+
+-> MAS TEMOS 1 SEGUNDA VERSÃO DISSO...
+
+
+UMA VERSÃO BEM MAIS LONGA...
+
+
+
+
+
+
+
+AÍ O PROFESSOR NOS EXPLICA:
+
+
+
+
+''WHILE IT IS POSSIBLE TO 
+    CONSOLIDATE 2 VERSIONS INSIDE OF A SAME COMPONENT,
+    OFTEN, IT IS JUST EASIER TO CREATE 2 SEPARATE COMPONENTS''..
+
+
+
+
+
+
+
+
+
+--> E É ISSO QUE O PROFESSOR FARÁ,
+
+CRIARÁ UM component JOB-CARD DE NOME 
+
+
+'job-card-wide.blade.php'...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR VAI TRABALHANDO DA ESQUERDA PARA A DIREITA..
+
+
+
+
+
+
+
+
+
+-> PRIMEIRAMENTE, TEREMOS A IMAGE, POR ISSO VAI FICANDO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, TEREMOS 1 DIV QUE VAI WRAP 
+
+O 'EMPLOYER NAME',
+
+    'JOB TITLE 
+
+    'JOB SALARY'..
+
+
+
+
+
+
+POR ISSO VAI FICANDO ASSIM:
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+
+            <div>
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+        
+        </div>
+
+
+
+
+
+
+
+
+
+
+--> MAIS TARDE, O PROFESSOR VAI NOS MOSTRAR UM TRUQUE DE 
+
+
+
+''HOW CAN WE HAVE MULTIPLE ANCHOR TAGS FROM WITHIN A SAME CARD,
+    WHILE STILL ALLOWING THE CARD ITSELF TO BE CLICKABLE''
+
+    (
+        provavelmente ele vai utilizar css...
+    )
+
+
+
+
+
+
+
+
+
+
+-> FINALMENTE,
+
+
+
+NA PARTE BEM DA DIREITA, TEREMOS AS TAGS,
+
+
+
+COM ISTO:
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+
+            <div>
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>  
+            </div>
+        
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+eX:
+
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+
+            <div>
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+é claro que temos que fazer mais coisas,
+
+
+
+mas podemos ver como fica, inicialmente...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PODEMOS INSERIR ESSE COMPONENT 
+
+LOGO ABAIXO DA 'x-section-heading' de 'Recent Jobs',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+        <section>
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <x-job-card />
+                <x-job-card />
+                <x-job-card />
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+            <div class="mt-6 space-x-1">
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag4</x-tag>
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+            <div class="mt-6 space-x-1">
+                <x-job-card-wide />
+                <x-job-card-wide />
+                <x-job-card-wide />
+            </div>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+MAS COLOCAMOS SPACE DE Y 3...
+
+
+
+
+
+
+
+
+
+OK... MAS NOSSAS IMAGES FICARAM ENORMES... É PQ NÃO COLOCAMOS CLASS ALGUMA,
+
+
+NO ELEMENTO 'img'...
+
+
+
+
+
+
+
+
+
+
+
+NA VERDADE, ELE VAI USAR FLEXBOX...
+
+
+
+
+
+
+
+
+
+
+
+'IF YOU ALREADY USED FLEXBOX,
+
+YOU KNOW YOU HAVE TO BE CAREFUL ABOUT BUTTONS AND IMAGES THAT ARE 
+DIRECT CHILDREN OF PARENT CLASSES, OF THE FLEX CONTAINERS......''
+
+
+
+
+
+
+
+-> BASTA WRAPPAR NOSSA IMAGE COM 1 DIV...
+
+
+
+
+-> DEPOIS DISSO, 
+
+DEIXAMOS O NEGÓCIO COMO 1 FLEX-ROW,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-center mt-6 gap-x-6">
+            <div>
+                <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div>
+                <a href="#" class="self-start text-sm">Laracasts</a> 
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR AUMENTA OS GAPS ENTRE 
+OS ITEMS, PARA space-y-6...
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O PROFESSOR QUER QUE A PARTE QUE NÃO É A IMAGE 
+
+FAÇA 'FLEX' E OCUPE O CONTAINER INTEIRO...
+
+
+
+POR ISSO ELE COLOCA 'flex-1',
+
+tipo assim:
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://placehold.it/42/42" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O LOGO DO EMPLOYER ESTÁ 1 POUCO WIDER DE 42....
+
+
+
+é 90...
+
+
+
+DEIAXMOS ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://placehold.it/90/90" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR USA UM OUTRO PLACEHOLDER SERVICE,
+
+
+
+QUE É 
+
+
+'picsum.photos/90/90'....
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+esse é outro placeholder service que podemos usar...
+
+
+
+
+
+
+
+
+
+
+-> TAMBEM PODEMOS RANDOMIZAR AS IMAGES PLACEHOLDER... QUEREMOS QUE ELAS SEJAM UNIQUE 
+PARA CADA JOB...
+
+
+
+
+
+
+
+->  BASTA ESCREVER uma parte da  url como 
+
+'/seed/<random_number>'...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/seed/1231390183/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... E A IMAGE SERÁ SEMPRE UNIQUE PARA ESSE ID...
+
+
+
+
+
+
+
+
+--> MAS QUEREMOS DEIXAR ESSE NÚMERO UNIQUE,
+
+PARA QUE CADA IMAGE SEJA DIFERENTE... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> ''ONCE WE HAVE ACTUAL JOBS IN OUR DATABASE,
+    WE WILL REFERENCE THE ID OF THE JOB,
+
+    TO PASS THIS VALUE IN''...
+
+
+
+
+--> COMO NÓS __ AINDA NÃO TEMOS OS VALUES DOS IDS
+
+    PARA COLOCAR DENTRO DESSA URL,
+
+
+
+    COLOCAMOS 
+
+    UM CALL DE 
+
+
+    'rand(0, 100000)',
+
+
+    PARA OBTER 1 NÚMERO ALEATÓRIO...
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO REALMENTE NOS DÁ UNIQUE IMAGES...
+
+
+
+
+
+
+
+
+ISSO É BEM LEGAL, PARA UM DEMO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DE VOLTA AO CÓDIGO,
+
+
+TEMOS QUE COLOCAR ALGUMAS CORES ESPECIAIS...
+
+
+
+
+
+
+
+
+
+--> USAMOS 'text-gray-400'...
+
+
+
+
+  
+  ex:
+
+
+
+
+
+
+
+
+
+          <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3>Video Producer</h3>
+                <p>Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS É CLARO QUE A FONT ESTÁ ERRADA... 
+
+
+A FONT-FAMILY ESTÁ ERRADA...
+
+
+
+
+
+
+
+--> QUEREMOS A FONT DE 'Hanken Grotesk'...
+
+
+
+
+
+
+
+
+
+-> ESSA FONT VEM DE FONTS GOOGLE...
+
+
+
+
+
+
+-->  O PROFESSOR COLA A URL DO CDN DO GOOGLE,
+
+QUE É ESTA:
+
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+AGORA QUEREMOS USAR ESSA FONT, DENTRO DO TAILWIND...
+
+
+
+
+
+BASTA FAZER O EXTEND DA FONTFAMILY,
+
+E APLICAR 
+
+
+ISSO...
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+                black: "#060606",
+            },
+            fontFamily: {
+                "hanken-grotesk": ["'Hanken Grotesk', sans-serif"],
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+QUEREMOS QUE O FALLBACK SEJA 'sans-serif',
+
+caso essa font não carregue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> COM ISSO, PODEMOS REFERENCIAR ESSA 
+    font de 
+
+    'hanken-grotesk'
+     
+
+
+     NO BODY INTEIRO,
+
+     COM 
+
+     'font-hanken-grotesk',
+
+
+     TIPO ASSIM:
+
+
+
+
+    
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white font-hanken-grotesk">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+  
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... FAZEMOS MAIS ALGUMAS ALTERAÇÕES....
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-lg">Video Producer</h3>
+                <p class="text-sm text-gray-400">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... QUEREMOS ALINHAR A PARTE DO 'SALARY'
+
+
+
+AO FINAL DO ELEMENTO..
+
+
+
+
+
+-> PARA ISSO, DEIXAMOS COMO 'FLEX-COL,
+
+
+
+E AÍ, PARA ESSE ITEM DE 'salary',
+
+COLOCAMOS 'mt-auto',
+
+TIPO ASSIM:
+
+
+
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-lg">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O TITLE PODE SER 1 POUCO MAIOR,
+
+
+E QUEREMOS QUE ELE SEJA DISTANCIADO DO NOME DO EMPLOYER...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-xl mt-3">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PRECISAMOS MUDAR MAIS ALGUMAS COISAS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+''AT THE MOMENT, WE HAVE TWO VERSIONS OF OUR EMPLOYER LOGO...
+    BUT WE WANT TO CONSOLIDATE THEM,
+
+
+    MAKE THEM THE SAME''...
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS CRIAR 1 NOVO COMPONENT,
+PQ SERÁ BEM ÚTIL, EVITARÁ A REPETIÇÃO DE CÓDIGO....
+
+
+
+
+
+
+
+
+-> SERÁ O COMPONENT 
+
+'employer-logo.blade.php'...
+
+
+
+
+
+
+
+
+
+
+-> MAIS TARDE, FAREMOS COM QUE ESSES COMPONENTS FAÇAM ACCEPT DO OBJECT DE 'employer' e 'job',
+
+para que eles sejam dinâmicos...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <x-employer-logo />
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-xl mt-3">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+<img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> lá no job card standard, também colocamos isso:
+
+
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ok... mas, aqui, ficamos com 1 problema:
+
+
+
+
+
+''THE SIZE OF THE IMAGE IN THE WIDE CARD IS 
+    100,
+
+
+
+BUT, IN THE SMALL JOB CARD,
+IT SHOULD BE 42''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA CONSERTAR ISSO,
+
+DEVEMOS ACEITAR 1 PROP... E O PROP SERÁ DE 'width'...
+
+
+
+
+
+
+
+-> TIPO ASSIM:
+
+
+
+
+
+@props(['width' => 42])
+<img src="https://picsum.photos/seed/{{rand(0, 100000)}}/100/100" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+A WIDTH DEFAULT SERÁ DE 42....
+
+
+
+a width de 100 será passada apenas pelo component 'wide card'...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+@props(['width' => 42])
+<img src="https://picsum.photos/seed/{{rand(0, 100000)}}/{{ $width }}/{{ $width }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+LÁ NO JOB CARD, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center mt-6">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+aí, lá no outro, podemos escrever assim:
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6">
+            <div>
+                <x-employer-logo :width="90"/>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-xl mt-3">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... FAZ SENTIDO...
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O PROFESSOR AJUSTA O STYLING DAS TAGS...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ESTAMOS COM SIZE DE 'xs',
+
+
+quando deveria ser 10px (em vez de xs, que é 12px)...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR COLOCA 1 FONTSIZE CUSTOM,
+
+ 
+
+ de '2xs'..
+
+
+ TIPO ASSIM:
+
+
+
+
+ /** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+                black: "#060606",
+            },
+            fontFamily: {
+                sans: ["'Hanken Grotesk', sans-serif"],
+            },
+            fontSize: {
+                '2xs': '10px',
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+mas o professor quer pegar em rem,
+
+então colocamos 0.625rem...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                laracasts: "rg(50, 138, 241)",
+                black: "#060606",
+            },
+            fontFamily: {
+                sans: ["'Hanken Grotesk', sans-serif"],
+            },
+            fontSize: {
+                '2xs':  '0.625rem'
+            },
+        },
+    },
+    plugins: [],
+};
+
+
+
+ISSO FEITO, ATUALIZAMOS A TAG, ASSIM:
+
+
+
+
+
+
+
+
+  <a class="bg-white/10 hover:bg-white/25 px-2 py-1 rounded-xl text-2xs transition-colors duration-300" href="#">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR COLOCA 'font-bold',
+
+e mais um padding no eixo x...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+  <a class="bg-white/10 hover:bg-white/25 px-3 py-1 rounded-xl text-2xs transition-colors duration-300" href="#">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.... O PROFESSOR ACHA QUE A FONT ESTÁ 1 POUCO HEAVY DEMAIS...
+
+
+
+
+
+
+
+
+
+
+-> POR ISSO VAMOS ATÉ O ARQUIVO DE 'layout.blade.php',,
+
+    E AÍ REMOVEMOS ALGUMAS DAS FONTS,
+
+    PARA APENAS 400, 500 E 600...
+
+
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+TAMBÉM TEMOS ALGUNS HOVER STYLES...  
+
+
+
+se vc passa o mouse em cima dos jobs,
+
+
+
+
+O TITLE FICA AZUL,
+
+E A BORDER FICA AZUL TAMBÉM...
+
+
+
+
+
+
+
+
+-> VAMOS ATÉ O 'job-card.blade.php'...
+
+
+
+
+
+
+
+
+
+
+-> COLOCAMOS QUE TEMOS 'border',
+
+MAS QUE A BORDER DEVE SER _ TRANSPARENT,
+
+POR DEFAULT...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent hover:border-blue-800">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3>Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+certo... mas queremos deixar o TITLE AZUL ,TAMBÉM,
+
+QUANDO 
+
+OCORRER ESSE HOVER...
+
+
+
+
+
+-> PARA ISSO, PODEMOS USAR AS CLASSES DE 'group'
+
+
+do tailwind...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-800">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3 class="group-hover:text-blue-800">Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... FUNCIONOU...
+
+
+
+
+é a class de 'group' no parent element,
+e aí 
+
+
+'group-hover:<property>' ,
+
+NO elemento children...
+
+
+
+
+
+
+
+
+
+
+
+
+-> EX:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3 class="group-hover:text-blue-600">Video Producer</h3>
+                <p>Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+O PROFESSOR FALA QUE ALGUNS STYLES DEVEM SER ALTERADOS, NO JOB CARD....
+
+
+
+
+
+
+
+
+
+
+-> TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8 font-bold">
+                <h3 class="group-hover:text-blue-600 text-lg">Video Producer</h3>
+                <p class="text-sm mt-4">Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> DEIXAMOS APENAS O BOLD NO TITLE...
+
+
+
+
+EX:
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8">
+                <h3 class="group-hover:text-blue-600 text-lg font-bold">Video Producer</h3>
+                <p class="text-sm mt-4">Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR TAMBÉM TERIA DE APLICAR OS BORDER STYLES 
+
+
+NO CARD-WIDE TAMBÉM...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6 hover:border-blue-600 group">
+            <div>
+                <x-employer-logo :width="100" />
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+SE QUISERMOS UMA TRANSITION PROGRESSIVA,
+
+
+DEIXAMOS 'duration-500' e 'transition-colors'..
+
+
+
+
+
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex text-start mt-6 gap-x-6 border border-transparent hover:border-blue-600 group transition-colors duration-500">
+            <div>
+                <x-employer-logo :width="100" />
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+                <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">Video Producer</h3>
+                <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+            </div>
+
+            <div class="">
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+                <x-tag>Tag</x-tag>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+MESMA COISA NO JOB-CARD NORMAL:
+
+
+
+
+
+
+
+
+
+
+
+        <div class="p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600 transition-colors duration-500">
+            <div class="self-start text-sm">Laracasts</div>
+
+            <div class="py-8">
+                <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">Video Producer</h3>
+                <p class="text-sm mt-4">Full Time - from $100,000</p>
+            </div>
+
+            <div class="flex justify-between items-center mt-auto">
+                <div>
+                    <x-tag>Tag1</x-tag>
+                    <x-tag>Tag2</x-tag>
+                    <x-tag>Tag3</x-tag>
+                </div>
+
+                <x-employer-logo :width="42" />
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+O QUE FALTOU?
+
+
+
+
+
+
+
+
+
+
+
+
+
+'IN A REAL APP, WE COULD HAVE MANY CARDS, WITH THIS SAME STYLING...''
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR PEGA O WRAPPER DOS 
+    CARDS, E COLOCA EM UM COMPONENT PRÓPRIO, CHAMADO DE 'panel.blade.php'...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+                <x-panel class="flex flex-col text-center">
+                    <div class="self-start text-sm">Laracasts</div>
+
+                    <div class="py-8">
+                        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">Video Producer</h3>
+                        <p class="text-sm mt-4">Full Time - from $100,000</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-auto">
+                        <div>
+                            <x-tag>Tag1</x-tag>
+                            <x-tag>Tag2</x-tag>
+                            <x-tag>Tag3</x-tag>
+                        </div>
+
+                        <x-employer-logo :width="42" />
+                    </div>
+                </x-panel>
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+(panel.blade.php):
+
+
+
+
+
+
+<div {{ $attributes->merge(['class' => 'p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600 transition-colors duration-500'])}}>
+    {{ $slot }}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+    <x-panel class="flex gap-x-6">
+        <div>
+            <x-employer-logo :width="100" />
+        </div>
+
+        <div class="flex-1 flex flex-col">
+            <a href="#" class="self-start text-sm text-gray-400">Laracasts</a>
+            <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">Video Producer</h3>
+            <p class="text-sm text-gray-400 mt-auto">Full Time - From $60,000</p>
+        </div>
+
+        <div class="">
+            <x-tag>Tag</x-tag>
+            <x-tag>Tag</x-tag>
+            <x-tag>Tag</x-tag>
+        </div>
+    </x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR FALA DISTO:
+
+
+
+
+
+
+
+<div {{ $attributes->merge(['class' => 'p-4 bg-white/5 rounded-xl flex flex-col text-center border border-transparent group hover:border-blue-600 transition-colors duration-500'])}}>
+    {{ $slot }}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO PQ, ATÉ AGORA, NÓS SEMPRE RODAMOS 
+
+'$attributes->merge()',
+
+
+
+PARA ENTÃO MERGEAR COISAS COMO 'CLASS', 'VALUE', ETC ETC....
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS O PROFESSOR, AGORA, NOS 
+MOSTRA 1 SHORTHAND PARA ISSO..
+
+
+
+
+
+EM VEZ DE ESCREVER 'attributes->merge()',
+
+
+
+PODEMOS ESCREVER '$attributes([])'... É EXATAMENTE A MESMA COISA...
+
+
+
+( ou seja, omitir o '->merge([])')....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR APONTA QUE PODERÍAMOS TAMBÉM USAR A DIRECTIVE DE 
+
+
+
+
+'@php 
+
+$classes = 'dasdssakdapskapokdas';
+
+@endphp 
+
+
+
+<div {{ $attributes(['class' => $classes ])}}>
+    {{ $slot}}
+</div>
+
+
+
+
+
+
+
+
+
+
+OK... AGORA TEREMOS A EXATA MESMA COISA DE ANTES,
+
+
+MAS AGORA 
+
+COM TUDO CONSOLIDADO DENTRO DE ESSE COMPONENT DE 'PANEL'...
+
+
+
+
+
+
+
+
+
+COM ISSO, PODEMOS USAR ESSES PANELS PARA OUTRAS COISAS, SE QUISERMOS,
+
+TIPO ASSIM:
+
+
+
+
+
+<x-panel>
+    <h5>Hello there!</h5>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... AGORA AS TAGS ESTÃO MT PEQUENAS...
+
+
+
+
+
+
+
+
+-> TEMOS QUE FAZER AS TAGS SEREM CONFIGURABLE...
+
+
+
+
+
+
+
+-->  AS TAGS ESTÃO FINE DENTRO DE CADA JOB CARD,
+
+MAS NÃO ESTÃO FINE NO LADO DE FORA..
+
+
+
+
+
+
+
+
+
+-> POR ISSO COLOCAREMOS 1 PROP EM 'tag.blade.php',
+
+
+DE NOME 'size'...
+
+
+
+
+
+
+
+-> O VALUE DEFAULT SERÁ 'base'...
+
+
+
+
+
+
+
+-> AÍ PODEMOS USAR A DIRECTIVE DE '@php',
+
+PARA ALTERAR O SIZE, DE ACORDO COM O PROP RECEBIDO,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@props(['size' => 'base'])
+
+
+@php
+
+if ($size === 'base') {
+    $classes = 'px-3 py-1 rounded-xl text-2xs';
+}
+
+if ($size === 'small') {
+    $classes = 'px-2 py-1 rounded-xl text-xs';
+}
+
+@endphp
+
+
+<a class="bg-white/10 hover:bg-white/25 px-3 py-1 rounded-xl text-2xs transition-colors duration-300" href="#">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+ok...
+
+
+
+
+
+
+
+
+MAS O PROFESSOR ESCREVE DE MANEIRA DIFERENTE... TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+@props(['size' => 'base'])
+
+
+@php
+
+$classes = 'bg-white/10 hover:bg-white/25 px-3 py-1 rounded-xl transition-colors duration-300';
+
+if ($size === 'base') {
+$classes .= ' px-5 py-1 text-sm';
+}
+
+if ($size === 'small') {
+$classes .= ' px-3 py-1 text-2xs';
+}
+
+@endphp
+
+
+<a href="#" class="{{ $classes }}">{{ $slot }}</a>
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+AGORA SÓ PRECISAMOS REFERENCIAR ISSO, NOS CALLS DOS COMPONENTS...
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+                <x-panel class="flex flex-col text-center">
+                    <div class="self-start text-sm">Laracasts</div>
+
+                    <div class="py-8">
+                        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">Video Producer</h3>
+                        <p class="text-sm mt-4">Full Time - from $100,000</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-auto">
+                        <div>
+                            <x-tag size="small">Tag1</x-tag>
+                            <x-tag size="small">Tag2</x-tag>
+                            <x-tag size="small">Tag3</x-tag>
+                        </div>
+
+                        <x-employer-logo :width="42" />
+                    </div>
+                </x-panel>
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+AGORA TEMOS SMALL E LARGE TAGS, BASICAMENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR AGORA QUER ESTILIZAR A FORM...
+
+
+
+
+
+
+VAMOS ATÉ O 'welcome.blade.php'...
+
+
+
+
+
+
+
+-> SERÁ UMA NOVA SECTION, NO TOPO:
+
+
+
+
+
+
+        <section>
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="">
+                <input type="text" placeholder="Web Developer..." class="">
+
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COLOCAMOS UNS STYLES ASSIM:
+
+
+
+
+
+        <section>
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="">
+                <input type="text" placeholder="Web Developer..." class="rounded-xl bg-white/5 border border-white/10 px-5 py-4">
+
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+aí alinhamos isso ao centro,
+
+com 'text-center'...
+
+
+
+
+
+
+
+
+
+
+TAMBÉM DEIXAMOS A WIDTH DO INPUT COMO 'FULL':
+
+
+
+
+
+        <section class="text-center">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="">
+                <input type="text" placeholder="Web Developer..." class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full">
+            </form>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+    -> 
+
+            <section class="text-center">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..." class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full">
+            </form>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+AÍ COLOCAMOS UMA MAX-WIDTH...
+
+
+
+
+
+
+COLOCAMOS 'max-w-xl'...
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+        <section class="text-center">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..." class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full max-w-xl">
+            </form>
+        </section>
+
+
+
+
+
+
+
+TAMBÉM UMA PADDING TOP DE 10...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... TERMINAMOS:
+
+
+
+
+
+
+
+
+<x-layout>
+    <div class="space-y-10">
+
+        <section class="text-center pt-6">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..." class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full max-w-xl">
+            </form>
+        </section>
+
+        <section class="pt-10">
+            <x-section-heading>Featured Jobs</x-section-heading>
+
+            <div class="mt-6 grid lg:grid-cols-3 gap-8">
+                <x-job-card />
+                <x-job-card />
+                <x-job-card />
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Tags</x-section-heading>
+            <div class="mt-6 space-x-1">
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag1</x-tag>
+                <x-tag>Tag2</x-tag>
+                <x-tag>Tag3</x-tag>
+                <x-tag>Tag4</x-tag>
+            </div>
+        </section>
+
+        <section>
+            <x-section-heading>Recent Jobs</x-section-heading>
+            <div class="mt-6 space-y-6">
+                <x-job-card-wide />
+                <x-job-card-wide />
+                <x-job-card-wide />
+            </div>
+        </section>
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+NO PRÓXIMO VIDEO, CONSTRUÍREMOS TODA ARCHITECTURE...
