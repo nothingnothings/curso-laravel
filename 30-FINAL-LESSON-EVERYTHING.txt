@@ -20,3 +20,2952 @@ QUE DEVEMOS BAIXAR DO REPOSITORY...
 
 
 certo... já preparei o código...
+
+
+
+
+
+
+
+-> VAMOS FAZER AUTH....
+
+
+
+
+
+
+
+
+
+--> LÁ NO ARQUIVO 'web.php',
+
+
+VAMOS SETTAR TODAS AS ROUTES NECESSÁRIAS...
+
+
+
+
+ESCREVEMOS TIPO ASSIM:
+
+
+Route::get('/register', [RegisteredUserController, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+
+
+
+
+
+
+OU SEJA, ESCREVEMOS DE ACORDO COM O QUE APRENDEMOS,
+
+NAS ÚLTIMAS AULAS...
+
+
+
+
+
+EX:
+
+
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+
+
+
+será a action de 'create'
+
+
+PQ ESTAREMOS 'CREATING A NEW SESSION'...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+<?php
+
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\JobController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [JobController::class, 'index'])->name('home');
+
+
+
+Route::get('/register', [RegisteredUserController, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store']);
+Route::delete('/logout', [SessionController::class, 'destroy']);
+
+
+
+
+
+
+
+
+
+
+
+OK... AGORA DEVEMOS CRIAR ESSES CONTROLLERS...
+
+
+
+
+
+
+
+
+
+
+
+
+
+---> O PROFESSOR ENTÃO CRIA OS CONTROLLERS...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+php artisan make:controller SessionController  
+
+
+
+
+
+
+
+
+NÓS TAMBÉM COLOCAMOS '--resource' ao final,
+
+para 
+
+
+'CREATE A RESOURCE FOR IT'....
+
+
+
+
+EX:
+
+
+
+  -r, --resource        Indicates if the generated controller should be a resource controller
+
+
+
+
+
+
+FAZEMOS A MESMA COISA, MAS 
+
+
+COM O RegisteredUserController também...
+
+
+
+
+
+
+
+
+
+O CÓDIGO FICOU ASSIM:
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+VAMOS COMEÇAR COM OS METHODS DE REGISTRATION...
+
+
+
+
+
+
+-> O CREATE VAI CARREGAR 
+
+auth.register:
+
+
+
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+
+        return view('auth.register');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> certo... aí devemos escrever o código de markup,
+
+tipo assim:
+
+
+
+
+
+
+<x-layout>
+    <h1 class="font-bold text-center text-4xl mb-8">Register</h1>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+ESSA SERÁ UMA 'STANDARD PAGE HEADING',
+
+
+
+por isso faz sentido colocá-la em 1 component próprio,
+
+
+
+tipo 
+
+
+
+
+'page-heading.blade.php'
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+    <h1 class="font-bold text-center text-4xl mb-8">{{ $slot }}</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ, NO REGISTER.BLADE.PHP,
+
+
+escrevemos assim:
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+OK... AGORA O PROFESSOR VAI USAR OS COMPONENTS QUE ELE JÁ HAVIA 
+PREPARADO,
+
+DENTRO DE 
+
+
+'resources>views>components>forms'...
+
+
+
+
+
+
+
+
+
+A VIEW DE 'FORM' É ESTA:
+
+
+
+
+
+
+
+<form {{ $attributes(["class" => "max-w-2xl mx-auto space-y-6", "method" => "GET"]) }}>
+    @if ($attributes->get('method', 'GET') !== 'GET')
+        @csrf
+        @method($attributes->get('method'))
+    @endif
+
+    {{ $slot }}
+</form>
+
+
+
+
+
+
+
+
+ISSO VAI CRIAR 1 FORM...
+
+
+
+
+
+E ELE TAMBÉM HANDLA O ADD DO '@csrf' 
+field 
+
+
+e do FIELD DE 'method',
+
+também...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''NOTICE THAT IT DEFAULTS TO A METHOD OF 
+    GET... BUT IF WE CHANGE IT TO A POST/PUT,
+    IT KNOWS THAT WE ALWAYS NEED TO 
+    INCLUDE 
+
+    THE @csrf 
+        and 
+        @method''...
+
+
+
+
+    
+
+
+O FIELD, POR SUA VEZ, FICOU ASSIM:
+
+
+
+
+
+
+
+
+
+@props(['label', 'name'])
+
+<div>
+    @if ($label)
+        <x-forms.label :$name :$label />
+    @endif
+
+    <div class="mt-1">
+        {{ $slot }}
+
+        <x-forms.error :error="$errors->first($name)" />
+    </div>
+</div>
+
+
+
+CONTÉM O LABEL,
+
+CONTÉM O INPUT EM SI,
+
+
+E CONTÉM 1 ERROR...
+
+
+
+
+JÁ VIMOS ISSO, MUITAS VEZES...
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR DÁ OUTRA DICA:
+
+
+
+''WHENEVER YOU ARE REFERENCING A COMPONENT 
+FROM WITHIN A DIRECTORY,
+YOU NEED 
+
+TO ADD "x-<directory_name>.<component_name>"',,
+
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+K... ISSO FAZ SENTIDO...
+
+
+COLOCAMOS MAIS UM, AGORA 
+
+
+PARA O EMAIL:
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+-> TEREMOS MAIS 2,
+
+
+
+PARA O PASSWORD E PARA O CONFIRM PASSWORD...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+SEMPRE DEIXE O NOME DO PASSWORD CONFIRM COMO 'password_confirmation'...
+
+
+
+
+
+
+
+
+
+
+
+NO FINAL DA FORM, COLOCAMOS O BUTTON...
+
+
+
+
+
+x-forms.button...
+
+
+
+
+
+
+
+--> TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
+
+
+        <x-forms.button>Create Account</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+MAS FICAMOS SEM PADDING, NO FINAL DA PAGE...
+
+
+
+
+
+
+
+PODEMOS ADICIONAR PADDING NO BODY,
+
+COM 'pb-20',
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white font-hanken-grotesk pb-20">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+
+
+''WHEN YOU REGISTER, YOU ALSO NEED TO CREATE AN EMPLOYER...''
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR 
+    ADICIONA UM COMPONENT 
+
+    CHAMADO DE 'x-forms.divider',
+
+
+
+
+
+QUE VAI ADICIONAR 1 LINHA (tipo uma div)...
+
+
+
+
+
+
+EX:
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
+
+        <x-forms.divider />
+
+        <x-forms.button>Create Account</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+ISSO FEITO,
+
+VAMOS ADICIONAR OUTROS INPUT FIELDS,
+
+
+DESSA VEZ PARA O EMPLOYER...
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
+
+        <x-forms.divider />
+
+        <x-forms.input label="Employer Name" name="employer" />
+        <x-forms.input label="Employer Logo" name="logo" type="file" />
+
+        <x-forms.button>Create Account</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+O LOGO SERÁ UM INPUT DE TYPE 'file',
+
+
+por isso deixamos 
+
+'type=file'...
+
+
+
+
+
+-> O COMPONENT INPUT.BLADE.PHP 
+
+tem este formato:
+
+
+
+
+
+
+@props(['label', 'name'])
+
+@php
+    $defaults = [
+        'type' => 'text',
+        'id' => $name,
+        'name' => $name,
+        'class' => 'rounded-xl bg-white/10 border border-white/10 px-5 py-4 w-full',
+        'value' => old($name)
+    ];
+@endphp
+
+<x-forms.field :$label :$name>
+    <input {{ $attributes($defaults) }}>
+</x-forms.field>
+
+
+
+
+
+
+
+
+
+COMO VC PODE VER,
+QUAISQUER ATTRIBUTES QUE PROVIDENCIAMOS, 
+
+a esse component,
+
+são mergeados nele,
+
+
+com 
+'' {{ $attributes($defaults) }} ''
+
+
+
+
+
+
+
+
+É ASSIM QUE ATTRIBUTES FUNCIONAM, PORTANTO...
+
+
+
+
+
+A ÚNICA COISA DIFERENTE QUE O PROFESSOR ESTÁ FAZENDO,
+AQUI,
+
+É DEIXAR OS DEFAULTS EM 1 ARRAY, naquela directive de 
+
+@php @endphp, 
+
+
+PARA DEIXAR MAIS LEGÍVEL... É UM BOM APPROACH A SER 
+SEGUIDO...
+
+
+
+
+
+
+
+
+
+CERTO... 
+
+
+
+PRÓXIMO PASSO:
+
+
+
+
+
+''EVERY TIME YOU HAVE A FILE UPLOAD,
+
+WITH A INPUT THAT ACCEPTS A FILE UPLOAD,
+
+ON THE FORM TAG ITSELF, YOU NEED TO SET 
+
+'enctype="multipart/form-data"',
+
+
+
+which sets how it should be encoded...
+
+
+it is standard HTML...
+
+
+
+ex:
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Register</x-page-heading>
+    <x-forms.form method="POST" action="/register" enctype="multipart/form-data">
+        <x-forms.input label="Name" name="name" />
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
+
+        <x-forms.divider />
+
+        <x-forms.input label="Employer Name" name="employer" />
+        <x-forms.input label="Employer Logo" name="logo" type="file" />
+
+        <x-forms.button>Create Account</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK.... LÁ NO CONTROLLER DE 'RegisteredUserController',
+
+
+TEMOS O METHOD DE 'store',
+
+QUE VAI SER DISPARADO COM O POST DE CREATE ACCOUNT:
+
+
+
+
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+
+        return view('auth.register');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR RODA 1 
+
+'dd()',
+
+DUMP AND DIE,
+
+DE TODA A REQUEST DATA...
+
+
+
+
+-> ele escreve 
+
+
+dd($request->all());
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        dd($request->all()); // * examine all the request data
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+COM ISSO, PREENCHEMOS A FORM,
+
+E EXAMINAMOS A DATA QUE É ENVIADA...
+
+
+
+
+
+
+
+OK... FICAMOS COM TODOS ATTRIBUTES:
+
+
+
+
+_token 
+_method 
+name 
+email 
+password 
+password_confirmation
+employer 
+logo 
+
+
+
+
+
+
+
+
+SE INSPECIONAMOS O 'logo',
+
+
+PERCEBEMOS QUE 
+
+ELE SERÁ CONVERTIDO 
+
+EM 1 INSTANCE 
+
+
+
+DE UMA CLASS 'UploadedFile',
+
+
+QUE É PROVIDENCIADA 
+
+PELO LARAVEL...
+
+
+
+
+
+
+--> ESSA CLASS VAI DEIXAR O STORE 
+    DE ESSA IMAGE O MAIS FÁCIL POSSÍVEL...
+
+
+    EM QUALQUER LUGAR 
+
+    (publically available, ou amazon S3, coisas assim)...
+
+
+
+
+
+
+
+
+
+
+--> OK...
+
+
+
+
+
+
+
+-> AGORA, NO CASO,
+
+
+
+VAMOS USAR 
+
+'$request',
+
+
+
+
+e aí 
+
+vamos validate()'...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+            'employer' => 'required|string|max:255',
+            'logo' => 'required|image|max:2048',
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+TEMOS VALIDATION PARA:
+
+1) A PARTE DOS INPUTS DO USER 
+
+
+2) A PARTE DO EMPLOYER...
+
+
+
+
+
+
+
+--> PARA ORGANIZAR TUDO ISSO, TEMOS 2 OPÇÕES:
+
+1) GROUP IT ALL TOGETHER (como estamos fazendo agora)
+
+
+2) SEPARATE THEM,
+
+
+    ARMAZENANDO ELES EM 2 VARIABLES,
+
+    TIPO ASSIM:
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer_name' => 'required|string|max:255',
+            'logo' => 'required|image',
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+    CERTO...
+
+
+
+
+
+
+MAS, PARA OS employerAttributes,
+
+QUEREMOS QUE A IMAGE SEJA ALGUNS TIPOS ESPECÍFICOS 
+
+DE FILES,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer_name' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK, MAS PQ O PROFESSOR SPLITTOU TUDO ISSO?
+
+
+
+
+É PQ 
+
+AÍ PODEMOS 
+
+
+DIRECIONAR CADA 1 DESSES CONJUNTOS DE ATTRIBUTES 
+
+
+A OBJECT CREATIONS DIFERENTES,
+
+TIPO ASSIM:
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer_name' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+        $user =  User::create($userAttributes);
+        $user->employer()->create($employerAttributes);
+
+        Auth::login($user);
+    }
+
+
+
+
+
+
+
+
+    ISSO VAI SETTAR O 'employer_id'
+
+
+    como sendo o user_id,
+
+    automaticamente...
+
+
+
+
+
+
+
+
+
+
+
+E ISSO FUNCIONARIA, NORMALMENTE...
+
+
+
+
+
+entretanto, aqui, 
+
+TEMOS QUE FAZER 1 POUCO DE WORK, ANTES,
+
+
+
+
+COM O 'LOGO'...
+
+
+
+
+--> TEMOS QUE 
+
+
+'STORE THE LOGO IN A PROPER LOCATION'... E, DEPOIS DISSO,
+
+
+PEGAR O 'STORED PATH'
+
+
+
+E COLOCAR DENTRO DA TABLE DE 'employers',
+
+
+
+na column de 'logo'...
+
+
+
+
+
+
+
+
+
+
+-> OK, MAS COMO PODEMOS FAZER ISSO?
+
+
+
+
+
+
+
+
+''IF YOU REMEMBER IT, 
+    THE LOGO FIELD, WHEN SENT,
+
+    ACTUALLY GETS CONVERTED INTO AN INSTANCE 
+
+    OF THE CLASS 'UploadedFile', from LARAVEL...''
+
+
+
+
+
+''AND THAT IS REALLY COOL, BECAUSE WE HAVE __ SOME 
+BEHAVIOR_ ON THAT CLASS''...
+
+
+
+
+-> NO CASO,
+
+
+PODEMOS USAR O METHOD DE '->store()',
+
+
+
+DENTRO DE ESSE 'UploadedFile' (representado por 'logo'),
+
+
+PARA FAZER O STORE DE ESSA IMAGE,
+
+
+''IN WHATEVER PLACE IT NEEDS TO GO''...
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+        // '->store()' is a method that exists inside of 'UploadedFile' class
+        $request->logo->store('logos'); // * This allows us to store the file in whatever place we want (s3, storage, other services, etc)
+
+
+
+
+
+
+
+
+
+
+
+AQUI, NO CASO,
+
+
+VAMOS ARMAZENAR ESSAS FILES 
+DENTRO DE 1 FOLDER CHAMADO DE 'logos'...
+
+
+
+
+
+
+
+
+
+
+
+-> PARA SABER MAIS SOBRE ISSO, VC DEVE ABRIR O ARQUIVO 
+
+'filesystems.php',
+
+
+DENTRO DO FOLDER DE 'config'...
+
+
+
+
+ELA TEM ESTE CÓDIGO:
+
+
+
+
+
+
+
+
+
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default filesystem disk that should be used
+    | by the framework. The "local" disk, as well as a variety of cloud
+    | based disks are available to your application for file storage.
+    |
+    */
+
+    'default' => env('FILESYSTEM_DISK', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filesystem Disks
+    |--------------------------------------------------------------------------
+    |
+    | Below you may configure as many filesystem disks as necessary, and you
+    | may even configure multiple disks for the same driver. Examples for
+    | most supported storage drivers are configured here for reference.
+    |
+    | Supported drivers: "local", "ftp", "sftp", "s3"
+    |
+    */
+
+    'disks' => [
+
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => true,
+            'throw' => false,
+        ],
+
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        's3' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Symbolic Links
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the symbolic links that will be created when the
+    | `storage:link` Artisan command is executed. The array keys should be
+    | the locations of the links and the values should be their targets.
+    |
+    */
+
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
+    ],
+
+];
+
+
+
+
+
+
+
+
+
+
+É AQUI QUE DECLARAMOS SE QUEREMOS ARMAZENAR 
+
+AS FILES LOCALMENTE,
+
+
+OU COM FTP,
+
+
+OU COM SFTP,
+
+S3...
+
+
+
+
+
+
+
+
+as settings para cada 1 das options/drivers são essas:
+
+
+
+
+
+
+   'disks' => [
+
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => true,
+            'throw' => false,
+        ],
+
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        's3' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+        ],
+
+    ],
+
+
+
+
+
+
+
+
+
+
+NO NOSSO CASO, QUEREMOS QUE AS IMAGES/LOGOS 
+
+
+
+SEJAM 
+
+
+'PUBLICALLY ACESSIBLE AVATARS',
+
+
+
+
+por isso 
+
+
+
+
+
+VAMOS QUERER USAR 
+
+o de public:
+
+
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+
+
+
+
+
+
+--> CERTO....
+
+
+
+
+
+
+PARA ISSO,
+
+VAMOS ATÉ O NOSSO ARQUIVO '.env',
+
+
+
+
+E AÍ MUDAMOS O VALUE 
+
+
+DE 
+
+
+'FILESYSTEM_DISK'...
+
+
+
+TROCAMOS ISTO:
+
+
+
+
+
+FILESYSTEM_DISK=local
+
+
+
+POR ISTO:
+
+
+
+FILESYSTEM_DISK=public
+
+
+
+
+
+
+
+
+
+
+
+
+OK... E ERA ISSO, BASICAMENTE...
+
+
+
+
+
+
+
+
+
+
+QUANDO UPLOADARMOS A IMAGE,
+ELA SERÁ SALVA DENTRO DE 
+
+
+
+
+storage>app>public...
+
+
+
+
+
+
+
+--> DENTRO DALI,
+
+SERÁ CRIADO O FOLDER DE 'logos'..
+
+
+
+
+
+
+ex:
+
+storage>app>public>logos><your-image-identifier>...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+-> AÍ CRIAREMOS 1 SYMBOLIC LINK,
+ATÉ AQUI,
+
+
+LÁ DO 'public directory',
+
+
+TUDO PARA QUE 
+
+
+AS PESSOAS CONSIGAM VISUALIZAR 
+
+ESSAS IMAGES, PUBLICAMENTE...
+
+
+
+
+
+
+
+
+
+OK, MAS COMO PODEMOS PEGAR ESSE PATH?
+
+
+
+
+
+
+
+
+-> depois que a image é salva,
+
+
+
+com 
+
+$request->logo->store('logos'),
+
+
+
+
+PODEMOS ARMAZENAR ISSO EM 1 VARIABLE DE 
+
+
+'$logoPath'...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer_name' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+        $user =  User::create($userAttributes);
+
+        // '->store()' is a method that exists inside of 'UploadedFile' class
+        $logoPath =  $request->logo->store('logos'); // * This allows us to store the file in whatever place we want (s3, storage, other services, etc). It will return us the path to the file that was stored.
+
+
+        $user->employer()->create($employerAttributes);
+
+        Auth::login($user);
+    }
+
+
+
+
+
+
+
+
+--> FINALMENTE,
+
+PODEMOS PEGAR ESSE PATH E PASSÁ-LO 
+
+
+COMO VALUE DE 'logo',
+
+dentro 
+
+
+do 'create()' do employer,
+
+tipo assim:
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer_name' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+        $user =  User::create($userAttributes);
+
+        // '->store()' is a method that exists inside of 'UploadedFile' class
+        $logoPath =  $request->logo->store('logos'); // * This allows us to store the file in whatever place we want (s3, storage, other services, etc). It will return us the path to the file that was stored.
+
+
+        $user->employer()->create([
+            'name' => $employerAttributes['employer_name'],
+            'logo' => $logoPath
+        ]);
+
+        Auth::login($user);
+    }
+
+
+
+
+
+
+    CERTO...
+
+
+
+    RESUMINDO:
+
+
+
+
+
+
+1) VALIDATE ALL THE INPUTS 
+
+
+2) CREATE THE USER 
+
+
+3) STORE THE LOGO 
+
+
+4) GET THE LOGO PATH 
+
+
+5) CREATE THE EMPLOYER, WITH THE LOGO 
+
+
+6) LOG THE USER IN, WITH THE USER OBJECT...
+
+
+7) REDIRECT TO THE HOMEPAGE...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+ /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+        $user =  User::create($userAttributes);
+
+        // '->store()' is a method that exists inside of 'UploadedFile' class
+        $logoPath =  $request->logo->store('logos'); // * This allows us to store the file in whatever place we want (s3, storage, other services, etc). It will return us the path to the file that was stored.
+
+
+        $user->employer()->create([
+            'name' => $employerAttributes['employer'],
+            'logo' => $logoPath
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/');
+    }
+
+
+
+
+
+
+
+
+
+O PROFESSOR REMOVE O RESTO DOS METHODS,
+
+
+PQ SÓ PRECISAMOS DO 'create' e do 'store',
+
+para a parte de CREATE ACCOUNT, do app...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Employer;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Password;
+
+class RegisteredUserController extends Controller
+{
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all()); // * examine all the request data
+
+        $userAttributes =   $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'password_confirmation' => 'required|min:8',
+
+        ]);
+
+        $employerAttributes = $request->validate([
+            'employer' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+        $user =  User::create($userAttributes);
+
+        // '->store()' is a method that exists inside of 'UploadedFile' class
+        $logoPath =  $request->logo->store('logos'); // * This allows us to store the file in whatever place we want (s3, storage, other services, etc). It will return us the path to the file that was stored.
+
+
+        $user->employer()->create([
+            'name' => $employerAttributes['employer'],
+            'logo' => $logoPath
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/');
+    }
+}
+
+
+
+
+
+
+MAS FICAMOS COM 1 ERROR...
+
+
+VAMOS ATÉ O RegisteredUserController:
+
+
+
+
+ERA ESTE O PROBLEMA:
+
+
+        $employerAttributes = $request->validate([
+            'employer' => 'required|string|max:255',
+            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])],
+        ]);
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK...
+
+
+
+
+
+
+
+
+
+
+-> AGORA VEREMOS LOGIN E LOGOUT...
+
+
+
+
+
+
+
+
+
+-> VAMOS NO SessionController,
+
+
+E AÍ ESCREVEMOS ASSIM:
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SessionController extends Controller
+{
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('auth.login');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+aí criamos essa view,
+
+de 'login.blade.php'...
+
+
+
+
+
+
+--> COPIAMOS O CÓDIGO DE 'register.blade.php',
+
+
+PARA ACELERAR O PROCESSO:
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Login</x-page-heading>
+    <x-forms.form method="POST" action="/login">
+        <x-forms.input label="Email" name="email" type="email" />
+        <x-forms.input label="Password" name="password" type="password" />
+        <x-forms.button>Log In</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... NO SESSION CONTROLLER,
+
+
+
+ESCREVEMOS A FUNCIONALIDADE DE 'STORE',
+
+
+QUE FAZ O ACTUAL LOGIN DO USER...
+
+
+
+
+
+
+
+
+-> COPIAMOS O CÓDIGO DA AULA DE AUTH,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $attributes = request()->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (! Auth::attempt($attributes)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        request()->session()->regenerate();
+
+        return redirect('/');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+FINALMENTE, COM O DESTROY (logout),
+
+escrevemos assim:
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $attributes = request()->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (! Auth::attempt($attributes)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        request()->session()->regenerate();
+
+        return redirect('/');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        Auth::logout();
+
+        return redirect('/');
+    }
+
+
+
+
+
+
+
+
+
+
+
+ISSO TUDO NOS SALVA BASTANTE TEMPO...
+
+
+
+
+
+
+
+
+--> COM ISSO, CONSEGUIMOS FAZER LOGIN...
+
+
+
+
+
+
+
+
+
+
+--> MAS, SE TENTAMOS ENTRAR NA PAGE DE LOGIN 
+
+DEPOIS DE ESTARMOS LOGGED IN,
+
+
+AINDA CONSEGUIMOS ENTRAR...
+
+
+
+
+
+
+
+-> É POR ISSO QUE PRECISAMOS ADICIONAR O MIDDLEWARE DE 
+'guest'
+a nossas routes,
+
+tipo assim:
+
+
+
+
+
+Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login');
+Route::post('/login', [SessionController::class, 'store'])->middleware('guest');
+Route::delete('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+PODEMOS USAR UM ROUTE GROUP,
+
+PARA DEIXAR AS COISAS MAIS ORGANIZADAS,
+
+TIPO ASSIM:
+
+
+
+
+<?php
+
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\SessionController;
+use Illuminate\Support\Facades\Route;
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/', [JobController::class, 'index'])->name('home');
+});
+
+
+
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/login', [SessionController::class, 'create'])->name('login');
+    Route::post('/login', [SessionController::class, 'store']);
+    Route::delete('/logout', [SessionController::class, 'destroy'])->name('logout');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+TAMBÉM PRECISAMOS TWEAKAR A NAVBAR....
+
+
+
+
+
+
+ATUALMENTE, ELA ESTÁ ASSIM:
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+<body class="bg-black text-white font-hanken-grotesk pb-20">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+            <a href="#">Post a Job</a>
+        </nav>
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+QUEREMOS VER AQUELE LINK DE 'POST A JOB'
+
+APENAS SE ESTIVERMOS AUTH....
+
+
+
+
+
+É POR ISSO QUE PODEMOS USAR A DIRECTIVE 
+
+'@auth',
+
+
+tipo assim:
+
+
+
+
+
+          @auth
+                <div>
+                    <a href="#">Post a Job</a>
+                </div>
+            @endauth
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+--> AÍ, DEPOIS DISSO, 
+
+O PROFESSOR COLOCA UMA 
+
+
+
+DIRECTIVE DE '@guest() @endguest',
+
+
+
+PARA FAZER SHOW DOS LINKS DE 'LOG IN' E ' REGISTER' 
+
+
+APENAS SE O CARA FOR 1 GUEST (não estiver logged in)...
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+            @auth
+                <div>
+                    <a href="/jobs/create">Post a Job</a>
+                </div>
+            @endauth
+
+            @guest
+                <div class="space-x-6 font-bold">
+                    <a href="/register">Sign Up</a>
+                    <a href="/login">Log in</a>
+                </div>
+            @endguest
+
+
+
+
+
+
+
+    CERTO...
+
+
+
+
+
+eX:
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+
+<body class="bg-black text-white font-hanken-grotesk pb-20">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+
+            @auth
+                <div>
+                    <a href="/jobs/create">Post a Job</a>
+                </div>
+            @endauth
+
+            @guest
+                <div class="space-x-6 font-bold">
+                    <a href="/register">Sign Up</a>
+                    <a href="/login">Log in</a>
+                </div>
+            @endguest
+        </nav>
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR QUER MEXER, AGORA, NA SEARCH BAR DO MEIO...
+
+
+
+
+
+
+
+
+ELE ENTRA EM 'jobs/index.blade.php',
+
+
+
+E TEMOS ISTO:
+
+
+
+
+
+        <section class="text-center pt-6">
+            <h1 class="font-bold text-4xl">Let's Find Your Next Job</h1>
+            <form action="" class="mt-6">
+                <input type="text" placeholder="Web Developer..."
+                    class="rounded-xl bg-white/5 border border-white/10 px-5 py-4 w-full max-w-xl">
+            </form>
+        </section>
+
+
+
+
+
+
+
+    
+
+
+--> MAS VAMOS SUBSTITUIR ISSO AÍ...
+
+
+TEREMOS, NO LUGAR DISSO,
+
+
+
+O COMPONENT 
+
+
+
+<x-forms.form></x-forms.form>
+
+
+NOVAMENTE...
+
+
+
+
+
+
+
+E ESSA FORM VAI FAZER UM GET REQUEST (o default)...
+
+
+
+
+
+-> MAS VAMOS ENVIAR ESSE GET REQUEST À ROUTE DE 
+'search'...
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+            <x-forms.form action="/search" class="mt-6">
+                <x-forms.input  :label="false" name="q" placeholder="Web Developer..." />
+            </x-forms.form>
+
+        
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+--> SE TENTAMOS DIGITAR ALGO NESSE INPUT FIELD
+
+    e apertamos enter,
+
+
+    ficamos com 404,
+
+
+    pq ainda não implementamos essa route...
+
+
+
+
+
+-> IMPLEMENTAMOS TIPO ASSIM, NAS ROUTEES:
+
+
+
+
+
+
+
+Route::get('/', [JobController::class, 'index'])->name('home');
+Route::get('/search', SearchController::class)->name('search');
+
+
+
+
+
+
+
+
+
+
+
+--> dessa vez,
+
+O PROFESSOR VAI  QUERER USAR UM 'INVOKABLE CONTROLLER'...
+
+
+
+
+
+
+
+
+INVOKABLE CONTROLLERS --> SÃO CONTROLLERS COM APENAS 
+                        1 ÚNICO METHOD/ACTION....
+
+
+
+
+                    --> NO CASO,
+
+                    VAMOS CRIAR O CONTROLLER 
+
+                    SearchController...
+
+
+                
+
+            --> podemos passar apenas o path à class 
+            em si,
+
+
+            que aí o magic method '__invoke'
+
+            VAI SER EXECUTADO, DENTRO DE ESSE CONTROLLER...
