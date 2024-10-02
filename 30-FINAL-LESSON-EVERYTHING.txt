@@ -2969,3 +2969,3715 @@ INVOKABLE CONTROLLERS --> SÃO CONTROLLERS COM APENAS
             que aí o magic method '__invoke'
 
             VAI SER EXECUTADO, DENTRO DE ESSE CONTROLLER...
+
+
+
+
+
+
+
+
+
+-> para isso, o professor escreve assim:
+
+
+
+
+
+
+
+
+
+
+php artisan make:controller SearchController 
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... PARA CRIAR 1 MAGIC METHOD DE '__invoke()',
+
+
+ESCREVEMOS ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SearchController extends Controller
+{
+     public function __invoke() {
+
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+        dd('asdasd');
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+ISSO É ÓTIMO PARA SITUATIONS EM QUE 1 CONTROLLER PRECISA TER APENAS 
+
+1 ÚNICA ACTION...
+
+
+
+
+
+
+
+-> CERTO...
+
+
+
+
+
+
+
+
+se digitamos no input field que dispara essa route,
+
+
+ficamos com esse print, do 'dd()'...
+
+
+
+
+
+
+
+
+
+
+o path, na nossa url,
+
+fica tipo assim:
+
+
+
+
+
+/search?q=asdjasksjdsakj
+
+
+
+
+
+
+
+
+
+
+ OK...
+
+
+
+
+
+
+
+
+
+ex:
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+        dd(request('q'));
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, TEMOS TODAS AS COISAS NECESSÁRIAS PARA FAZER 'SEARCH' 
+
+NA TABLE DE JOBS...
+
+
+
+
+
+
+
+
+
+
+-> NÃO VAMOS USAR FULL-TEXT SEARCH,
+NEM NADA DO GÊNERO...
+
+
+VAMOS USAR ALGO BEM PRIMITIVO,
+
+UM 'LIKE' search 
+
+
+
+
+
+
+-> ''SEARCH FOR ANY JOB '''LIKE''' this string''...
+
+
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use Illuminate\Http\Request;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+        // dd(request('q'));
+
+        Job::where('title', 'LIKE', '%' . request('q') . '%')->get();
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+OK... PORTANTO, ALGO BEM SIMPLES...
+
+
+
+
+
+
+
+-> AÍ VAMOS RETORNAR ISSO COMO JSON,
+
+
+COM ISTO:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+
+        $jobs = Job::where('title', 'LIKE', '%' . request('q') . '%')->get();
+
+        return $jobs; // Return the jobs, as JSON. 
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO FUNCIONOU...
+
+
+
+
+
+
+
+FICAMOS COM UM JSON OBJECT COMO:
+
+
+[
+    {
+        "id": 1,
+        "employer_id": ...,
+        "title": ddasdsda,
+        "salary: asas,
+        "location": dassdaasd,
+        "schedule":
+        "url": ...,
+        "featured": 0,
+        "created_at": dassad,
+        "updated_at": 
+    }
+]
+
+
+
+
+
+
+
+
+-> CERTO... AGORA APENAS PRECISAMOS RENDERIZAR 1 VIEW,
+
+PARA 'RENDER THESE RESULTS'...
+
+
+
+
+
+
+
+-> NO CASO, PODEMOS FAZER O RETURN DE UMA VIEW...
+
+
+
+
+
+
+
+
+-> UMA VIEW COMO 'results',
+
+EM QUE TEREMOS OS JOBS RELACIONADOS..
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+        // dd(request('q'));
+
+        $jobs = Job::where('title', 'LIKE', '%' . request('q') . '%')->get();
+
+        // return $jobs; // Return the jobs, as JSON.
+
+        return view('results', ['jobs' => $jobs]); // Return a view, with a list of jobs found.
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+ 
+
+
+
+ISSO FEITO,
+
+
+
+O PROFESSOR CRIA ESSA VIEW, TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>Results</x-page-heading>
+
+    <div class="space-y-6">
+        @foreach ($jobs as $job)
+        <x-job-card-wide :job="$job" />
+        @endforeach
+    </div>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+OK... VOLTAMOS AO BROWSER, REFRESHAMOS,
+
+E AÍ 
+
+
+
+
+
+ESSE SEARCH FUNCIONA...
+
+
+
+
+
+
+
+
+
+
+COM ISSO, UMA FORM PRIMITIVA DE SEARCH ESTÁ CONCLUÍDA....
+
+
+
+
+
+
+
+
+
+
+
+-> PODERÍAMOS ADICIONAR ISSO PARA TAGS, TAMBÉM...
+
+
+
+
+
+
+
+
+
+
+
+-> O PROFESSOR ENTÃO ADICIONA UMA NOVA ROUTE, PARA 'TAGGING',
+
+
+
+TIPO ASSIM:
+
+
+
+
+Route::get('/tags/{tag}', [TagController::class, 'index'])->name('tag');
+
+
+
+
+
+
+
+
+
+
+
+isso vai hittar esse controller de 'TagController',
+
+que criaremos agora, com 
+
+
+
+
+
+
+
+php artisan make:controller TagController...
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class TagController extends Controller
+{
+    //
+}
+
+
+
+
+
+
+
+
+
+
+
+ESSE SERÁ OUTRO INVOKABLE CONTROLLER (controller com apenas 1 único method)...
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use Illuminate\Http\Request;
+
+class TagController extends Controller
+{
+    public function __invoke() {
+        // dd(request('q'));
+
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA, 
+
+
+''WE WANT TO FIND ALL THE JOBS THAT ARE ASSOCIATED WITH A GIVEN TAG ID/TAG''...
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, PODEMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PODERÍAMOS ESCREVER ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use App\Models\Tag;
+
+class TagController extends Controller
+{
+    public function __invoke() {
+        // dd(request('q'));
+
+        // Find all jobs associated with the tag:
+        $jobs = Job::whereHas('tags', function (Tag $tag, $query) {
+            $query->where('name', $tag);
+        })->get();
+
+        return view('results', ['jobs' => $jobs]);
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... MAS AINDA NÃO TEMOS RELATION ALGUMA ENTRE 'tag' e 'job'...
+
+
+
+
+
+
+
+
+
+-> LÁ EM TAG, TEMOS ISTO:
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS PODEMOS EDITAR ISSO, E DEIXAR ASSIM:
+
+
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+    public function jobs(): BelongsToMany
+    {
+        return $this->belongsToMany(Job::class);
+    }
+}
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+AÍ, LÁ EM 'Jobs',
+
+
+
+FICA TIPO ASSIM:
+
+
+
+
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Job extends Model
+{
+    use HasFactory;
+
+
+    protected $guarded = [];
+
+    public function employer(): BelongsTo
+    {
+        return $this->belongsTo(Employer::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E ISSO REALMENTE FUNCIONA...
+
+
+
+
+
+DE VOLTA AO CONTROLLER DE 'TagController',
+
+
+QUEREMOS TER ACESSO AO MODEL DE 'Tag'...
+
+
+
+
+
+
+
+
+-> E PODEMOS FAZER ISSO, SIM, ATRAVÉS DE 'ROUTE MODEL BINDING'..
+
+
+
+
+
+
+
+
+-> BASTA ESCREVER ASSIM, EM '__invoke()':
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use App\Models\Tag;
+
+class TagController extends Controller
+{
+    public function __invoke(Tag $tag) {
+        // dd(request('q'));
+
+        // Find all jobs associated with the tag:
+        $jobs = Job::whereHas('tags', function ($query) use ($tag) {
+            $query->where('name', $tag);
+        })->get();
+
+        return view('results', ['jobs' => $jobs]);
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo...
+
+
+
+
+
+
+
+
+
+
+MAS ISSO NAO FUNCIONARIA...
+
+
+
+
+
+
+
+
+-> NÃO FUNCIONARIA PQ 
+
+
+
+
+O identifier, por default, 
+
+
+vai ser um ID... e não queremos um 
+
+ID,
+
+
+e sim queremos 
+
+
+
+o 'name' da tag...
+
+
+
+
+É POR ISSO QUE, LÁ NA ROUTE,
+
+
+
+DEIXAMOS TIPO ASSIM:
+
+
+
+
+
+Route::get('/tags/{tag:name}', [TagController::class])->name('tag');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ, NO METHOD DO CONTROLLER, PODEMOS SIMPLIFICAR ESTE CÓDIGO:
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use App\Models\Tag;
+
+class TagController extends Controller
+{
+    public function __invoke(Tag $tag) {
+        // dd(request('q'));
+
+        // Find all jobs associated with the tag:
+        $jobs = Job::whereHas('tags', function ($query) use ($tag) {
+            $query->where('name', $tag);
+        })->get();
+
+        return view('results', ['jobs' => $jobs]);
+     }
+}
+
+
+
+
+
+
+
+
+
+DEIXANDO ASSIM:
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+use App\Models\Tag;
+
+class TagController extends Controller
+{
+    public function __invoke(Tag $tag) {
+        // dd(request('q'));
+
+        // Find all jobs associated with the tag:
+        $jobs = $tag->jobs;
+
+        return view('results', ['jobs' => $jobs]);
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK... SE VOLTAMOS AO BROWSER,
+
+PODEMOS TESTAR ESSE SEARCH,
+
+
+
+
+USANDO URLS COMO ESTA:
+
+
+
+
+
+
+
+example-30.test/tags/some-title
+
+
+
+
+
+
+
+
+É CLARO QUE ISSO NÃO ENCONTRA COISA ALGUMA,
+
+
+
+MAS ISSO VAI REALMENTE FUNCIONAR,
+
+
+
+E 'WE ARE GOING TO GET ALL THE JOBS, ASSOCIATED     
+    WITH THAT PARTICULAR TAG''...
+
+
+
+
+
+
+
+
+
+-> CERTO... E QUEREMOS QUE ESSA ROUTE SEJA DISPARADA SEMPRE QUE CLICARMOS 
+
+EM ALGUMAS DAS TAGS DE NOSSOS JOBS...
+
+
+
+PQ ESSAS TAGS DEVEM SER CLICKABLE...
+
+
+
+
+
+
+
+
+MAS ISSO ESTÁ FUNCIONANDO....??
+
+
+
+
+
+
+
+
+
+SIM, JÁ ESTÁ....
+
+
+
+
+PQ AS NOSSAS TAGS POSSUEM ESTE FORMATO:
+
+
+
+
+
+
+<a href="/tags/{{ strtolower($tag->name) }}" class="{{ $classes }}">{{ $tag->name }}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+OK... 
+QUER DIZER QUE ESSA FEATURE DE SEARCH, POR TAGS,
+
+JÁ FUNCIOna.... na real, é tipo um FILTER por 1 tag... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+--> OK...MAS AINDA TEMOS QUE IMPLEMENTAR A FORM QUE 
+
+VAI 'POST' (store) um job...
+
+
+
+
+
+
+
+
+
+
+
+-> PODEMOS IMPLEMENTAR ISSO COMEÇANDO PELA ROUTE,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+Route::get('/jobs/create', [JobController::class, 'create'])->name('create-job');
+Route::post('/jobs/create', [JobController::class, 'store']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> É CLARO QUE ESSAS 2 ROUTES PRECISAM DE MIDDLEWARE,
+
+O MIDDLEWARE DE 'auth',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+<?php
+
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TagController;
+use Illuminate\Support\Facades\Route;
+
+
+Route::get('/', [JobController::class, 'index'])->name('home');
+
+Route::get('/jobs/create', [JobController::class, 'create'])->middleware('auth')->name('create-job');
+Route::post('/jobs/create', [JobController::class, 'store'])->middleware('auth');
+
+
+// * Both of these controllers are 'invokable controllers'.
+Route::get('/search', SearchController::class)->name('search');
+Route::get('/tags/{tag:name}', [TagController::class])->name('tag');
+
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/login', [SessionController::class, 'create'])->name('login');
+    Route::post('/login', [SessionController::class, 'store']);
+    Route::delete('/logout', [SessionController::class, 'destroy'])->name('logout');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+AÍ, NO CONTROLLER DE 'JobController':
+
+
+
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('jobs.create');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ CRIAMOS A VIEW PARA ISSO..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+--> AÍ PRECISAMOS DO COMPONENT 'x-forms.form',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form  method="POST" action="/jobs">
+
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ O PROFESSOR COLOCA VÁRIOS INPUT FIELDS,
+
+TIPO ASSIM:
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+O PRÓXIMO INPUT FIELD 
+
+
+SERÁ ''THE URL''...
+
+
+
+
+
+
+-> SERÁ A URL PARA ''VIEW THE ACTUAL 
+                        JOB PAGE, ON YOUR COMPANY'S WEBSITE''... 
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, QUANDO VC CRIA 1 JOB,
+
+
+VC PODE OPCIONALMENTE ADICIONAR ALGUMAS TAGS...
+
+
+
+
+
+-> SERÁ UMA COMMA SEPARATED LIST..
+
+
+
+
+
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+ISSO NÃO É 100% IDEAL, 
+
+MAS É BOM O SUFICIENTE...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VAMOS CONVERTER ESSA LISTA, COM COMMAS,
+
+
+EM TAGS SEPARADAS...
+
+
+
+
+
+
+
+
+
+-> DEPOIS DISSO,
+
+COLOCAMOS 1 JOB,
+
+PARA PUBLISH O JOB..
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+
+        <x-forms.button>Publish</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+DEPOIS DISSO, O PROFESSOR INTRODUZ UM OUTRO FIELD,
+
+
+FIELD DE SELECT,
+
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+
+        <x-forms.select label="Schedule" name="schedule">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+        </x-forms.select>
+
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+        <x-forms.button>Publish</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+MAIS PARA BAIXO, ADICIONAMOS UM ELEMENTO 'checkbox', USADO PARA 'featured':
+
+
+
+
+
+
+
+ 
+
+
+ <x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+
+        <x-forms.select label="Schedule" name="schedule">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+        </x-forms.select>
+
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.checkbox name="featured" label="Featured (Extra Cost)" />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+        <x-forms.button>Publish</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+
+        <x-forms.select label="Schedule" name="schedule">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+        </x-forms.select>
+
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.checkbox name="featured" label="Featured (Extra Cost)" />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+        <x-forms.button>Publish</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+OK... 
+
+
+
+
+O PROFESSOR ADICIONA UM DIVIDER,
+
+PARA DIVIDIR OS MAIN FIELDS 
+
+
+DOS FIELDS OPCIONAIS (tags):
+
+
+
+
+
+
+
+<x-layout>
+    <x-page-heading>New Job</x-page-heading>
+
+    <x-forms.form method="POST" action="/jobs">
+        <x-forms.input name="title" label="Title" placeholder="CEO" />
+        <x-forms.input name="Salary" label="salary" placeholder="$90,000 USD" />
+        <x-forms.input name="Location" label="location" placeholder="Winter Park, Florida" />
+        <x-forms.select label="Schedule" name="schedule">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+        </x-forms.select>
+        <x-forms.input name="url" label="URL" placeholder="https://acme.com/jobs/ceo-wanted" />
+        <x-forms.checkbox name="featured" label="Featured (Extra Cost)" />
+        <x-forms.divider />
+        <x-forms.input name="tags" label="Tags (comma separated)" placeholder="music, video, education" />
+        <x-forms.button>Publish</x-forms.button>
+    </x-forms.form>
+</x-layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ISSO VAI FAZER 1 POST REQUEST à ROUTE 
+
+
+
+DE POST...
+
+
+
+
+
+E ISSO VAI TRIGGAR O CONTROLLER DE 'store':
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreJobRequest $request)
+    {
+        //
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> OK... MAS O PROFESSOR ESTÁ COM 1 OBJECT ESPECIAL,
+
+
+
+DE 
+
+
+'StoreJobRequest'...
+
+
+
+
+
+
+
+
+
+
+ESSE É UM CONCEITO QUE NÃO VIMOS AO LONGO DO CURSO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+''SOME PEOPLE LIKE THEM, SOME DON'T''...
+
+
+
+
+
+
+
+
+--> mas o professor remove isso, pq não quer mostrar nada novo..
+
+
+
+
+
+
+
+
+
+
+
+
+
+deixa apenas 1 Request comum:
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+        //
+    }
+
+
+
+
+
+
+
+
+
+com isso, vamos VALIDATE O REQUEST,
+
+
+COM ESTES FIELDS:
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+        $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => 'required',
+                'featured' => 'required',
+            ]
+            );
+    }
+
+
+
+
+
+
+
+
+
+
+PODERÍAMOS TER SETTADO O 'Rule::in' 
+
+usando 1 ENUM,
+
+
+mas o professor acha melhor não...
+
+
+
+
+
+
+
+-> a url deve ser uma url,
+tipo assim:
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+        $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'featured' => 'required',
+            ]
+            );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    --> O featured o professor remove, pq quer handlar de forma diferente...
+
+
+
+
+
+
+
+
+
+
+EX;
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+        $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+            ]
+            );
+    }
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+FINALMENTE, TEMOS AS TAGS...
+
+
+
+
+
+
+
+
+-> o professor deixa as tags como 'nullable',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+        $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'tags' => ['nullable']
+            ]
+            );
+    }
+
+
+
+
+
+
+
+
+
+
+
+--> O PROFESSOR ENTÃO ARMAZENA TUDO ISSO EM 1 VARIABLE DE 'attributes'...
+
+
+
+
+
+E, DEPOIS, ELE HANDLA O STATUS DE 'featured' MANUALMENTE...
+
+
+
+
+
+
+
+
+Ex:
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+       $attributes = $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'tags' => ['nullable']
+            ]
+            );
+
+        
+    }
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+       $attributes = $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'tags' => ['nullable']
+            ]
+            );
+
+        $attributes['featured'] = $request->has('featured');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA,
+
+
+
+SÓ VAMOS COLOCAR ESSE FEATURED COMO 'true'
+
+
+
+SE AQUELE REQUEST REALMENTE TIVER 1 VALUE DE 'featured',
+
+
+e se aquele value realmente for de true...
+
+
+
+
+TUDO QUE QUEREMOS, AQUI, É UM BOOLEAN...
+
+
+
+
+
+
+
+
+
+
+-> POR FIM, PODEMOS USAR 
+
+
+    'Auth::user()',
+
+
+    PARA RETORNAR O AUTHENTICATED USER...
+
+
+
+
+
+
+    -> AÍ, USAMOS ESSE USER,
+
+    PARA OBTER O EMPLOYER...
+
+
+
+
+
+    --> DEPOIS DISSO, REFERENCIAMOS A RELATIONSHIP DE 'jobs'
+
+    do user,
+
+    e aí criamos um NOVO job,
+
+    dentro desse EMPLOYER...
+
+
+
+
+    TIPO ASSIM:
+
+
+
+
+
+
+        Auth::user()->employer->jobs()->create($attributes);
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAS O PROFESSOR ESCREVE 1 POUCO DIFERENTE...
+
+
+
+
+
+
+
+
+
+
+
+''UNLESS YOU ARE SIGNED IN, YOU HAVE NO CHANCE OF CREATING 
+A JOB UNDER A DIFFERENT EMPLOYER''..
+
+
+
+
+
+-. o professor usa 
+
+
+
+'Arr:except($attributes, 'tags');'
+
+
+
+
+
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+       $attributes = $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'tags' => ['nullable']
+            ]
+            );
+
+        $attributes['featured'] = $request->has('featured');
+
+        Auth::user()->employer->jobs()->create(Arr::except($attributes, ['tags']));
+    }
+
+
+
+
+
+
+
+
+
+COM ISSO, FICAMOS COM 1 NOVO JOB RECORD...
+
+
+
+
+
+A ETAPA FINAL É 
+
+
+COLOCAR AS TAGS NESSE JOB...
+
+
+
+
+
+
+-> RODAMOS 1 IF...
+
+
+
+
+
+SE TEMOS ALGUMA TAG NO REQUEST,
+
+
+
+RODAMOS O CÓDIGO DENTRO DO IF BLOCk...
+
+
+
+EX:
+
+
+
+
+
+
+
+        $job = Auth::user()->employer->jobs()->create(Arr::except($attributes, ['tags']));
+
+        if ($attributes['tags'] ?? false) {
+            // 'tags' will be a comma separated string:
+            $tags = explode(',', $attributes['tags']);
+
+            foreach ($tags as $tagName) {
+                $job->tag();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA, USAMOS A LÓGICA DAQUELE METHOD DE 'tag()' custom,
+
+que escrevemos dentro do model de 'Job',
+
+mais cedo:
+
+
+
+
+
+
+    // This will create and attach a tag to our job:
+    public function tag(string $tagName): void
+    {
+        $tag = Tag::firstOrCreate(['name' => $tagName]);
+
+        $this->tags()->attach($tag);
+    }
+
+
+
+
+
+
+
+
+
+
+esse method vai fazer o actual add da tag,
+
+no contexto de esse job...
+
+
+
+
+
+
+
+
+
+
+
+
+-> ISSO É BEM PRIMITIVO...
+
+
+(pq poderíamos acabar com tags como 'frontend' e 'front-end')...
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    // public function store(StoreJobRequest $request)
+    public function store(Request $request)
+    {
+
+       $attributes = $request->validate(
+            [
+                'title' => 'required',
+                'salary' => 'required',
+                'location' => 'required',
+                'schedule' => ['required', Rule::in(['full-time', 'part-time'])],
+                'url' => ['required', 'active_url'],
+                'tags' => ['nullable']
+            ]
+            );
+
+        $attributes['featured'] = $request->has('featured');
+
+        $job = Auth::user()->employer->jobs()->create(Arr::except($attributes, ['tags']));
+
+        if ($attributes['tags'] ?? false) {
+            // 'tags' will be a comma separated string:
+            $tags = explode(',', $attributes['tags']);
+
+            foreach ($tags as $tagName) {
+                $job->tag();
+            }
+        }
+
+         redirect('/');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+COM ISSO, TERMINAMOS ESSA PARTE DO JOB CONTROLLER...
+
+
+
+
+
+
+
+
+
+
+QUEREMOS QUE OS JOBS MAIS NOVOS FIQUEM PRIMEIRO,
+
+
+NAQUELA LISTA DO METHOD DE index()...
+
+
+
+
+
+
+
+
+
+-> PARA ISSO,
+
+
+BASTA COLOCAr 'latest()',
+
+
+NO INÍCIO DA CALL,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+
+        $jobs = Job::latest()->get()->groupBy('featured');
+        $tags = Tag::all();
+
+
+        return view(
+            'jobs.index',
+            [
+                'jobs' => $jobs[0],
+                'featuredJobs' => $jobs[1],
+                'tags' => $tags,
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO... E FUNCIONOU...
+
+
+
+
+
+
+AGORA NOVOS JOBS SEMPRE APARECEM NO TOPO...
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA QUEREMOS SER CAPAZES DE 'CLICK ON A JOB' 
+
+
+
+E SERMOS LEVADOS À PAGE DAQUELE JOB LISTING ESPECÍFICO...
+
+
+
+
+
+
+
+
+-> PARA ISSO, VAMOS ATÉ O TEMPLATE DE 'job-card.blade.php',
+
+
+E AÍ COLOCAMOS UMA ANCHOR TAG DENTRO DAQUELE 'h3'...
+
+
+
+
+
+
+-> ESSA ANCHOR TAG VAI DIRECIONAR AO '$job->url'...
+
+
+
+
+
+ex:
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex flex-col text-center">
+    <div class="self-start text-sm">{{ $job->employer->name }}</div>
+
+    <div class="py-8">
+        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">{{ $job->title }}</h3>
+        <a href="{{ $job->url }}">{{ $job->title }}</a>
+        <p class="text-sm mt-4">{{ $job->salary }}</p>
+    </div>
+
+    <div class="flex justify-between items-center mt-auto">
+        <div>
+            @foreach ($job->$tags as $tag)
+            <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+
+        <x-employer-logo :width="42" />
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+A MESMA COISA PARA o 'job-card-wide':
+
+
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex gap-x-6">
+    <div>
+        <x-employer-logo :width="100" />
+    </div>
+
+    <div class="flex-1 flex flex-col">
+        <a href="#" class="self-start text-sm text-gray-400">{{ $job->employer->name }}</a>
+        <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">
+            <a href="{{ $job->url }}">{{ $job->title }}</a>
+        </h3>
+        <p class="text-sm text-gray-400 mt-auto">{{ $job->salary }}</p>
+    </div>
+
+    <div>
+        @foreach ($tags as $tag)
+        <x-tag size="small" :tag="$tag" />
+        @endforeach
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+E ISSO FUNCIONOU,
+
+
+
+
+NOS LEVA A OUTROS SITES... SITES DOS JOBS...
+
+
+
+
+
+
+
+
+-> colocamos 
+
+
+
+target="_blank",
+
+
+PARA ABRIR A URL EM 1 NOVA ABA...
+
+
+
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex flex-col text-center">
+    <div class="self-start text-sm">{{ $job->employer->name }}</div>
+
+    <div class="py-8">
+        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">
+            <a href="{{ $job->url }}" target="_blank">{{ $job->title }}</a>
+        </h3>
+        <p class="text-sm mt-4">{{ $job->salary }}</p>
+    </div>
+
+    <div class="flex justify-between items-center mt-auto">
+        <div>
+            @foreach ($job->$tags as $tag)
+            <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+
+        <x-employer-logo :width="42" />
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+TEMOS MAIS 2 COISAS PARA VER...
+
+
+
+
+
+
+
+
+temos que:
+
+
+
+
+
+
+
+1) UPDATE THE JOB CARD, TO SHOW THE NEW EMPLOYER LOGO...
+
+
+
+
+
+
+
+2) ALSO, WANT TO DISPLAY A LOGOUT LINK,
+    AND MAKE A FEW TWEAKS TO IMPROVE OUR QUERY PERFORMANCE.. (problema n+1)...
+
+
+
+
+
+
+
+
+
+
+
+
+--> PARA O EMPLOYER LOGO,
+
+ATUALMENTE TEMOS ISTO:
+
+
+
+
+
+
+@props(['width' => 42])
+<img src="https://picsum.photos/seed/{{rand(0, 100000)}}/{{ $width }}/{{ $width }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+OU SEJA, É UM HARDCODE 
+
+
+DE PLACEHOLDER IMAGES....
+
+
+
+
+
+
+MAS PODEMOS TROCAR ISSO POR 
+
+
+'$employer->logo'...
+
+
+
+
+
+
+Ex:
+
+
+ 
+
+
+
+
+
+
+ @props(['width' => 42])
+<img src="{{ $employer->logo }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> MAS PRECISAMOS PASSAR O EMPLOYER, COMO PROP,
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex flex-col text-center">
+    <div class="self-start text-sm">{{ $job->employer->name }}</div>
+
+    <div class="py-8">
+        <h3 class="group-hover:text-blue-600 text-lg font-bold transition-colors duration-500">
+            <a href="{{ $job->url }}" target="_blank">{{ $job->title }}</a>
+        </h3>
+        <p class="text-sm mt-4">{{ $job->salary }}</p>
+    </div>
+
+    <div class="flex justify-between items-center mt-auto">
+        <div>
+            @foreach ($job->$tags as $tag)
+            <x-tag size="small" :tag="$tag" />
+            @endforeach
+        </div>
+
+        <x-employer-logo :width="42" :employer="$job->employer" />
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+@props(['job'])
+<x-panel class="flex gap-x-6">
+    <div>
+        <x-employer-logo :width="100" :employer="$job->employer" />
+    </div>
+
+    <div class="flex-1 flex flex-col">
+        <a href="#" class="self-start text-sm text-gray-400">{{ $job->employer->name }}</a>
+        <h3 class="font-bold text-xl mt-3 group-hover:text-blue-600 transition-colors duration-500">
+            <a href="{{ $job->url }}" target="_blank">{{ $job->title }}</a>
+        </h3>
+        <p class="text-sm text-gray-400 mt-auto">{{ $job->salary }}</p>
+    </div>
+
+    <div>
+        @foreach ($tags as $tag)
+        <x-tag size="small" :tag="$tag" />
+        @endforeach
+    </div>
+</x-panel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+E ASSIM:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@props(['width' => 42, 'employer'])
+<img src="{{ $employer->logo }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CERTO...
+
+
+
+
+
+
+
+
+
+
+MAS AINDA NÃO ACABAMOS...
+
+
+
+
+
+
+
+-> O professor entra em 'employer-logo.blade.php':
+
+
+
+
+
+@props(['width' => 42, 'employer'])
+<img src="{{ $employer->logo }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+ELE ENTÃO USA A FUNCTION DE 'asset()'
+
+do laravel,
+
+
+com essa url...
+
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+@props(['width' => 42, 'employer'])
+<img src="{{ asset($employer->logo) }}" alt="placeholder" class="rounded-xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSO VAI 'PREPARE A FULL URL TO THE ASSET''...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-->  precisamos fazer isso justamente pq 
+
+
+''WHEN YOU UPLOAD AN IMAGE, THESE LOGOS,
+    THEY GO 
+
+    TO 
+    'storage>app>public>logos' directory''..
+
+
+
+
+
+
+
+
+-> AÍ, QUANDO ELES ACABAM NESSE FOLDER,
+
+TUDO QUE VC PRECISA FAZER É 
+
+'CREATE A SYM LINK OF THESE FILES, 
+    IN YOUR PUBLIC FOLDER,
+    WHICH IS PUBLICLY ACCESSIBLE''...
+
+
+
+
+
+
+
+--> PARA FAZER ISSO, CRIAR UM 'SYMBOLIC LINK',
+
+
+VC PRECISA RODAR 
+
+
+
+'php artisan storage:link'...
+
+
+
+
+
+
+
+
+
+
+SE VC FAZ ISSO, FICA COM ESTA MESSAGE:
+
+
+
+
+
+PS D:\AULAS-LARAVEL\curso-laravel\code\example-30> php artisan storage:link
+
+   INFO  The [D:\AULAS-LARAVEL\curso-laravel\code\example-30\public\storage] link has 
+   been connected to [D:\AULAS-LARAVEL\curso-laravel\code\example-30\storage\app/public].
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM ISSO, ESSE SYMBOLIC LINK FICA CRIADO...
+
+
+
+
+
+
+
+-> COM ISSO, 
+
+
+CONSEGUIMOS VISUALIZAR NOSSOS LOGOS NO SITE,
+
+
+MAS A WIDTH FICOU ERRADA, O LOGO FICOU GIGANTE...
+
+
+
+
+
+
+
+
+-> PARA CORRIGIR ISSO, DEVEMOS USAR O PROP DE 'width',
+
+TIPO ASSIM:
+
+
+
+
+
+
+
+@props(['width' => 42, 'employer'])
+<img src="{{ asset($employer->logo) }}" alt="placeholder" class="rounded-xl" width="{{ $width }}" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+certo..
+
+
+
+
+
+
+
+
+
+
+
+
+
+AGORA VEREMOS O PROBLEMA DAS QUERIES 'N+1'...
+
+
+
+
+
+
+
+
+-> SEMPRE DEVEMOS OPTIMIZE NOSSAS QUERIES...
+
+
+
+
+
+
+ATUALMENTE, A QUERY DE FETCH JOBS ESTÁ ASSIM:
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+
+        $jobs = Job::latest()->get()->groupBy('featured');
+        $tags = Tag::all();
+
+
+        return view(
+            'jobs.index',
+            [
+                'jobs' => $jobs[0],
+                'featuredJobs' => $jobs[1],
+                'tags' => $tags,
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-> ''IF WE ARE GOING TO ACCESS TAG AND EMPLOYER INFO 
+FROM A JOB, AND WE ARE NOT CAREFUL,
+
+THAT IS GOING TO LEAD INTO A N+1 PROBLEM...''
+
+
+
+
+
+
+
+
+
+
+-> PARA ISSO, DEVEMOS USAR O METHOD DE 'with',
+
+
+PARA FAZER O EAGER LOAD DE TODA INFO NECESSÁRIA A NÓS (como employer e tags, nesse caso):
+
+
+
+
+
+
+EX:
+
+
+
+
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+
+        $jobs = Job::latest()->with(['employer', 'tags'])->get()->groupBy('featured');
+        $tags = Tag::all();
+
+        return view(
+            'jobs.index',
+            [
+                'jobs' => $jobs[0],
+                'featuredJobs' => $jobs[1],
+                'tags' => $tags
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+    E A MESMA COISA NO SearchController,
+
+    TIPO ASSIM:
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Job;
+
+
+// This is how you write an invokable controller.
+class SearchController extends Controller
+{
+     public function __invoke() {
+
+        $jobs = Job::with(['employer', 'tags'])->where('title', 'LIKE', '%' . request('q') . '%')->get();
+        return view('results', ['jobs' => $jobs]); // Return a view, with a list of jobs found.
+     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+
+
+O PROFESSOR QUER ADICIONAR 1 BUTTON DE LOGOUT...
+
+
+
+
+
+
+
+
+-> PARA ISSO,
+
+
+
+ELE ADICIONA UMA FORM 
+
+
+
+
+
+PARA FAZER O LOGOUT...
+
+
+
+
+
+
+
+-> LÁ NO LAYOUT.BLADE.PHP,
+
+tipo assim:
+
+
+
+
+
+
+         @auth
+                <div>
+                    <a href="/jobs/create">Post a Job</a>
+                </div>
+
+                <form method="POST" action="/logout">
+                    @csrf
+                    @method('DELETE')
+                    <button>Log Out</button>
+                </form>
+
+        @endauth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AÍ COLOCAMOS A CLASS DE 'flex' 
+
+na parent div:
+
+    
+
+
+
+
+
+                @auth
+            <div class="space-x-6 font-bold flex">
+                <a href="/jobs/create">Post a Job</a>
+
+
+                <form method="POST" action="/logout">
+                    @csrf
+                    @method('DELETE')
+                    <button>Log Out</button>
+                </form>
+
+            </div>
+            @endauth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FINAL:
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Positions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    @vite(['resources/js/app.js'])
+</head>
+
+<body class="bg-black text-white font-hanken-grotesk pb-20">
+    <div class="px-10">
+        <nav class="flex justify-between items-center py-4 border-b border-white/10">
+            <div>
+                <a href="/">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Laracasts">
+                </a>
+            </div>
+            <div class="space-x-6 font-bold">
+                <a href="#">Jobs</a>
+                <a href="#">Careers</a>
+                <a href="#">Salaries</a>
+                <a href="#">Companies</a>
+            </div>
+
+            @auth
+            <div class="space-x-6 font-bold flex">
+                <a href="/jobs/create">Post a Job</a>
+
+
+                <form method="POST" action="/logout">
+                    @csrf
+                    @method('DELETE')
+                    <button>Log Out</button>
+                </form>
+
+            </div>
+            @endauth
+
+            @guest
+            <div class="space-x-6 font-bold">
+                <a href="/register">Sign Up</a>
+                <a href="/login">Log in</a>
+            </div>
+            @endguest
+        </nav>
+
+        <main class="mt-10 max-w-[986px] mx-auto">
+            {{ $slot }}
+        </main>
+    </div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OK...
+
+
+
+
+
+
+
+
+
+acabamos com este course...
+
+
+
+
+
+
+
+
+-> 
